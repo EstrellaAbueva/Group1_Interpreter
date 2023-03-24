@@ -1,11 +1,11 @@
-﻿grammar CodeGrammar;
+﻿grammar Code;
 
 program: 'BEGIN CODE' NEWLINE variable_declaration* executable_code 'END CODE';
 variable_declaration: declaration NEWLINE;
 executable_code: statement NEWLINE;
 
-statement: declaration | assignment | function_call | comment | if_statement | while_loop;
-declaration: NEWLINE IDENTIFIER	variable (',' IDENTIFIER variable)* ':' type;)
+statement: declaration | assignment | function_call | if_statement | while_loop;
+declaration: NEWLINE IDENTIFIER	variable variable (',' variable)*;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: IDENTIFIER ('=' expression)?;
 assignment: IDENTIFIER ('=' IDENTIFIER)* '=' expression;
@@ -23,8 +23,6 @@ comparison: expression comparison_operator expression;
 comparison_operator: '>' | '<' | '>=' | '<=' | '=' | '<>';
 
 while_loop: 'WHILE' comparison 'DO' executable_code 'END WHILE';
-
-comment: '#' ~[\r\n]* NEWLINE?;
 
 constant: INT | FLOAT | BOOL | CHAR | STRING;
 INT: [0-9]+;

@@ -4,7 +4,7 @@ program: 'BEGIN CODE' NEWLINE variable_declaration* executable_code 'END CODE';
 variable_declaration: declaration NEWLINE;
 executable_code: statement NEWLINE;
 
-statement: declaration | assignment | function_call | if_statement | while_loop;
+statement: declaration | assignment | comment | function_call | if_statement | while_loop;
 declaration: NEWLINE IDENTIFIER	variable variable (',' variable)*;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: IDENTIFIER ('=' expression)?;
@@ -23,6 +23,8 @@ comparison: expression comparison_operator expression;
 comparison_operator: '>' | '<' | '>=' | '<=' | '=' | '<>';
 
 while_loop: 'WHILE' comparison 'DO' executable_code 'END WHILE';
+
+comment: '#' ~( '\r' | '\n' | '\r\n' )*;
 
 constant: INT | FLOAT | BOOL | CHAR | STRING;
 INT: [0-9]+;
@@ -56,4 +58,4 @@ concat_operator: '&';
 newline_operator: '$';
 
 WS: [ \t\r\n]+ -> skip;
-NEWLINE: '\r'? '\n';
+NEWLINE: '\n';

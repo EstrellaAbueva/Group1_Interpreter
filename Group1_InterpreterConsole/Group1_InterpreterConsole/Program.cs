@@ -1,8 +1,8 @@
 ﻿using Antlr4.Runtime;
-using Group1_InterpreterConsole.Content;
+using Group1_InterpreterConsole.Contents;
 using System.CodeDom.Compiler;
 
-var fileName = "Content\\test.code";
+var fileName = "Contents\\test.code";
 
 var fileContents = File.ReadAllText(fileName);
 

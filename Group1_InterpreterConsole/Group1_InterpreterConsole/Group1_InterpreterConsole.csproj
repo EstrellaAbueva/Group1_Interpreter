@@ -56,8 +56,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Content\Code.g4" />
-    <None Include="Content\test.code">
+    <None Include="Contents\Code.g4" />
+    <None Include="Contents\test.code">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

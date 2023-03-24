@@ -5,13 +5,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B06B88B5-FD8C-4F1A-99BC-5FAA5E6CB341}</ProjectGuid>
+    <ProjectGuid>{13E5E0BE-164B-48D3-84D5-A67C7506AEC0}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Group1_InterpreterConsole</RootNamespace>
-    <AssemblyName>Group1_InterpreterConsole</AssemblyName>
+    <RootNamespace>Group1_InterpreterFinal</RootNamespace>
+    <AssemblyName>Group1_InterpreterFinal</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <ImplicitUsings>enable</ImplicitUsings>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <NuGetPackageImportStamp>

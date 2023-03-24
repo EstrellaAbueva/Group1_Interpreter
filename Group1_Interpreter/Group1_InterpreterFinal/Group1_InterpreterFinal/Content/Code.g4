@@ -33,7 +33,7 @@ BOOL: 'TRUE' | 'FALSE';
 CHAR: '\'' ~('\''|'\\') '\'';
 STRING: '"' ~('"')* '"';
 ESCAPE_SEQUENCE: '\\' . ;
-IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
+IDENTIFIER: [a-	zA-Z_] [a-zA-Z0-9_]*;
 
 expression
 	: constant 

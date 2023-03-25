@@ -1,11 +1,18 @@
 ﻿grammar Code;
 
-program: 'BEGIN CODE' NEWLINE variable* executable_code 'END CODE';
+program: begin_code (declaration | executable_code | comment | NEWLINE)* end_code;
 variable_dec: declaration NEWLINE;
 executable_code: statement NEWLINE;
+line: (declaration | statement | comment) NEWLINE;
 
-statement: declaration | assignment | comment | function_call | if_statement | while_loop | print;
-declaration: NEWLINE IDENTIFIER variable (',' variable)*;
+begin_code: NEWLINE? BEGIN CODE;
+end_code: NEWLINE? END CODE EOF;
+BEGIN: 'BEGIN';
+CODE: 'CODE';
+END: 'END';
+
+statement: declaration | assignment | comment | function_call | if_statement | while_loop;
+declaration: NEWLINE type IDENTIFIER '=' variable (',' variable)*;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: IDENTIFIER ('=' (expression))?;
 assignment: IDENTIFIER ('=' IDENTIFIER)* '=' expression;
@@ -23,8 +30,6 @@ comparison: expression comparison_operator expression;
 comparison_operator: '>' | '<' | '>=' | '<=' | '=' | '<>';
 
 while_loop: 'WHILE' comparison 'DO' executable_code 'END WHILE';
-
-print: 'PRINT' expression;
 
 comment: '#' ~( '\r' | '\n' | '\r\n' )*;
 constant: INT | FLOAT | BOOL | CHAR | STRING;

@@ -1,13 +1,13 @@
 ﻿grammar Code;
 
-program: 'BEGIN CODE' NEWLINE variable_declaration* executable_code 'END CODE';
-variable_declaration: declaration NEWLINE;
+program: 'BEGIN CODE' NEWLINE variable* executable_code 'END CODE';
+variable_dec: declaration NEWLINE;
 executable_code: statement NEWLINE;
 
-statement: declaration | assignment | comment | function_call | if_statement | while_loop;
-declaration: NEWLINE IDENTIFIER	variable variable (',' variable)*;
+statement: declaration | assignment | comment | function_call | if_statement | while_loop | print;
+declaration: NEWLINE IDENTIFIER variable (',' variable)*;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
-variable: IDENTIFIER ('=' expression)?;
+variable: IDENTIFIER ('=' (expression))?;
 assignment: IDENTIFIER ('=' IDENTIFIER)* '=' expression;
 function_call: IDENTIFIER (display | scan);
 arguments: expression (',' expression)*;
@@ -24,8 +24,9 @@ comparison_operator: '>' | '<' | '>=' | '<=' | '=' | '<>';
 
 while_loop: 'WHILE' comparison 'DO' executable_code 'END WHILE';
 
-comment: '#' ~( '\r' | '\n' | '\r\n' )*;
+print: 'PRINT' expression;
 
+comment: '#' ~( '\r' | '\n' | '\r\n' )*;
 constant: INT | FLOAT | BOOL | CHAR | STRING;
 INT: [0-9]+;
 FLOAT: [0-9]+('.' [0-9]+)?;
@@ -57,5 +58,5 @@ bool_operator: 'AND' | 'OR';
 concat_operator: '&';
 newline_operator: '$';
 
-WS: [ \t\r\n]+ -> skip;
+WS: [ \t]+ -> skip;
 NEWLINE: '\n';

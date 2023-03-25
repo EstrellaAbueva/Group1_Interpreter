@@ -9,29 +9,39 @@ namespace Group1_InterpreterConsole.CodeVisitor
 {
     public class Visitor : CodeBaseVisitor<object?>
     {
-        public override object? VisitProgram(CodeParser.ProgramContext context)
-        {
-            return base.VisitProgram(context);
-        }
-
-        public override object? VisitStatement(CodeParser.StatementContext context)
-        {
-            return base.VisitStatement(context);
-        }
-
+        private Dictionary<string, object?> _variables { get; } = new ();
+       
         public override object? VisitAssignment(CodeParser.AssignmentContext context)
         {
-            return base.VisitAssignment(context);
+            var varName = context.IDENTIFIER()[0].GetText();
+
+            var value = Visit(context.expression());
+
+            _variables[varName] = value;
+            return null;
         }
 
-        public override object? VisitDeclaration(CodeParser.DeclarationContext context)
+        public override object? VisitPrint(CodeParser.PrintContext context)
         {
-            return base.VisitDeclaration(context);
+            var value = Visit(context.expression());
+            Console.WriteLine(value);
+            return null;
         }
 
+        //for visitVariable
         public override object? VisitVariable(CodeParser.VariableContext context)
         {
-            return base.VisitVariable(context);
+            var varName = context.IDENTIFIER().GetText();
+            if (_variables.ContainsKey(varName))
+            {
+                return _variables[varName];
+            }
+            else
+            {
+                throw new Exception($"Variable {varName} not found");
+            }
         }
+
+
     }
 }

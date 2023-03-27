@@ -1,12 +1,11 @@
 ﻿using Antlr4.Runtime.Misc;
-using Antlr4.Runtime.Tree;
 using Group1_InterpreterConsole.Contents;
 
 namespace Group1_InterpreterConsole.CodeVisitor
 {
     public class Visitor : CodeBaseVisitor<object?>
     {
-        private Dictionary<string, object?> _variables { get; } = new();
+        private Dictionary<string, object?> _variables { get; set; } = new();
 
         public override object VisitProgram([NotNull] CodeParser.ProgramContext context)
         {
@@ -61,12 +60,11 @@ namespace Group1_InterpreterConsole.CodeVisitor
             throw new NotImplementedException();
         }
 
-        public override object VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
+        public override object? VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
         {
             var type = context.type().GetText();
             var vars = context.expression();
 
-            
             var varName = vars.IDENTIFIER().GetText();
             var varValue = vars.expression();
 
@@ -76,42 +74,54 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
             else
             {
-                switch (type)
+                if (type.Equals("INT"))
                 {
-                    case "INT":
-                        if (int.TryParse(varValue?.ToString(), out int intValue))
-                            _variables[varName] = intValue;
-                        else
+                    if (int.TryParse(varValue.ToString(), out int intValue))
+                    {
+                        _variables[varName] = intValue;
+                    }
+                    else
+                    {
+                        int value;
+                        bool success = int.TryParse(varValue.ToString(), out value);
+                        if (!success)
+                        {
                             Console.WriteLine($"Invalid value for integer variable '{varName}'");
-                        break;
-                    case "FLOAT":
-                        if (float.TryParse(varValue?.ToString(), out float floatValue))
-                            _variables[varName] = floatValue;
-                        else
-                            Console.WriteLine($"Invalid value for float variable '{varName}'");
-                        break;
-                    case "BOOL":
-                        if (bool.TryParse(varValue?.ToString(), out bool boolValue))
-                            _variables[varName] = boolValue;
-                        else
-                            Console.WriteLine($"Invalid value for boolean variable '{varName}'");
-                        break;
-                    case "CHAR":
-                        var charValue = varValue?.ToString();
-                        if (charValue?.Length == 3 && charValue[0] == '\'' && charValue[2] == '\'')
-                            _variables[varName] = charValue[1];
-                        else
-                            Console.WriteLine($"Invalid value for character variable '{varName}'");
-                        break;
-                    case "STRING":
-                        _variables[varName] = varValue?.ToString();
-                        break;
-                    default:
-                        Console.WriteLine($"Invalid variable type '{type}'");
-                        break;
+                        }
+                    }
+                }
+
+                //else if (type.Equals("FLOAT"))
+                //{
+                //    if (float.TryParse(varValue.ToString(), out float floatValue))
+                //        return _variables[varName] = floatValue;
+                //    else
+                //        Console.WriteLine($"Invalid value for float variable '{varName}'");
+                //}
+                //else if (type.Equals("BOOL"))
+                //{
+                //    if (bool.TryParse(varValue.ToString(), out bool boolValue))
+                //        return _variables[varName] = boolValue;
+                //    else
+                //        Console.WriteLine($"Invalid value for boolean variable '{varName}'");
+                //}
+                //else if (type.Equals("CHAR"))
+                //{
+                //    var charValue = varValue.ToString();
+                //    if (charValue?.Length == 3 && charValue[0] == '\'' && charValue[2] == '\'')
+                //        return _variables[varName] = charValue[1];
+                //    else
+                //        Console.WriteLine($"Invalid value for character variable '{varName}'");
+                //}
+                //else if (type.Equals("STRING"))
+                //{
+                //    return _variables[varName] = varValue.ToString();
+                //}
+                else
+                {
+                    Console.WriteLine($"Invalid variable type '{type}'");
                 }
             }
-            
 
             return new object();
         }
@@ -164,10 +174,11 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
         }
 
-        public override object? VisitStatement([NotNull]CodeParser.StatementContext context)
+        public override object? VisitStatement([NotNull] CodeParser.StatementContext context)
         {
             if (context.declaration() != null)
             {
+                Console.WriteLine("Sud");
                 return VisitDeclaration(context.declaration());
             }
             else if (context.assignment() != null)

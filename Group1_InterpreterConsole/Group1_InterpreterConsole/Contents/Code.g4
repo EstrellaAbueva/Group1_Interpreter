@@ -39,7 +39,6 @@ IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 statement
 	: declaration 
 	| assignment 
-	| COMMENT 
 	| function_call 
 	| if_statement 
 	| while_loop

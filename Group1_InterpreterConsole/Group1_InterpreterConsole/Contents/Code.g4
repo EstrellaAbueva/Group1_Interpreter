@@ -12,7 +12,7 @@ declaration: NEWLINE type IDENTIFIER '=' expression;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: IDENTIFIER ('=' (expression))?;
 assignment: IDENTIFIER '=' expression;
-function_call: IDENTIFIER (display | scan);
+function_	call: IDENTIFIER (display | scan);
 arguments: expression (',' expression)*;
 
 display: 'DISPLAY' ':' expression;

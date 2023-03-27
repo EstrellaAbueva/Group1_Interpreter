@@ -176,13 +176,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitStatement([NotNull] CodeParser.StatementContext context)
         {
-            if (context.declaration() != null)
+            if (context.assignment() != null)
             {
                 Console.WriteLine("Sud");
-                return VisitDeclaration(context.declaration());
-            }
-            else if (context.assignment() != null)
-            {
                 return VisitAssignment(context.assignment());
             }
             //else if (context.function_call() != null)

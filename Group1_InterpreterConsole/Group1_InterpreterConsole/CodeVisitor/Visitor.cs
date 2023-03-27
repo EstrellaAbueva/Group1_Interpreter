@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Antlr4.Runtime.Misc;
+﻿using Antlr4.Runtime.Misc;
+using Antlr4.Runtime.Tree;
 using Group1_InterpreterConsole.Contents;
 
 namespace Group1_InterpreterConsole.CodeVisitor
 {
     public class Visitor : CodeBaseVisitor<object?>
     {
-        private Dictionary<string, object?> _variables { get; } = new ();
-        
-        public override object? VisitProgram(CodeParser.ProgramContext context)
+        private Dictionary<string, object?> _variables { get; } = new();
+
+        public override object VisitProgram([NotNull] CodeParser.ProgramContext context)
         {
             string code = context.GetText().Trim();
             if (code.StartsWith("BEGIN CODE") && code.EndsWith("END CODE"))
@@ -23,38 +18,30 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 {
                     VisitStatement(statementContext);
                 }
-                return null;
             }
             else
             {
                 throw new ArgumentException("Code must start with 'BEGIN CODE' and end with 'END CODE'.");
             }
+            return new object();
         }
 
-        public override object? VisitAssignment(CodeParser.AssignmentContext context)
+        public override object? VisitAssignment([NotNull] CodeParser.AssignmentContext context)
         {
-            var varName = context.IDENTIFIER()[0].GetText();
+            var varName = context.IDENTIFIER().GetText();
 
             var value = Visit(context.expression());
 
-            _variables[varName] = value;
-            return null;
+            return _variables[varName] = value;
         }
 
-        public override object? VisitVariable(CodeParser.VariableContext context)
+        public override object? VisitVariable([NotNull] CodeParser.VariableContext context)
         {
             var varName = context.IDENTIFIER().GetText();
-            if (_variables.ContainsKey(varName))
-            {
-                return _variables[varName];
-            }
-            else
-            {
-                throw new Exception($"Variable {varName} not found");
-            }
+            return _variables?.GetValueOrDefault(varName) ?? throw new Exception($"Variable {varName} not found");
         }
 
-        public override object? VisitConstant(CodeParser.ConstantContext context)
+        public override object VisitConstant([NotNull] CodeParser.ConstantContext context)
         {
             if (context.INT() is { } i)
                 return int.Parse(i.GetText());
@@ -63,7 +50,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 return float.Parse(f.GetText());
 
             if (context.STRING() is { } s)
-                return s.GetText();
+                return context.STRING().GetText()[1..^1];
 
             if (context.BOOL() is { } b)
                 return b.GetText() == "true";
@@ -74,63 +61,63 @@ namespace Group1_InterpreterConsole.CodeVisitor
             throw new NotImplementedException();
         }
 
-        public override object? VisitDeclaration(CodeParser.DeclarationContext context)
+        public override object VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
         {
             var type = context.type().GetText();
-            var vars = context.variable();
+            var vars = context.expression();
 
-            foreach (var v in vars)
+            
+            var varName = vars.IDENTIFIER().GetText();
+            var varValue = vars.expression();
+
+            if (_variables.ContainsKey(varName))
             {
-                var varName = v.IDENTIFIER().GetText();
-                var varValue = v.expression() == null ? null : Visit(v.expression());
-
-                if (_variables.ContainsKey(varName))
+                Console.WriteLine($"Variable '{varName}' is already defined!");
+            }
+            else
+            {
+                switch (type)
                 {
-                    Console.WriteLine($"Variable '{varName}' is already defined!");
-                }
-                else
-                {
-                    switch (type)
-                    {
-                        case "INT":
-                            if (int.TryParse(varValue?.ToString(), out int intValue))
-                                _variables[varName] = intValue;
-                            else
-                                Console.WriteLine($"Invalid value for integer variable '{varName}'");
-                            break;
-                        case "FLOAT":
-                            if (float.TryParse(varValue?.ToString(), out float floatValue))
-                                _variables[varName] = floatValue;
-                            else
-                                Console.WriteLine($"Invalid value for float variable '{varName}'");
-                            break;
-                        case "BOOL":
-                            if (bool.TryParse(varValue?.ToString(), out bool boolValue))
-                                _variables[varName] = boolValue;
-                            else
-                                Console.WriteLine($"Invalid value for boolean variable '{varName}'");
-                            break;
-                        case "CHAR":
-                            var charValue = varValue?.ToString();
-                            if (charValue?.Length == 3 && charValue[0] == '\'' && charValue[2] == '\'')
-                                _variables[varName] = charValue[1];
-                            else
-                                Console.WriteLine($"Invalid value for character variable '{varName}'");
-                            break;
-                        case "STRING":
-                            _variables[varName] = varValue?.ToString();
-                            break;
-                        default:
-                            Console.WriteLine($"Invalid variable type '{type}'");
-                            break;
-                    }
+                    case "INT":
+                        if (int.TryParse(varValue?.ToString(), out int intValue))
+                            _variables[varName] = intValue;
+                        else
+                            Console.WriteLine($"Invalid value for integer variable '{varName}'");
+                        break;
+                    case "FLOAT":
+                        if (float.TryParse(varValue?.ToString(), out float floatValue))
+                            _variables[varName] = floatValue;
+                        else
+                            Console.WriteLine($"Invalid value for float variable '{varName}'");
+                        break;
+                    case "BOOL":
+                        if (bool.TryParse(varValue?.ToString(), out bool boolValue))
+                            _variables[varName] = boolValue;
+                        else
+                            Console.WriteLine($"Invalid value for boolean variable '{varName}'");
+                        break;
+                    case "CHAR":
+                        var charValue = varValue?.ToString();
+                        if (charValue?.Length == 3 && charValue[0] == '\'' && charValue[2] == '\'')
+                            _variables[varName] = charValue[1];
+                        else
+                            Console.WriteLine($"Invalid value for character variable '{varName}'");
+                        break;
+                    case "STRING":
+                        _variables[varName] = varValue?.ToString();
+                        break;
+                    default:
+                        Console.WriteLine($"Invalid variable type '{type}'");
+                        break;
                 }
             }
+            
 
-            return null;
+            return new object();
         }
 
-        public override object? VisitDisplay(CodeParser.DisplayContext context)
+
+        public override object VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {
             var value = Visit(context.expression());
 
@@ -143,10 +130,10 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 Console.WriteLine("null");
             }
 
-            return null;
+            return new object();
         }
 
-        public override object? VisitComparison(CodeParser.ComparisonContext context)
+        public override object VisitComparison([NotNull] CodeParser.ComparisonContext context)
         {
             var left = Visit(context.expression()[0]);
             var right = Visit(context.expression()[1]);
@@ -177,9 +164,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
         }
 
-        public override object? VisitStatement(CodeParser.StatementContext context)
+        public override object? VisitStatement([NotNull]CodeParser.StatementContext context)
         {
-            // Determine the type of statement and call the corresponding visitor method
             if (context.declaration() != null)
             {
                 return VisitDeclaration(context.declaration());
@@ -188,10 +174,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return VisitAssignment(context.assignment());
             }
-            //else if (context.comment() != null)
-            //{
-            //    return VisitComment(context.comment());
-            //}
             //else if (context.function_call() != null)
             //{
             //    return VisitFunction_call(context.function_call());
@@ -206,9 +188,31 @@ namespace Group1_InterpreterConsole.CodeVisitor
             //}
             else
             {
-                // Unknown statement type
                 throw new Exception("Unknown statement type");
             }
+        }
+
+
+        public override object? VisitExpression([NotNull] CodeParser.ExpressionContext context)
+        {
+            if (context.constant() != null)
+            {
+                return VisitConstant(context.constant());
+            }
+            else if (context.IDENTIFIER() != null)
+            {
+                var varName = context.IDENTIFIER().GetText();
+                if (_variables != null && _variables.ContainsKey(varName))
+                {
+                    return _variables[varName];
+                }
+                else
+                {
+                    throw new Exception($"Variable {varName} not found");
+                }
+            }
+
+            return new object();
         }
 
 

@@ -3,27 +3,15 @@
 program: BEGIN NEWLINE statement* NEWLINE END;
 variable_dec: declaration NEWLINE;
 executable_code: statement NEWLINE;
-line: (declaration | statement | comment) NEWLINE;
+line: (declaration | statement | COMMENT) NEWLINE;
 
-begin_code: NEWLINE? BEGIN CODE;
-end_code: NEWLINE? END CODE EOF;
 BEGIN: 'BEGIN CODE';
 END: 'END CODE';
 
-statement
-	: declaration 
-	| assignment 
-	| comment 
-	| function_call 
-	| if_statement 
-	| while_loop
-	| display
-	;
-
-declaration: NEWLINE type IDENTIFIER '=' variable (',' variable)*;
+declaration: NEWLINE type IDENTIFIER '=' expression;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: IDENTIFIER ('=' (expression))?;
-assignment: IDENTIFIER ('=' IDENTIFIER)* '=' expression;
+assignment: IDENTIFIER '=' expression;
 function_call: IDENTIFIER (display | scan);
 arguments: expression (',' expression)*;
 
@@ -39,7 +27,6 @@ comparison_operator: '>' | '<' | '>=' | '<=' | '=' | '<>';
 
 while_loop: 'WHILE' comparison 'DO' executable_code 'END WHILE';
 
-comment: '#' ~( '\r' | '\n' | '\r\n' )*;
 constant: INT | FLOAT | BOOL | CHAR | STRING;
 INT: [0-9]+;
 FLOAT: [0-9]+('.' [0-9]+)?;
@@ -48,6 +35,17 @@ CHAR: '\'' ~('\''|'\\') '\'';
 STRING: '"' ~('"')* '"';
 ESCAPE_SEQUENCE: '\\' . ;
 IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
+
+statement
+	: declaration 
+	| assignment 
+	| COMMENT 
+	| function_call 
+	| if_statement 
+	| while_loop
+	| display
+	| scan
+	;
 
 expression
 	: constant 
@@ -72,4 +70,5 @@ concat_operator: '&';
 newline_operator: '$';
 
 WS: [ \t]+ -> skip;
+COMMENT: '#' ~[\r\n]* -> skip ;
 NEWLINE: '\n';

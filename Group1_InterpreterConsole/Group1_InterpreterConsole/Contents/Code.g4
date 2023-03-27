@@ -1,17 +1,25 @@
 ﻿grammar Code;
 
-program: begin_code (declaration | executable_code | comment | NEWLINE)* end_code;
+program: BEGIN NEWLINE statement* NEWLINE END;
 variable_dec: declaration NEWLINE;
 executable_code: statement NEWLINE;
 line: (declaration | statement | comment) NEWLINE;
 
 begin_code: NEWLINE? BEGIN CODE;
 end_code: NEWLINE? END CODE EOF;
-BEGIN: 'BEGIN';
-CODE: 'CODE';
-END: 'END';
+BEGIN: 'BEGIN CODE';
+END: 'END CODE';
 
-statement: declaration | assignment | comment | function_call | if_statement | while_loop;
+statement
+	: declaration 
+	| assignment 
+	| comment 
+	| function_call 
+	| if_statement 
+	| while_loop
+	| display
+	;
+
 declaration: NEWLINE type IDENTIFIER '=' variable (',' variable)*;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: IDENTIFIER ('=' (expression))?;

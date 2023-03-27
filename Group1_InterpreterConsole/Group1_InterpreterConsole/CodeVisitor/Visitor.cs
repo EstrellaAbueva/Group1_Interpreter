@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,19 +15,20 @@ namespace Group1_InterpreterConsole.CodeVisitor
         
         public override object? VisitProgram(CodeParser.ProgramContext context)
         {
-            //check if the program has BEGIN CODE
-            if (context.GetText() is null)
+            string code = context.GetText().Trim();
+            if (code.StartsWith("BEGIN CODE") && code.EndsWith("END CODE"))
             {
-                throw new Exception("Program must start with BEGIN");
+                // Visit each statement in the code
+                foreach (var statementContext in context.statement())
+                {
+                    VisitStatement(statementContext);
+                }
+                return null;
             }
-
-            //check if the program has END CODE
-            if (context.GetText() is null)
+            else
             {
-                throw new Exception("Program must end with END");
+                throw new ArgumentException("Code must start with 'BEGIN CODE' and end with 'END CODE'.");
             }
-
-            return null;
         }
 
         public override object? VisitAssignment(CodeParser.AssignmentContext context)
@@ -175,31 +177,40 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
         }
 
-        public override object? VisitIf_statement(CodeParser.If_statementContext context)
+        public override object? VisitStatement(CodeParser.StatementContext context)
         {
-            //bool condition = (bool)Visit(context.comparison());
-            //if (condition)
+            // Determine the type of statement and call the corresponding visitor method
+            if (context.declaration() != null)
+            {
+                return VisitDeclaration(context.declaration());
+            }
+            else if (context.assignment() != null)
+            {
+                return VisitAssignment(context.assignment());
+            }
+            //else if (context.comment() != null)
             //{
-            //    Visit(context.if_block().executable_code());
+            //    return VisitComment(context.comment());
             //}
-            //else
+            //else if (context.function_call() != null)
             //{
-            //    foreach (var elseIfBlock in context.else_if_block())
-            //    {
-            //        condition = (bool)Visit(elseIfBlock.comparison());
-            //        if (condition)
-            //        {
-            //            Visit(elseIfBlock.executable_code());
-            //            return null;
-            //        }
-            //    }
-            //    if (context.else_block() != null)
-            //    {
-            //        Visit(context.else_block().executable_code());
-            //    }
+            //    return VisitFunction_call(context.function_call());
             //}
-            return null;
+            //else if (context.if_statement() != null)
+            //{
+            //    return VisitIf_statement(context.if_statement());
+            //}
+            //else if (context.while_loop() != null)
+            //{
+            //    return VisitWhile_loop(context.while_loop());
+            //}
+            else
+            {
+                // Unknown statement type
+                throw new Exception("Unknown statement type");
+            }
         }
+
 
     }
 }

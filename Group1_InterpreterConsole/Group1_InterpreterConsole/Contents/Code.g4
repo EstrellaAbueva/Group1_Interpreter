@@ -1,21 +1,21 @@
 ﻿grammar Code;
 
 program: BEGIN NEWLINE statement* NEWLINE END;
-variable_dec: initialization NEWLINE;
+variable_dec: declaration* NEWLINE;
 executable_code: statement NEWLINE;
-line: (initialization | statement | COMMENT) NEWLINE;
+line: (declaration | statement | COMMENT) NEWLINE;
 
 BEGIN: 'BEGIN CODE';
 END: 'END CODE';
 
-initialization: type IDENTIFIERS (',' IDENTIFIERS)* ('=' expression)? ;
+declaration: NEWLINE? type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: IDENTIFIER ('=' (expression))?;
 assignment: type IDENTIFIER '=' expression NEWLINE;
 function_call: IDENTIFIER (display | scan);
 arguments: expression (',' expression)*;
 
-display: 'DISPLAY' ':' expression;
+display: 'DISPLAY' ':' expression*;
 scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)*;
 
 if_statement: if_block else_if_block* else_block? 'END IF';
@@ -37,7 +37,8 @@ ESCAPE_SEQUENCE: '\\' . ;
 IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
 statement 
-	: assignment 
+	: declaration
+	| assignment 
 	| function_call 
 	| if_statement 
 	| while_loop

@@ -1,5 +1,5 @@
-﻿# This is a sample CODE
-BEGIN CODE
-	FLOAT e = 1.2
-	DISPLAY: e
+﻿BEGIN CODE
+	CHAR a_1= 'n'
+	BOOL t = "TRUE"
+	DISPLAY: a_1 t
 END CODE

@@ -6,7 +6,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 {
     public class Visitor : CodeBaseVisitor<object?>
     {
-        private Dictionary<string, object?> _variables { get; set; } = new Dictionary<string, object?>();
+        private Dictionary<string, object?> Variables { get; set; } = new Dictionary<string, object?>();
 
         public override object? VisitProgram([NotNull] CodeParser.ProgramContext context)
         {
@@ -32,13 +32,13 @@ namespace Group1_InterpreterConsole.CodeVisitor
             var varName = context.IDENTIFIER().GetText();
             var value = Visit(context.expression());
 
-            return _variables[varName] = value;
+            return Variables[varName] = value;
         }
 
         public override object? VisitVariable([NotNull] CodeParser.VariableContext context)
         {
             var varName = context.IDENTIFIER().GetText();
-            return _variables?.GetValueOrDefault(varName) ?? throw new Exception($"Variable {varName} not found");
+            return Variables?.GetValueOrDefault(varName) ?? throw new Exception($"Variable {varName} not found");
         }
 
         public override object? VisitConstant([NotNull] CodeParser.ConstantContext context)
@@ -77,10 +77,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {
-            foreach (var variable in _variables)
+            foreach (var variable in Variables)
             {
-               Console.WriteLine("{0}",variable.Value);
-               break;
+               Console.WriteLine(variable.Value);
             }
 
             Console.WriteLine();
@@ -149,6 +148,18 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return VisitDisplay(context.display());
             }
+            else if (context.declaration() != null)
+            {
+                return VisitDeclaration(context.declaration());
+            }
+            //else if (context.conditional() != null)
+            //{
+            //    return VisitConditional(context.conditional());
+            //}
+            //else if (context.loop() != null)
+            //{
+            //    return VisitLoop(context.loop());
+            //}
             //else if (context.function_call() != null)
             //{
             //    return VisitFunction_call(context.function_call());
@@ -173,9 +184,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
             else if (context.IDENTIFIER() != null)
             {
                 var varName = context.IDENTIFIER().GetText();
-                if (_variables != null && _variables.ContainsKey(varName))
+                if (Variables != null && Variables.ContainsKey(varName))
                 {
-                    return _variables[varName];
+                    return Variables[varName];
                 }
                 else
                 {
@@ -186,6 +197,83 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return null;
         }
 
+        public override object? VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
+        {
+            var type = context.type().GetText();
+            var varName = context.IDENTIFIER().Select(x => x.GetText()).ToArray();
+
+            var varValue = context.expression();
+
+            foreach (var vars in varName)
+            {
+                if (Variables.ContainsKey(varName[0]))
+                {
+                    Console.WriteLine($"Variable '{varName}' is already defined!");
+                }
+                else
+                {
+                    if (type.Equals("INT"))
+                    {
+                        if (int.TryParse(varValue.ToString(), out int intValue))
+                        {
+                            Variables[varName[0]] = intValue;
+                        }
+                        else
+                        {
+                            int value;
+                            bool success = int.TryParse(varValue.ToString(), out value);
+                            if (!success)
+                            {
+                                Console.WriteLine($"Invalid value for integer variable '{varName}'");
+                            }
+                        }
+                    }
+                    else if (type.Equals("FLOAT"))
+                    {
+                        if (float.TryParse(varValue.ToString(), out float floatValue))
+                            return Variables[varName[0]] = floatValue;
+                        else
+                            Console.WriteLine($"Invalid value for float variable '{varName}'");
+                    }
+                    else if (type.Equals("BOOL"))
+                    {
+                        if (bool.TryParse(varValue.ToString(), out bool boolValue))
+                            return Variables[varName[0]] = boolValue;
+                        else
+                            Console.WriteLine($"Invalid value for boolean variable '{varName}'");
+                    }
+                    else if (type.Equals("CHAR"))
+                    {
+                        var charValue = varValue.ToString();
+                        if (charValue?.Length == 3 && charValue[0] == '\'' && charValue[2] == '\'')
+                            return Variables[varName[0]] = charValue[1];
+                        else
+                            Console.WriteLine($"Invalid value for character variable '{varName}'");
+                    }
+                    else if (type.Equals("STRING"))
+                    {
+                        return Variables[varName[0]] = varValue.ToString();
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Invalid variable type '{type}'");
+                    }
+                }
+
+            }
+
+            return null;
+        }
+
+        public override object? VisitVariable_dec([NotNull] CodeParser.Variable_decContext context)
+        {
+            foreach (var declarationContext in context.declaration())
+            {
+                VisitDeclaration(declarationContext);
+            }
+
+            return null;
+        }
 
     }
 }

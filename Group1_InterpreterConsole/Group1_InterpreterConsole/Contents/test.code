@@ -1,6 +1,5 @@
 ﻿# This is a sample CODE
 BEGIN CODE
-	INT z = 5
-	STRING a = "Hello World"
-	DISPLAY: z a
+	FLOAT e = 1.2
+	DISPLAY: e
 END CODE

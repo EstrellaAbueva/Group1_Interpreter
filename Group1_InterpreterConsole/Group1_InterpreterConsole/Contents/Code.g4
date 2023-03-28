@@ -1,14 +1,14 @@
 ﻿grammar Code;
 
 program: BEGIN NEWLINE statement* NEWLINE END;
-variable_dec: declaration NEWLINE;
+variable_dec: initialization NEWLINE;
 executable_code: statement NEWLINE;
-line: (declaration | statement | COMMENT) NEWLINE;
+line: (initialization | statement | COMMENT) NEWLINE;
 
 BEGIN: 'BEGIN CODE';
 END: 'END CODE';
 
-declaration: assignment*;
+initialization: type IDENTIFIERS (',' IDENTIFIERS)* ('=' expression)? ;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: IDENTIFIER ('=' (expression))?;
 assignment: type IDENTIFIER '=' expression NEWLINE;

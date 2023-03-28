@@ -1,18 +1,15 @@
 ﻿using Antlr4.Runtime.Misc;
 using Group1_InterpreterConsole.Contents;
 using Group1_InterpreterConsole.Methods;
-using System.Runtime.CompilerServices;
 
 namespace Group1_InterpreterConsole.CodeVisitor
 {
     public class Visitor : CodeBaseVisitor<object?>
     {
         private Dictionary<string, object?> _variables { get; set; } = new Dictionary<string, object?>();
-        private readonly ErrorHandling errorHandling = new ErrorHandling();
 
         public override object? VisitProgram([NotNull] CodeParser.ProgramContext context)
         {
-            ErrorHandling.ErrorProgram(context);
             string code = context.GetText().Trim();
             if (code.StartsWith("BEGIN CODE") && code.EndsWith("END CODE"))
             {
@@ -22,7 +19,10 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     VisitStatement(statementContext);
                 }
             }
-            
+            else
+            {
+                Console.WriteLine("Code must start with 'BEGIN CODE' and end with 'END CODE'.");
+            }
             
             return null;
         }
@@ -30,7 +30,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitAssignment([NotNull] CodeParser.AssignmentContext context)
         {
             var varName = context.IDENTIFIER().GetText();
-
             var value = Visit(context.expression());
 
             return _variables[varName] = value;
@@ -42,24 +41,38 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return _variables?.GetValueOrDefault(varName) ?? throw new Exception($"Variable {varName} not found");
         }
 
-        public override object VisitConstant([NotNull] CodeParser.ConstantContext context)
+        public override object? VisitConstant([NotNull] CodeParser.ConstantContext context)
         {
-            if (context.INT() is { } i)
-                return int.Parse(i.GetText());
-
-            if (context.FLOAT() is { } f)
-                return float.Parse(f.GetText());
-
-            if (context.STRING() is { } s)
-                return context.STRING().GetText();
-
-            if (context.BOOL() is { } b)
-                return b.GetText() == "true";
-
-            if (context.CHAR() is { } c)
-                return char.Parse(c.GetText());
-
-            throw new NotImplementedException();
+            var constant = context.GetText();
+            //check constant 
+            if (constant.StartsWith("\"") && constant.EndsWith("\""))
+            {
+                return constant.Substring(1, constant.Length - 2);
+            }
+            else if (constant.StartsWith("'") && constant.EndsWith("'"))
+            {
+                return constant[1];
+            }
+            else if (constant == "TRUE" || constant == "FALSE")
+            {
+                return bool.Parse(constant);
+            }
+            else if (int.TryParse(constant, out var intResult))
+            {
+                return intResult;
+            }
+            else if (float.TryParse(constant, out var floatResult))
+            {
+                return floatResult;
+            }
+            else if(char.TryParse(constant, out var charResult))
+            {
+                return charResult;
+            }
+            else
+            {
+                throw new Exception($"Unknown constant {constant}");
+            }
         }
 
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
@@ -77,10 +90,24 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitType([NotNull] CodeParser.TypeContext context)
         {
-            return null;
+            switch (context.GetText())
+            {
+                case "INT":
+                    return typeof(int);
+                case "FLOAT":
+                    return typeof(float);
+                case "BOOL":
+                    return typeof(bool);
+                case "CHAR":
+                    return typeof(char);
+                case "STRING":
+                    return typeof(string);
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
-        public override object VisitComparison([NotNull] CodeParser.ComparisonContext context)
+        public override object? VisitComparison([NotNull] CodeParser.ComparisonContext context)
         {
             var left = Visit(context.expression()[0]);
             var right = Visit(context.expression()[1]);
@@ -109,6 +136,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 default:
                     throw new NotImplementedException();
             }
+
         }
 
         public override object? VisitStatement([NotNull] CodeParser.StatementContext context)
@@ -121,6 +149,14 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return VisitDisplay(context.display());
             }
+            //else if (context.function_call() != null)
+            //{
+            //    return VisitFunction_call(context.function_call());
+            //}
+            //else if (context.function_declaration() != null)
+            //{
+            //    return VisitFunction_declaration(context.function_declaration());
+            //}
             else
             {
                 throw new Exception("Unknown statement type");
@@ -147,7 +183,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 }
             }
 
-            return new object();
+            return null;
         }
 
 

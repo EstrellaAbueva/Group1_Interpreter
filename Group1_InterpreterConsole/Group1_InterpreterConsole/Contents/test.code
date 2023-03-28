@@ -1,5 +1,6 @@
 ﻿# This is a sample CODE
 BEGIN CODE
 	INT z = 5
-	DISPLAY: z
+	STRING a = "Hello World"
+	DISPLAY: z a
 END CODE

@@ -8,10 +8,10 @@ line: (declaration | statement | COMMENT) NEWLINE;
 BEGIN: 'BEGIN CODE';
 END: 'END CODE';
 
-declaration: NEWLINE type IDENTIFIER '=' expression;
+declaration: assignment*;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: IDENTIFIER ('=' (expression))?;
-assignment: IDENTIFIER '=' expression;
+assignment: type IDENTIFIER '=' expression NEWLINE;
 function_call: IDENTIFIER (display | scan);
 arguments: expression (',' expression)*;
 
@@ -36,9 +36,8 @@ STRING: '"' ~('"')* '"';
 ESCAPE_SEQUENCE: '\\' . ;
 IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
-statement
-	: declaration 
-	| assignment 
+statement 
+	: assignment 
 	| function_call 
 	| if_statement 
 	| while_loop

@@ -7,11 +7,13 @@ namespace Group1_InterpreterConsole.Methods
     {
         public static object? ErrorProgram([NotNull] CodeParser.ProgramContext context)
         {
-            if (context.BEGIN() is null || context.END() is null)
+            string code = context.GetText().Trim();
+            if (code.StartsWith("BEGIN CODE") && code.EndsWith("END CODE") || context.BEGIN() is null || context.END() is null)
             {
-                Console.WriteLine("Code must start with 'BEGIN' and end with 'END'.");
+                Console.WriteLine("Code must start with 'BEGIN CODE' and end with 'END CODE'.");
             }
 
+            Environment.Exit(0);
             return null;
         }
     }

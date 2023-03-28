@@ -22,10 +22,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     VisitStatement(statementContext);
                 }
             }
-            else
-            {
-                Console.WriteLine("Code must start with 'BEGIN CODE' and end with 'END CODE'.");
-            }
+            
             
             return null;
         }

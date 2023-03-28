@@ -79,10 +79,12 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             foreach (var variable in _variables)
             {
-               Console.WriteLine("{0}",variable.Value);
-               break;
+                if (context.expression().IDENTIFIER().GetText().Equals(variable.Key))
+                {
+                    Console.WriteLine("{0}", variable.Value);
+                    break;
+                }
             }
-
             Console.WriteLine();
 
             return null;

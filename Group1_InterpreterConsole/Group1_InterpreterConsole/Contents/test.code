@@ -1,5 +1,5 @@
 ﻿# This is a sample CODE
 BEGIN CODE
-	INT z = 5
-	DISPLAY: z
+	FLOAT e = 1.2
+	DISPLAY: e
 END CODE

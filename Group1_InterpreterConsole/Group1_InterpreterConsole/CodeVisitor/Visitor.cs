@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Misc;
 using Group1_InterpreterConsole.Contents;
 using Group1_InterpreterConsole.Methods;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 
 namespace Group1_InterpreterConsole.CodeVisitor
@@ -31,9 +32,13 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitAssignment([NotNull] CodeParser.AssignmentContext context)
         {
             var varName = context.IDENTIFIER().GetText();
+            var varType = VisitType(context.type());
             var value = VisitExpression(context.expression());
 
-            return Variables[varName] = value;
+            var converter = TypeDescriptor.GetConverter((Type)varType);
+            var valueWithType = converter.ConvertFrom(value?.ToString() ?? "");
+
+            return Variables[varName] = valueWithType;
         }
 
         public override object? VisitVariable([NotNull] CodeParser.VariableContext context)
@@ -81,20 +86,33 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
         }
 
-
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {
-            foreach (var variable in Variables)
-            {
-               Console.Write(variable.Value + " ");
-            }
+            var displayValues = context.expression();
 
-            Console.WriteLine();
+            foreach (var displayValue in displayValues)
+            {
+                var value = displayValue.GetText();
+
+                if (value.StartsWith("\"") && value.EndsWith("\""))
+                {
+                    Console.Write(value.Trim('"'));
+                }
+                else if (Variables.ContainsKey(value))
+                {
+                    Console.Write(Variables[value]);
+                }
+                else
+                {
+                    Console.Write(value);
+                }
+            }
 
             return null;
         }
 
-        public override object? VisitType([NotNull] CodeParser.TypeContext context)
+
+        public override object VisitType([NotNull] CodeParser.TypeContext context)
         {
             switch (context.GetText())
             {
@@ -109,7 +127,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 case "STRING":
                     return typeof(string);
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException("Invalid Data Type");
             }
         }
 
@@ -155,23 +173,10 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return VisitDisplay(context.display());
             }
-
-            //else if (context.conditional() != null)
-            //{
-            //    return VisitConditional(context.conditional());
-            //}
-            //else if (context.loop() != null)
-            //{
-            //    return VisitLoop(context.loop());
-            //}
-            //else if (context.function_call() != null)
-            //{
-            //    return VisitFunction_call(context.function_call());
-            //}
-            //else if (context.function_declaration() != null)
-            //{
-            //    return VisitFunction_declaration(context.function_declaration());
-            //}
+            else if (context.declaration() != null)
+            {
+                return VisitDeclaration(context.declaration());
+            }
             else
             {
                 throw new Exception("Unknown statement type");
@@ -256,55 +261,56 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return null;
         }
 
-        //public override object VisitConcat_operator([NotNull] CodeParser.Concat_operatorContext context)
-        //{
-        //    // Get the left and right expressions
-        //    var left = context.expression()[0].Accept(this);
-        //    var right = context.expression()[1].Accept(this);
+        public override object VisitConcatOpExpression([NotNull] CodeParser.ConcatOpExpressionContext context)
+        {
+            // Get the left and right expressions
+            var left = context.expression()[0].Accept(this);
+            var right = context.expression()[1].Accept(this);
 
-        //    // Check if both left and right contain strings and the '&' character
-        //    if (left is string strLeft && right is string strRight && strLeft.Contains('&') && strRight.Contains('&'))
-        //    {
-        //        // Split the strings by the '&' character
-        //        var partsLeft = strLeft.Split('&');
-        //        var partsRight = strRight.Split('&');
+            // Check if both left and right contain strings and the '&' character
+            if (left is string strLeft && right is string strRight && strLeft.Contains('&') && strRight.Contains('&'))
+            {
+                // Split the strings by the '&' character
+                var partsLeft = strLeft.Split('&');
+                var partsRight = strRight.Split('&');
 
-        //        // Concatenate the corresponding parts
-        //        var result = "";
-        //        for (int i = 0; i < partsLeft.Length && i < partsRight.Length; i++)
-        //        {
-        //            var partLeft = partsLeft[i].Trim();
-        //            var partRight = partsRight[i].Trim();
+                // Concatenate the corresponding parts
+                var result = "";
+                for (int i = 0; i < partsLeft.Length && i < partsRight.Length; i++)
+                {
+                    var partLeft = partsLeft[i].Trim();
+                    var partRight = partsRight[i].Trim();
 
-        //            // Check if either part is a boolean, int, float, or char and concatenate them
-        //            if (bool.TryParse(partLeft, out _) || int.TryParse(partLeft, out _) || float.TryParse(partLeft, out _) || partLeft.StartsWith("'"))
-        //            {
-        //                result += partLeft;
-        //            }
-        //            else if (bool.TryParse(partRight, out _) || int.TryParse(partRight, out _) || float.TryParse(partRight, out _) || partRight.StartsWith("'"))
-        //            {
-        //                result += partRight;
-        //            }
-        //            else
-        //            {
-        //                result += partLeft + partRight;
-        //            }
+                    // Check if either part is a boolean, int, float, or char and concatenate them
+                    if (bool.TryParse(partLeft, out _) || int.TryParse(partLeft, out _) || float.TryParse(partLeft, out _) || partLeft.StartsWith("'"))
+                    {
+                        result += partLeft;
+                    }
+                    else if (bool.TryParse(partRight, out _) || int.TryParse(partRight, out _) || float.TryParse(partRight, out _) || partRight.StartsWith("'"))
+                    {
+                        result += partRight;
+                    }
+                    else
+                    {
+                        result += partLeft + partRight;
+                    }
 
-        //            // Add the '&' character if there are more parts
-        //            if (i < partsLeft.Length - 1 && i < partsRight.Length - 1)
-        //            {
-        //                result += "&";
-        //            }
-        //        }
+                    // Add the '&' character if there are more parts
+                    if (i < partsLeft.Length - 1 && i < partsRight.Length - 1)
+                    {
+                        result += "&";
+                    }
+                }
 
-        //        return result;
-        //    }
-        //    else
-        //    {
-        //        // Throw an error if either left or right is not a string or the '&' character is missing
-        //        throw new Exception("Cannot concatenate non-string values or missing '&' character.");
-        //    }
-        //}
+                return result;
+            }
+            else
+            {
+                // Throw an error if either left or right is not a string or the '&' character is missing
+                throw new Exception("Cannot concatenate non-string values or missing '&' character.");
+            }
+        }
+
 
         public override object? VisitIdentifierExpression([NotNull] CodeParser.IdentifierExpressionContext context)
         {

@@ -1,6 +1,8 @@
 ﻿using Antlr4.Runtime.Misc;
 using Group1_InterpreterConsole.Contents;
 using Group1_InterpreterConsole.Methods;
+using System.Text.RegularExpressions;
+using System;
 
 namespace Group1_InterpreterConsole.CodeVisitor
 {
@@ -77,14 +79,39 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {
-            foreach (var variable in _variables)
+            //get the whole thing
+            string expressionText = context.expression().GetText();
+            string[] expressionParts = expressionText.Split('&');
+            string output = "";
+            foreach (var part in expressionParts)
             {
-                if (context.expression().IDENTIFIER().GetText().Equals(variable.Key))
+                /* if (context.expression().IDENTIFIER().GetText().Equals(variable.Key))
+                 {
+                     Console.WriteLine("{0}", variable.Value);
+                     break;
+                 }*/
+                if(part.Length == 1)    // possible char
                 {
-                    Console.WriteLine("{0}", variable.Value);
-                    break;
+                    if (Regex.IsMatch(part, @"^[\W_]+$"))
+                    {
+                        continue;
+                    }
+
+                    if (_variables[part] != null)
+                    {
+                        output += _variables[part];
+                    }
                 }
+                else
+                {
+                    if (_variables[part] != null)
+                    {
+                        output += _variables[part];
+                    }
+                }
+                
             }
+            Console.WriteLine(output);
             Console.WriteLine();
 
             return null;

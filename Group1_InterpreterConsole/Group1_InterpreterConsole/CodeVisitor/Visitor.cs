@@ -177,34 +177,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 throw new Exception("Unknown statement type");
             }
         }
-
-
-        public override object? VisitExpression([NotNull] CodeParser.ExpressionContext context)
-        {
-            if (context.constant() != null)
-            {
-                return VisitConstant(context.constant());
-            }
-            else if (context.IDENTIFIER() != null)
-            {
-                var varName = context.IDENTIFIER().GetText();
-                if (Variables != null && Variables.ContainsKey(varName))
-                {
-                    return Variables[varName];
-                }
-                else
-                {
-                    throw new Exception($"Variable {varName} not found");
-                }
-            }
-            if (context.concat_operator() != null)
-            {
-                return VisitConcat_operator(context.concat_operator());
-            }
-
-            return null;
-        }
-
+        
         public override object? VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
         {
             var type = context.type().GetText();
@@ -333,6 +306,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
         //    }
         //}
 
-
+        public override object? VisitIdentifierExpression([NotNull] CodeParser.IdentifierExpressionContext context)
+        {
+            return null;
+        }
     }
 }

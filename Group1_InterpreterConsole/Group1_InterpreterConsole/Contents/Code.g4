@@ -48,18 +48,16 @@ statement
 	;
 
 expression
-	: constant 
-	| IDENTIFIER 
-	| COMMENT
-	| '(' expression ')'
-	| 'NOT' expression
-	| expression unary_operator expression
-	| expression add_operator expression
-	| expression multiply_operator expression
-	| expression compare_operator expression
-	| expression bool_operator expression
-	| expression concat_operator expression
-	| expression newline_operator expression
+	: constant												# constantExpression											
+	| IDENTIFIER											# identifierExpression
+	| '(' expression ')'									# parenthesisExpression
+	| 'NOT' expression										# NOTExpression
+	| expression unary_operator expression					# unaryExpression
+	| expression add_operator expression					# addOpExpression
+	| expression multiply_operator expression				# multiplyOpExpression
+	| expression compare_operator expression				# compareOpExpression
+	| expression bool_operator expression					# boolOpExpression
+	| expression concat_operator expression					# concatOpExpression
 	;
 
 unary_operator: '+' | '-';

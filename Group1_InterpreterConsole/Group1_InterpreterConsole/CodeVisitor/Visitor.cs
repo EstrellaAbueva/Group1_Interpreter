@@ -155,10 +155,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return VisitDisplay(context.display());
             }
-            //else if (context.declaration() != null)
-            //{
-            //    return VisitDeclaration(context.declaration());
-            //}
+
             //else if (context.conditional() != null)
             //{
             //    return VisitConditional(context.conditional());
@@ -199,6 +196,10 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 {
                     throw new Exception($"Variable {varName} not found");
                 }
+            }
+            if (context.concat_operator() != null)
+            {
+                return VisitConcat_operator(context.concat_operator());
             }
 
             return null;
@@ -281,6 +282,57 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             return null;
         }
+
+        //public override object VisitConcat_operator([NotNull] CodeParser.Concat_operatorContext context)
+        //{
+        //    // Get the left and right expressions
+        //    var left = context.expression()[0].Accept(this);
+        //    var right = context.expression()[1].Accept(this);
+
+        //    // Check if both left and right contain strings and the '&' character
+        //    if (left is string strLeft && right is string strRight && strLeft.Contains('&') && strRight.Contains('&'))
+        //    {
+        //        // Split the strings by the '&' character
+        //        var partsLeft = strLeft.Split('&');
+        //        var partsRight = strRight.Split('&');
+
+        //        // Concatenate the corresponding parts
+        //        var result = "";
+        //        for (int i = 0; i < partsLeft.Length && i < partsRight.Length; i++)
+        //        {
+        //            var partLeft = partsLeft[i].Trim();
+        //            var partRight = partsRight[i].Trim();
+
+        //            // Check if either part is a boolean, int, float, or char and concatenate them
+        //            if (bool.TryParse(partLeft, out _) || int.TryParse(partLeft, out _) || float.TryParse(partLeft, out _) || partLeft.StartsWith("'"))
+        //            {
+        //                result += partLeft;
+        //            }
+        //            else if (bool.TryParse(partRight, out _) || int.TryParse(partRight, out _) || float.TryParse(partRight, out _) || partRight.StartsWith("'"))
+        //            {
+        //                result += partRight;
+        //            }
+        //            else
+        //            {
+        //                result += partLeft + partRight;
+        //            }
+
+        //            // Add the '&' character if there are more parts
+        //            if (i < partsLeft.Length - 1 && i < partsRight.Length - 1)
+        //            {
+        //                result += "&";
+        //            }
+        //        }
+
+        //        return result;
+        //    }
+        //    else
+        //    {
+        //        // Throw an error if either left or right is not a string or the '&' character is missing
+        //        throw new Exception("Cannot concatenate non-string values or missing '&' character.");
+        //    }
+        //}
+
 
     }
 }

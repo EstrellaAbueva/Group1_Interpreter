@@ -1,18 +1,12 @@
-﻿using Group1_InterpreterConsole.Contents;
-using System.Diagnostics.CodeAnalysis;
+﻿using Antlr4.Runtime;
 
 namespace Group1_InterpreterConsole.Methods
 {
-    public class ErrorHandling
+    public class ErrorHandling: BaseErrorListener
     {
-        public static void ErrorProgram([NotNull] CodeParser.ProgramContext context)
+        public override void SyntaxError(IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
         {
-            if (context.BEGIN() is null || context.END() is null)
-            {
-                Console.WriteLine("Code must start with 'BEGIN CODE' and end with 'END CODE'.");
-            }
-
-            Environment.Exit(0);
+            Console.Error.WriteLine($"line {line}:{charPositionInLine} {msg}");
         }
     }
 }

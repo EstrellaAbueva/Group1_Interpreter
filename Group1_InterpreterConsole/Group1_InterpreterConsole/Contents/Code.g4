@@ -1,8 +1,8 @@
 ﻿grammar Code;
 
-program: BEGIN NEWLINE statement* NEWLINE END;
-variable_dec: declaration* NEWLINE;
-executable_code: statement NEWLINE;
+program: NEWLINE? BEGIN NEWLINE statement* NEWLINE END;
+variable_dec: declaration* NEWLINE?;
+executable_code: statement* NEWLINE?;
 line: (declaration | statement | COMMENT) NEWLINE;
 
 BEGIN: 'BEGIN CODE';
@@ -15,7 +15,7 @@ assignment: type IDENTIFIER '=' expression NEWLINE;
 function_call: IDENTIFIER (display | scan);
 arguments: expression (',' expression)*;
 
-display: 'DISPLAY' ':' expression*;
+display: NEWLINE? 'DISPLAY' ':' expression*;
 scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)*;
 
 if_statement: if_block else_if_block* else_block? 'END IF';
@@ -44,11 +44,13 @@ statement
 	| while_loop
 	| display
 	| scan
+	| COMMENT
 	;
 
 expression
 	: constant 
 	| IDENTIFIER 
+	| COMMENT
 	| '(' expression ')'
 	| 'NOT' expression
 	| expression unary_operator expression

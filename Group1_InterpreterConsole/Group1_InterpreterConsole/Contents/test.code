@@ -1,5 +1,8 @@
-﻿BEGIN CODE
+﻿# This is a sample CODE
+BEGIN CODE
 	CHAR a_1= 'n'
-	BOOL t = "TRUE"
-	DISPLAY: a_1 t
+	INT x = 1
+	FLOAT i = 1.3
+	# BOOL t = "TRUE"
+	DISPLAY: a_1 x i 
 END CODE

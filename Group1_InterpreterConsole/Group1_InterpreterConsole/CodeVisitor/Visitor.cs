@@ -30,7 +30,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitAssignment([NotNull] CodeParser.AssignmentContext context)
         {
             var varName = context.IDENTIFIER().GetText();
-            var value = Visit(context.expression());
+            var value = VisitExpression(context.expression());
 
             return Variables[varName] = value;
         }
@@ -44,7 +44,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitConstant([NotNull] CodeParser.ConstantContext context)
         {
             var constant = context.GetText();
-            //check constant 
+
             if (constant.StartsWith("\"") && constant.EndsWith("\""))
             {
                 return constant.Substring(1, constant.Length - 2);
@@ -57,15 +57,15 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return bool.Parse(constant);
             }
-            else if (int.TryParse(constant, out var intResult))
+            else if (int.TryParse(constant, out int intResult))
             {
                 return intResult;
             }
-            else if (float.TryParse(constant, out var floatResult))
+            else if (float.TryParse(constant, out float floatResult))
             {
                 return floatResult;
             }
-            else if(char.TryParse(constant, out var charResult))
+            else if (char.TryParse(constant, out char charResult))
             {
                 return charResult;
             }
@@ -74,6 +74,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 throw new Exception($"Unknown constant {constant}");
             }
         }
+
 
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {

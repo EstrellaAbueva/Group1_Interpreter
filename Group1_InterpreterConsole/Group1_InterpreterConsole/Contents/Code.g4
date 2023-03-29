@@ -22,7 +22,7 @@ if_statement: if_block else_if_block* else_block? 'END IF';
 if_block: 'IF' comparison 'THEN' executable_code;
 else_if_block: 'ELSE IF' comparison 'THEN' executable_code;
 else_block: 'ELSE' executable_code;
-comparison: expression comparison_operator expression;
+comparison: expression* comparison_operator expression*;
 comparison_operator: '>' | '<' | '>=' | '<=' | '=' | '<>';
 
 while_loop: 'WHILE' comparison 'DO' executable_code 'END WHILE';
@@ -37,8 +37,7 @@ ESCAPE_SEQUENCE: '\\' . ;
 IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
 statement 
-	: declaration
-	| assignment 
+	: assignment
 	| function_call 
 	| if_statement 
 	| while_loop

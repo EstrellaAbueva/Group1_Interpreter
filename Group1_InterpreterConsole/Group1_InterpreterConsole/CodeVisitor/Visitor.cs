@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime.Misc;
 using Group1_InterpreterConsole.Contents;
 using Group1_InterpreterConsole.Methods;
+using System.Text.RegularExpressions;
 
 namespace Group1_InterpreterConsole.CodeVisitor
 {
@@ -53,25 +54,30 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return constant[1];
             }
-            else if (constant == "TRUE" || constant == "FALSE")
+            else if (context.BOOL() != null)
             {
-                return bool.Parse(constant);
+                return bool.Parse(context.BOOL().GetText());
             }
-            else if (int.TryParse(constant, out int intResult))
+            else if (context.INT() != null)
             {
-                return intResult;
+                return int.Parse(context.INT().GetText());
             }
-            else if (float.TryParse(constant, out float floatResult))
+            else if (context.FLOAT() != null)
             {
-                return floatResult;
+                return float.Parse(context.FLOAT().GetText());
             }
-            else if (char.TryParse(constant, out char charResult))
+            else if (context.STRING() != null)
             {
-                return charResult;
+                string text = context.STRING().GetText();
+                // Remove the enclosing quotes from the string
+                text = text.Substring(1, text.Length - 2);
+                // Replace escape sequences with their corresponding characters
+                text = Regex.Replace(text, @"\\(.)", "$1");
+                return text;
             }
             else
             {
-                throw new Exception($"Unknown constant {constant}");
+                throw new InvalidOperationException("Unknown literal type");
             }
         }
 
@@ -80,7 +86,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             foreach (var variable in Variables)
             {
-               Console.WriteLine(variable.Value);
+               Console.Write(variable.Value + " ");
             }
 
             Console.WriteLine();
@@ -149,10 +155,10 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return VisitDisplay(context.display());
             }
-            else if (context.declaration() != null)
-            {
-                return VisitDeclaration(context.declaration());
-            }
+            //else if (context.declaration() != null)
+            //{
+            //    return VisitDeclaration(context.declaration());
+            //}
             //else if (context.conditional() != null)
             //{
             //    return VisitConditional(context.conditional());
@@ -205,9 +211,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             var varValue = context.expression();
 
-            foreach (var vars in varName)
+            for(int i = 0; i < varName.Length; i++)
             {
-                if (Variables.ContainsKey(varName[0]))
+                if (Variables.ContainsKey(varName[i]))
                 {
                     Console.WriteLine($"Variable '{varName}' is already defined!");
                 }
@@ -217,7 +223,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     {
                         if (int.TryParse(varValue.ToString(), out int intValue))
                         {
-                            Variables[varName[0]] = intValue;
+                            Variables[varName[i]] = intValue;
                         }
                         else
                         {
@@ -232,28 +238,28 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     else if (type.Equals("FLOAT"))
                     {
                         if (float.TryParse(varValue.ToString(), out float floatValue))
-                            return Variables[varName[0]] = floatValue;
+                            return Variables[varName[i]] = floatValue;
                         else
                             Console.WriteLine($"Invalid value for float variable '{varName}'");
                     }
                     else if (type.Equals("BOOL"))
                     {
                         if (bool.TryParse(varValue.ToString(), out bool boolValue))
-                            return Variables[varName[0]] = boolValue;
+                            return Variables[varName[i]] = boolValue;
                         else
                             Console.WriteLine($"Invalid value for boolean variable '{varName}'");
                     }
                     else if (type.Equals("CHAR"))
                     {
                         var charValue = varValue.ToString();
-                        if (charValue?.Length == 3 && charValue[0] == '\'' && charValue[2] == '\'')
-                            return Variables[varName[0]] = charValue[1];
+                        if (charValue?.Length == 3 && charValue[i] == '\'' && charValue[2] == '\'')
+                            return Variables[varName[i]] = charValue[1];
                         else
                             Console.WriteLine($"Invalid value for character variable '{varName}'");
                     }
                     else if (type.Equals("STRING"))
                     {
-                        return Variables[varName[0]] = varValue.ToString();
+                        return Variables[varName[i]] = varValue.ToString();
                     }
                     else
                     {

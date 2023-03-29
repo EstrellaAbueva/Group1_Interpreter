@@ -243,7 +243,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     }
                     else if (type.Equals("STRING"))
                     {
-                        Variables[identifier] = value;
+                        Variables[identifier] = value.Trim('"');
                     }
                     else
                     {

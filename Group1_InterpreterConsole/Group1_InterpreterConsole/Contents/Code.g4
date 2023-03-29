@@ -44,7 +44,7 @@ statement
 	| display
 	| scan
 	| COMMENT
-	| declaration
+	| declaration											
 	;
 
 expression

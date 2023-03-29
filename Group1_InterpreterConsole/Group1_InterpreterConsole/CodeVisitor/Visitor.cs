@@ -228,11 +228,12 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     }
                     else if (type.Equals("BOOL"))
                     {
-                        if (bool.TryParse(value, out bool boolValue))
+                        if (bool.TryParse(value.ToString().Trim('"'), out bool boolValue))
                             Variables[identifier] = boolValue;
                         else
                             Console.WriteLine($"Invalid value for boolean variable '{identifier}'");
                     }
+
                     else if (type.Equals("CHAR"))
                     {
                         var charValue = value;

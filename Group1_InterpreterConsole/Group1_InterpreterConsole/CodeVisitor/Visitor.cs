@@ -228,12 +228,10 @@ namespace Group1_InterpreterConsole.CodeVisitor
                         else
                             Console.WriteLine($"Invalid value for float variable '{identifier}'");
                     }
-                    else if (type.Equals("BOOL"))
+                    else if (bool.TryParse(value.ToString().Trim('"'), out bool boolValue))
                     {
-                        if (bool.TryParse(value, out bool boolValue))
-                            Variables[identifier] = boolValue;
-                        else
-                            Console.WriteLine($"Invalid value for boolean variable '{identifier}'");
+                        var upperBoolValue = boolValue ? true : false;
+                        Variables[identifier] = upperBoolValue;
                     }
                     else if (type.Equals("CHAR"))
                     {
@@ -245,7 +243,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     }
                     else if (type.Equals("STRING"))
                     {
-                        Variables[identifier] = value.ToString();
+                        Variables[identifier] = value.Trim('"');
                     }
                     else
                     {
@@ -332,5 +330,25 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 return null;
             }
         }
+
+        public override object? VisitConstantExpression([NotNull] CodeParser.ConstantExpressionContext context)
+        {
+            if(context.constant().INT() is { } i)
+                return int.Parse(i.GetText());
+            
+            if (context.constant().FLOAT() is { } f)
+                return float.Parse(f.GetText());
+            
+            if (context.constant().CHAR() is { } g)
+                return char.Parse(g.GetText());
+
+            if (context.constant().STRING() is { } s)
+                return s.GetText()[1..^1];
+
+            if (context.constant().BOOL() is { } b)
+                return b.GetText() == "true";
+
+            throw new NotImplementedException();
+        }   
     }
 }

@@ -1,14 +1,15 @@
 ﻿using Antlr4.Runtime.Misc;
 using Group1_InterpreterConsole.Contents;
 using Group1_InterpreterConsole.Methods;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
-using System;
+using System.Xml.Linq;
 
 namespace Group1_InterpreterConsole.CodeVisitor
 {
     public class Visitor : CodeBaseVisitor<object?>
     {
-        private Dictionary<string, object?> _variables { get; set; } = new Dictionary<string, object?>();
+        private Dictionary<string, object?> Variables { get; set; } = new Dictionary<string, object?>();
 
         public override object? VisitProgram([NotNull] CodeParser.ProgramContext context)
         {
@@ -32,21 +33,25 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitAssignment([NotNull] CodeParser.AssignmentContext context)
         {
             var varName = context.IDENTIFIER().GetText();
-            var value = Visit(context.expression());
+            var varType = VisitType(context.type());
+            var value = VisitExpression(context.expression());
 
-            return _variables[varName] = value;
+            var converter = TypeDescriptor.GetConverter((Type)varType);
+            var valueWithType = converter.ConvertFrom(value?.ToString() ?? "");
+
+            return Variables[varName] = valueWithType;
         }
 
         public override object? VisitVariable([NotNull] CodeParser.VariableContext context)
         {
             var varName = context.IDENTIFIER().GetText();
-            return _variables?.GetValueOrDefault(varName) ?? throw new Exception($"Variable {varName} not found");
+            return Variables?.GetValueOrDefault(varName) ?? throw new Exception($"Variable {varName} not found");
         }
 
         public override object? VisitConstant([NotNull] CodeParser.ConstantContext context)
         {
             var constant = context.GetText();
-            //check constant 
+
             if (constant.StartsWith("\"") && constant.EndsWith("\""))
             {
                 return constant.Substring(1, constant.Length - 2);
@@ -55,69 +60,61 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return constant[1];
             }
-            else if (constant == "TRUE" || constant == "FALSE")
+            if (context.BOOL() != null)
             {
-                return bool.Parse(constant);
+                var boolValue = context.BOOL().GetText().ToLower() == "true";
+                return boolValue;
             }
-            else if (int.TryParse(constant, out var intResult))
+            else if (context.INT() != null)
             {
-                return intResult;
+                return int.Parse(context.INT().GetText());
             }
-            else if (float.TryParse(constant, out var floatResult))
+            else if (context.FLOAT() != null)
             {
-                return floatResult;
+                return float.Parse(context.FLOAT().GetText());
             }
-            else if(char.TryParse(constant, out var charResult))
+            else if (context.STRING() != null)
             {
-                return charResult;
+                string text = context.STRING().GetText();
+                // Remove the enclosing quotes from the string
+                text = text.Substring(1, text.Length - 2);
+                // Replace escape sequences with their corresponding characters
+                text = Regex.Replace(text, @"\\(.)", "$1");
+                return text;
             }
             else
             {
-                throw new Exception($"Unknown constant {constant}");
+                throw new InvalidOperationException("Unknown literal type");
             }
         }
 
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {
-            //get the whole thing
-            string expressionText = context.expression().GetText();
-            string[] expressionParts = expressionText.Split('&');
-            string output = "";
-            foreach (var part in expressionParts)
-            {
-                /* if (context.expression().IDENTIFIER().GetText().Equals(variable.Key))
-                 {
-                     Console.WriteLine("{0}", variable.Value);
-                     break;
-                 }*/
-                if(part.Length == 1)    // possible char
-                {
-                    if (Regex.IsMatch(part, @"^[\W_]+$"))
-                    {
-                        continue;
-                    }
+            var displayValues = context.expression();
 
-                    if (_variables[part] != null)
-                    {
-                        output += _variables[part];
-                    }
+            foreach (var displayValue in displayValues)
+            {
+                var value = displayValue.GetText();
+
+                if (value.StartsWith("\"") && value.EndsWith("\""))
+                {
+                    Console.Write(value.Trim('"'));
+                }
+                else if (Variables.ContainsKey(value))
+                {
+                    Console.Write(Variables[value]);
                 }
                 else
                 {
-                    if (_variables[part] != null)
-                    {
-                        output += _variables[part];
-                    }
+                    Console.Write(value);
                 }
-                
             }
-            Console.WriteLine(output);
-            Console.WriteLine();
 
             return null;
         }
 
-        public override object? VisitType([NotNull] CodeParser.TypeContext context)
+
+        public override object VisitType([NotNull] CodeParser.TypeContext context)
         {
             switch (context.GetText())
             {
@@ -132,7 +129,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 case "STRING":
                     return typeof(string);
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException("Invalid Data Type");
             }
         }
 
@@ -178,43 +175,180 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return VisitDisplay(context.display());
             }
-            //else if (context.function_call() != null)
-            //{
-            //    return VisitFunction_call(context.function_call());
-            //}
-            //else if (context.function_declaration() != null)
-            //{
-            //    return VisitFunction_declaration(context.function_declaration());
-            //}
+            else if (context.declaration() != null)
+            {
+                return VisitDeclaration(context.declaration());
+            }
             else
             {
                 throw new Exception("Unknown statement type");
             }
         }
 
-
-        public override object? VisitExpression([NotNull] CodeParser.ExpressionContext context)
+        public override List<object?>? VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
         {
-            if (context.constant() != null)
+            var type = context.type().GetText();
+            var identifiers = context.IDENTIFIER().Select(x => x.GetText()).ToList();
+
+            var values = context.expression();
+
+            for (int j = 0; j < values.Count(); j++)
             {
-                return VisitConstant(context.constant());
-            }
-            else if (context.IDENTIFIER() != null)
-            {
-                var varName = context.IDENTIFIER().GetText();
-                if (_variables != null && _variables.ContainsKey(varName))
+                var value = values[j].GetText();
+                    
+                if (j >= identifiers.Count())
                 {
-                    return _variables[varName];
+                    Console.WriteLine($"Too many values specified for variable '{string.Join(",", identifiers)}'");
+                    break;
+                }
+
+                var identifier = identifiers[j];
+
+                if (Variables.ContainsKey(identifier))
+                {
+                    Console.WriteLine($"Variable '{identifier}' is already defined!");
                 }
                 else
                 {
-                    throw new Exception($"Variable {varName} not found");
+                    if (type.Equals("INT"))
+                    {
+                        if (int.TryParse(value, out int intValue))
+                        {
+                            Variables[identifier] = intValue;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Invalid value for integer variable '{identifier}'");
+                        }
+                    }
+                    else if (type.Equals("FLOAT"))
+                    {
+                        if (float.TryParse(value, out float floatValue))
+                            Variables[identifier] = floatValue;
+                        else
+                            Console.WriteLine($"Invalid value for float variable '{identifier}'");
+                    }
+                    else if (bool.TryParse(value.ToString().Trim('"'), out bool boolValue))
+                    {
+                        var upperBoolValue = boolValue ? true : false;
+                        Variables[identifier] = upperBoolValue;
+                    }
+                    else if (type.Equals("CHAR"))
+                    {
+                        var charValue = value;
+                        if (charValue?.Length == 3 && charValue[0] == '\'' && charValue[2] == '\'')
+                            Variables[identifier] = charValue[1];
+                        else
+                            Console.WriteLine($"Invalid value for character variable '{identifier}'");
+                    }
+                    else if (type.Equals("STRING"))
+                    {
+                        Variables[identifier] = value.Trim('"');
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Invalid variable type '{type}'");
+                    }
                 }
+            }
+
+            return new List<object?>(); // add this to the end of the for loop
+        }
+
+        public override object? VisitVariable_dec([NotNull] CodeParser.Variable_decContext context)
+        {
+            foreach (var declarationContext in context.declaration())
+            {
+                VisitDeclaration(declarationContext);
             }
 
             return null;
         }
 
+        public override object VisitConcatOpExpression([NotNull] CodeParser.ConcatOpExpressionContext context)
+        {
+            // Get the left and right expressions
+            var left = context.expression()[0].Accept(this);
+            var right = context.expression()[1].Accept(this);
 
+            // Check if both left and right contain strings and the '&' character
+            if (left is string strLeft && right is string strRight && strLeft.Contains('&') && strRight.Contains('&'))
+            {
+                // Split the strings by the '&' character
+                var partsLeft = strLeft.Split('&');
+                var partsRight = strRight.Split('&');
+
+                // Concatenate the corresponding parts
+                var result = "";
+                for (int i = 0; i < partsLeft.Length && i < partsRight.Length; i++)
+                {
+                    var partLeft = partsLeft[i].Trim();
+                    var partRight = partsRight[i].Trim();
+
+                    // Check if either part is a boolean, int, float, or char and concatenate them
+                    if (bool.TryParse(partLeft, out _) || int.TryParse(partLeft, out _) || float.TryParse(partLeft, out _) || partLeft.StartsWith("'"))
+                    {
+                        result += partLeft;
+                    }
+                    else if (bool.TryParse(partRight, out _) || int.TryParse(partRight, out _) || float.TryParse(partRight, out _) || partRight.StartsWith("'"))
+                    {
+                        result += partRight;
+                    }
+                    else
+                    {
+                        result += partLeft + partRight;
+                    }
+
+                    // Add the '&' character if there are more parts
+                    if (i < partsLeft.Length - 1 && i < partsRight.Length - 1)
+                    {
+                        result += "&";
+                    }
+                }
+
+                return result;
+            }
+            else
+            {
+                // Throw an error if either left or right is not a string or the '&' character is missing
+                throw new Exception("Cannot concatenate non-string values or missing '&' character.");
+            }
+        }
+
+
+        public override object? VisitIdentifierExpression([NotNull] CodeParser.IdentifierExpressionContext context)
+        {
+            var identifier = context.IDENTIFIER().GetText();
+
+            if (Variables.ContainsKey(identifier))
+            {
+                return Variables[identifier];
+            }
+            else
+            {
+                Console.WriteLine($"Variable '{identifier}' is not defined!");
+                return null;
+            }
+        }
+
+        public override object? VisitConstantExpression([NotNull] CodeParser.ConstantExpressionContext context)
+        {
+            if(context.constant().INT() is { } i)
+                return int.Parse(i.GetText());
+            
+            if (context.constant().FLOAT() is { } f)
+                return float.Parse(f.GetText());
+            
+            if (context.constant().CHAR() is { } g)
+                return char.Parse(g.GetText());
+
+            if (context.constant().STRING() is { } s)
+                return s.GetText()[1..^1];
+
+            if (context.constant().BOOL() is { } b)
+                return b.GetText() == "true";
+
+            throw new NotImplementedException();
+        }   
     }
 }

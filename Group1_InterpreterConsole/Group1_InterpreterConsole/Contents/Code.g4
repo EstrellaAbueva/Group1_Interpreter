@@ -1,28 +1,28 @@
 ﻿grammar Code;
 
-program: BEGIN NEWLINE statement* NEWLINE END;
-variable_dec: initialization NEWLINE;
-executable_code: statement NEWLINE;
-line: (initialization | statement | COMMENT) NEWLINE;
+program: NEWLINE? BEGIN NEWLINE statement* NEWLINE END;
+variable_dec: declaration* NEWLINE?;
+executable_code: statement* NEWLINE?;
+line: (declaration | statement | COMMENT) NEWLINE;
 
 BEGIN: 'BEGIN CODE';
 END: 'END CODE';
 
-initialization: type IDENTIFIERS (',' IDENTIFIERS)* ('=' expression)? ;
+declaration: NEWLINE? type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ; 
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: IDENTIFIER ('=' (expression))?;
 assignment: type IDENTIFIER '=' expression NEWLINE;
 function_call: IDENTIFIER (display | scan);
 arguments: expression (',' expression)*;
 
-display: 'DISPLAY' ':' expression (NEWLINE)?;
+display: NEWLINE? 'DISPLAY' ':' expression*;
 scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)*;
 
 if_statement: if_block else_if_block* else_block? 'END IF';
 if_block: 'IF' comparison 'THEN' executable_code;
 else_if_block: 'ELSE IF' comparison 'THEN' executable_code;
 else_block: 'ELSE' executable_code;
-comparison: expression comparison_operator expression;
+comparison: expression* comparison_operator expression*;
 comparison_operator: '>' | '<' | '>=' | '<=' | '=' | '<>';
 
 while_loop: 'WHILE' comparison 'DO' executable_code 'END WHILE';
@@ -37,26 +37,27 @@ ESCAPE_SEQUENCE: '\\' . ;
 IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
 statement 
-	: assignment 
+	: assignment
 	| function_call 
 	| if_statement 
 	| while_loop
 	| display
 	| scan
+	| COMMENT
+	| declaration											
 	;
 
 expression
-	: constant 
-	| IDENTIFIER 
-	| '(' expression ')'
-	| 'NOT' expression
-	| expression unary_operator expression
-	| expression add_operator expression
-	| expression multiply_operator expression
-	| expression compare_operator expression
-	| expression bool_operator expression
-	| expression concat_operator expression
-	| expression newline_operator expression
+	: constant												# constantExpression											
+	| IDENTIFIER											# identifierExpression
+	| '(' expression ')'									# parenthesisExpression
+	| 'NOT' expression										# NOTExpression
+	| expression unary_operator expression					# unaryExpression
+	| expression add_operator expression					# addOpExpression
+	| expression multiply_operator expression				# multiplyOpExpression
+	| expression compare_operator expression				# compareOpExpression
+	| expression bool_operator expression					# boolOpExpression
+	| expression concat_operator expression					# concatOpExpression
 	;
 
 operator

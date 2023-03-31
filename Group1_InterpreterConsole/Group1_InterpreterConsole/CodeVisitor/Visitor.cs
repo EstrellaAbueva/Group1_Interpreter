@@ -91,24 +91,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {
             var displayValues = context.expression();
+            var exp = Visit(context.expression());
 
-            foreach (var displayValue in displayValues)
-            {
-                var value = displayValue.GetText();
-
-                if (value.StartsWith("\"") && value.EndsWith("\""))
-                {
-                    Console.Write(value.Trim('"'));
-                }
-                else if (Variables.ContainsKey(value))
-                {
-                    Console.Write(Variables[value]);
-                }
-                else
-                {
-                    Console.Write(value);
-                }
-            }
+            Console.WriteLine(exp);
 
             return null;
         }
@@ -267,52 +252,37 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object VisitConcatOpExpression([NotNull] CodeParser.ConcatOpExpressionContext context)
         {
-            // Get the left and right expressions
+            // Get the left and right expressions;
             var left = context.expression()[0].Accept(this);
             var right = context.expression()[1].Accept(this);
-
-            // Check if both left and right contain strings and the '&' character
-            if (left is string strLeft && right is string strRight && strLeft.Contains('&') && strRight.Contains('&'))
+            var output = "";
+            // Check if both left and right are variable names
+            if(left == null && right == null)
             {
-                // Split the strings by the '&' character
-                var partsLeft = strLeft.Split('&');
-                var partsRight = strRight.Split('&');
-
-                // Concatenate the corresponding parts
-                var result = "";
-                for (int i = 0; i < partsLeft.Length && i < partsRight.Length; i++)
+                throw new NullReferenceException();
+            }
+            if (left != null) {
+                if (Variables.ContainsKey(left.ToString()!))
                 {
-                    var partLeft = partsLeft[i].Trim();
-                    var partRight = partsRight[i].Trim();
-
-                    // Check if either part is a boolean, int, float, or char and concatenate them
-                    if (bool.TryParse(partLeft, out _) || int.TryParse(partLeft, out _) || float.TryParse(partLeft, out _) || partLeft.StartsWith("'"))
-                    {
-                        result += partLeft;
-                    }
-                    else if (bool.TryParse(partRight, out _) || int.TryParse(partRight, out _) || float.TryParse(partRight, out _) || partRight.StartsWith("'"))
-                    {
-                        result += partRight;
-                    }
-                    else
-                    {
-                        result += partLeft + partRight;
-                    }
-
-                    // Add the '&' character if there are more parts
-                    if (i < partsLeft.Length - 1 && i < partsRight.Length - 1)
-                    {
-                        result += "&";
-                    }
+                    output += Variables[left.ToString()!];
                 }
-
-                return result;
-            }
-            else
+                else
+                {
+                    output += left.ToString();
+                }
+            }    
+            if(right != null)
             {
-                // Throw an error if either left or right is not a string or the '&' character is missing
-                throw new Exception("Cannot concatenate non-string values or missing '&' character.");
+                if (Variables.ContainsKey(right.ToString()!))
+                {
+                    output += Variables[right.ToString()!];
+                }
+                else
+                {
+                    output += right.ToString();
+                }
             }
+            return output;
         }
 
 

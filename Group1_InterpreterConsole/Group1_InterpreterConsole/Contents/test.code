@@ -6,11 +6,5 @@ BEGIN CODE
 	BOOL t = "TRUE"
 	STRING e = "Hello World"
 	DISPLAY: "Ella"
-	DISPLAY: a_1
-	DISPLAY: e
-	DISPLAY: i
-	DISPLAY: x
-	DISPLAY: y
-	DISPLAY: z
-	DISPLAY: t
+	DISPLAY: a_1 & "Kobe" & e & i & x & y & z & z
 END CODE

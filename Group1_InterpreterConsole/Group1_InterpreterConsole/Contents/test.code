@@ -1,8 +1,8 @@
 ﻿# This is a sample CODE
 BEGIN CODE
-	INT c = 3
-	INT b = 2
-	b = 2
-	DISPLAY: c
-	DISPLAY: b
+    INT a, b, c = 3
+    a = b = 2
+    DISPLAY: a
+    DISPLAY: b
+    DISPLAY: c
 END CODE

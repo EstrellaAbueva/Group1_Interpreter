@@ -32,24 +32,37 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitAssignment([NotNull] CodeParser.AssignmentContext context)
         {
-            var varName = context.IDENTIFIER().GetText();
+            var identifiers = context.IDENTIFIER().Select(x => x.GetText()).ToList();
             var value = VisitExpression(context.expression());
 
-            if (Variables.ContainsKey(varName))
+            // If the assignment only has one identifier, update its value directly
+            if (identifiers.Count == 1)
             {
-                var existingValue = Variables[varName];
-                var existingValueType = existingValue?.GetType();
-                var converter = existingValueType != null ? TypeDescriptor.GetConverter(existingValueType) : null;
-                var newValueWithType = converter?.ConvertFrom(value?.ToString() ?? "");
-                return Variables[varName] = newValueWithType;
-            }
-            else
-            {
+                var varName = identifiers[0];
                 return Variables[varName] = value;
+            }
+
+            // If the assignment has multiple identifiers, update their values in a chain
+            for (int j = 0; j < identifiers.Count(); j++)
+            {
+                var varName = identifiers[j];
+
+                if (j == 0)
+                {
+                    // For the first identifier, assign the value directly
+                    Variables[varName] = value;
+                }
+                else
+                {
+                    // For subsequent identifiers, assign the value of the previous identifier
+                    Variables[varName] = Variables[identifiers[j - 1]];
+                }
             }
 
             return null;
         }
+
+
 
         public override object? VisitVariable([NotNull] CodeParser.VariableContext context)
         {
@@ -102,7 +115,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             var displayValues = context.expression();
             var exp = Visit(context.expression());
 
-            Console.WriteLine(exp);
+            Console.Write(exp);
 
             return null;
         }
@@ -186,17 +199,10 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             var values = context.expression();
 
-            for (int j = 0; j < values.Count(); j++)
+            for (int j = 0; j < identifiers.Count(); j++)
             {
-                var value = values[j].GetText();
-                    
-                if (j >= identifiers.Count())
-                {
-                    Console.WriteLine($"Too many values specified for variable '{string.Join(",", identifiers)}'");
-                    break;
-                }
-
                 var identifier = identifiers[j];
+                var value = j < values.Count() ? values[j].GetText() : null;
 
                 if (Variables.ContainsKey(identifier))
                 {
@@ -204,7 +210,11 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 }
                 else
                 {
-                    if (type.Equals("INT"))
+                    if (value == null && type != "STRING")
+                    {
+                        Console.WriteLine($"Missing value for variable '{identifier}'");
+                    }
+                    else if (type.Equals("INT"))
                     {
                         if (int.TryParse(value, out int intValue))
                         {
@@ -222,7 +232,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                         else
                             Console.WriteLine($"Invalid value for float variable '{identifier}'");
                     }
-                    else if (bool.TryParse(value.ToString().Trim('"'), out bool boolValue))
+                    else if (bool.TryParse(value?.ToString().Trim('"'), out bool boolValue))
                     {
                         var upperBoolValue = boolValue ? true : false;
                         Variables[identifier] = upperBoolValue.ToString().ToUpper();
@@ -237,7 +247,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     }
                     else if (type.Equals("STRING"))
                     {
-                        Variables[identifier] = value.Trim('"');
+                        Variables[identifier] = value?.Trim('"') ?? "";
                     }
                     else
                     {
@@ -248,6 +258,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             return new List<object?>(); // add this to the end of the for loop
         }
+
 
         public override object? VisitVariable_dec([NotNull] CodeParser.Variable_decContext context)
         {
@@ -293,7 +304,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
             return output;
         }
-
 
         public override object? VisitIdentifierExpression([NotNull] CodeParser.IdentifierExpressionContext context)
         {

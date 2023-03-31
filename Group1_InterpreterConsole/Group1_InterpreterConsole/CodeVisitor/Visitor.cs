@@ -33,13 +33,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitAssignment([NotNull] CodeParser.AssignmentContext context)
         {
             var varName = context.IDENTIFIER().GetText();
-            var varType = VisitType(context.type());
             var value = VisitExpression(context.expression());
 
-            var converter = TypeDescriptor.GetConverter((Type)varType);
-            var valueWithType = converter.ConvertFrom(value?.ToString() ?? "");
-
-            return Variables[varName] = valueWithType;
+            return Variables[varName] = value;
         }
 
         public override object? VisitVariable([NotNull] CodeParser.VariableContext context)
@@ -319,6 +315,15 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 return b.GetText() == "True";
 
             throw new NotImplementedException();
-        }   
+        }
+
+        public override object? VisitVariable_assignment([NotNull] CodeParser.Variable_assignmentContext context)
+        {
+            var type = context.type().GetText();
+            var name = context.IDENTIFIER().GetText();
+
+            return Variables[name] = null;
+        }
+
     }
 }

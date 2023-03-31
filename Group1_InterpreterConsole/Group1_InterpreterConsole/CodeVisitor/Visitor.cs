@@ -199,10 +199,17 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             var values = context.expression();
 
-            for (int j = 0; j < identifiers.Count(); j++)
+            for (int j = 0; j < values.Count(); j++)
             {
+                var value = values[j].GetText();
+
+                if (j >= identifiers.Count())
+                {
+                    Console.WriteLine($"Too many values specified for variable '{string.Join(",", identifiers)}'");
+                    break;
+                }
+
                 var identifier = identifiers[j];
-                var value = j < values.Count() ? values[j].GetText() : null;
 
                 if (Variables.ContainsKey(identifier))
                 {
@@ -210,11 +217,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 }
                 else
                 {
-                    if (value == null && type != "STRING")
-                    {
-                        Console.WriteLine($"Missing value for variable '{identifier}'");
-                    }
-                    else if (type.Equals("INT"))
+                    if (type.Equals("INT"))
                     {
                         if (int.TryParse(value, out int intValue))
                         {
@@ -232,11 +235,14 @@ namespace Group1_InterpreterConsole.CodeVisitor
                         else
                             Console.WriteLine($"Invalid value for float variable '{identifier}'");
                     }
-                    else if (bool.TryParse(value?.ToString().Trim('"'), out bool boolValue))
+                    else if (type.Equals("BOOL"))
                     {
-                        var upperBoolValue = boolValue ? true : false;
-                        Variables[identifier] = upperBoolValue.ToString().ToUpper();
+                        if (bool.TryParse(value.ToString().Trim('"'), out bool boolValue))
+                            Variables[identifier] = boolValue;
+                        else
+                            Console.WriteLine($"Invalid value for boolean variable '{identifier}'");
                     }
+
                     else if (type.Equals("CHAR"))
                     {
                         var charValue = value;
@@ -247,7 +253,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     }
                     else if (type.Equals("STRING"))
                     {
-                        Variables[identifier] = value?.Trim('"') ?? "";
+                        Variables[identifier] = value.Trim('"');
                     }
                     else
                     {

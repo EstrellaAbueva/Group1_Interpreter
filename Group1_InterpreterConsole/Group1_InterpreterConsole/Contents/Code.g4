@@ -46,6 +46,7 @@ statement
 	| scan
 	| COMMENT
 	| declaration
+	| variable
 	| variable_assignment
 	;
 

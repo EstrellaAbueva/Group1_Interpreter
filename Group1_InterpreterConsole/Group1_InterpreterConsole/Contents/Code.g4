@@ -15,7 +15,7 @@ assignment: type IDENTIFIER '=' expression NEWLINE;
 function_call: IDENTIFIER (display | scan);
 arguments: expression (',' expression)*;
 
-display: NEWLINE? 'DISPLAY' ':' expression*;
+display: NEWLINE? 'DISPLAY' ':' expression;
 scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)*;
 
 if_statement: if_block else_if_block* else_block? 'END IF';

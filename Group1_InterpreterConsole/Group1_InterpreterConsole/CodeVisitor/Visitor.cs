@@ -35,7 +35,20 @@ namespace Group1_InterpreterConsole.CodeVisitor
             var varName = context.IDENTIFIER().GetText();
             var value = VisitExpression(context.expression());
 
-            return Variables[varName] = value;
+            if (Variables.ContainsKey(varName))
+            {
+                var existingValue = Variables[varName];
+                var existingValueType = existingValue?.GetType();
+                var converter = existingValueType != null ? TypeDescriptor.GetConverter(existingValueType) : null;
+                var newValueWithType = converter?.ConvertFrom(value?.ToString() ?? "");
+                Variables[varName] = newValueWithType;
+            }
+            else
+            {
+                Variables[varName] = value;
+            }
+
+            return Variables[varName];
         }
 
         public override object? VisitVariable([NotNull] CodeParser.VariableContext context)

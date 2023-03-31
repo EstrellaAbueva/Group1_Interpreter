@@ -10,9 +10,9 @@ END: 'END CODE';
 
 declaration: NEWLINE? type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ; 
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
-variable: type IDENTIFIER ('=' (expression))?;
-variable_assignment: type IDENTIFIER NEWLINE?;
-assignment: IDENTIFIER '=' expression NEWLINE?;
+variable: NEWLINE? type IDENTIFIER ('=' (expression))?;
+variable_assignment: NEWLINE? type IDENTIFIER NEWLINE?;
+assignment: NEWLINE? IDENTIFIER '=' expression NEWLINE?;
 function_call: IDENTIFIER (display | scan);
 arguments: expression (',' expression)*;
 

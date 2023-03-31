@@ -231,7 +231,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     else if (bool.TryParse(value.ToString().Trim('"'), out bool boolValue))
                     {
                         var upperBoolValue = boolValue ? true : false;
-                        Variables[identifier] = upperBoolValue;
+                        Variables[identifier] = upperBoolValue.ToString().ToUpper();
                     }
                     else if (type.Equals("CHAR"))
                     {

@@ -10,13 +10,14 @@ END: 'END CODE';
 
 declaration: NEWLINE? type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ; 
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
-variable: IDENTIFIER ('=' (expression))?;
-assignment: type IDENTIFIER '=' expression NEWLINE;
+variable: NEWLINE? type IDENTIFIER ('=' (expression))?;
+variable_assignment: NEWLINE? type IDENTIFIER NEWLINE?;
+assignment: NEWLINE? IDENTIFIER '=' expression NEWLINE?;
 function_call: IDENTIFIER (display | scan);
 arguments: expression (',' expression)*;
 
-display: NEWLINE? 'DISPLAY' ':' expression;
-scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)*;
+display: NEWLINE? 'DISPLAY' ':' expression NEWLINE?;
+scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)* NEWLINE?;
 
 if_statement: if_block else_if_block* else_block? 'END IF';
 if_block: 'IF' comparison 'THEN' executable_code;
@@ -44,7 +45,8 @@ statement
 	| display
 	| scan
 	| COMMENT
-	| declaration											
+	| declaration
+	| variable_assignment
 	;
 
 expression

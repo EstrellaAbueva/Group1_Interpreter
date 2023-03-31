@@ -41,14 +41,14 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 var existingValueType = existingValue?.GetType();
                 var converter = existingValueType != null ? TypeDescriptor.GetConverter(existingValueType) : null;
                 var newValueWithType = converter?.ConvertFrom(value?.ToString() ?? "");
-                Variables[varName] = newValueWithType;
+                return Variables[varName] = newValueWithType;
             }
             else
             {
-                Variables[varName] = value;
+                return Variables[varName] = value;
             }
 
-            return Variables[varName];
+            return null;
         }
 
         public override object? VisitVariable([NotNull] CodeParser.VariableContext context)

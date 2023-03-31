@@ -7,5 +7,6 @@ BEGIN CODE
 	a_1 = 'n'
 	STRING e = "Hello World"
 	DISPLAY: "Ella"
+	DISPLAY: t
 	DISPLAY: a_1 & "Kobe" & e & i & x & y & z & z
 END CODE

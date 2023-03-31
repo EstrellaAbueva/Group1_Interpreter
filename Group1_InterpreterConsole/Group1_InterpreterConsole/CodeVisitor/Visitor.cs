@@ -316,7 +316,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 return s.GetText()[1..^1];
 
             if (context.constant().BOOL() is { } b)
-                return b.GetText() == "true";
+                return b.GetText() == "True";
 
             throw new NotImplementedException();
         }   

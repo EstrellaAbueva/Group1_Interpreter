@@ -194,7 +194,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
             var contextParts = contextstring.Split(',');
             var exp = context.expression();
             int expctr = 0;
-            //Dictionary<string, object?> expList = new Dictionary<string, object?>();
 
             // traverse each part
             for (int x = 0; x < contextParts.Length; x++)
@@ -218,69 +217,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 }
                 
             }
-
-            /*for (int j = 0; j < values.Count(); j++)
-            {
-                var value = values[j].GetText();
-                    
-                if (j >= varnames.Count())
-                {
-                    Console.WriteLine($"Too many values specified for variable '{string.Join(",", varnames)}'");
-                    break;
-                }
-
-                var identifier = varnames[j];
-
-                if (Variables.ContainsKey(identifier))
-                {
-                    Console.WriteLine($"Variable '{identifier}' is already defined!");
-                }
-                else
-                {
-                    if (type.Equals("INT"))
-                    {
-                        if (int.TryParse(value, out int intValue))
-                        {
-                            Variables[identifier] = intValue;
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Invalid value for integer variable '{identifier}'");
-                        }
-                    }
-                    else if (type.Equals("FLOAT"))
-                    {
-                        if (float.TryParse(value, out float floatValue))
-                            Variables[identifier] = floatValue;
-                        else
-                            Console.WriteLine($"Invalid value for float variable '{identifier}'");
-                    }
-                    else if (type.Equals("BOOL"))
-                    {
-                        if (bool.TryParse(value.ToString().Trim('"'), out bool boolValue))
-                            Variables[identifier] = boolValue;
-                        else
-                            Console.WriteLine($"Invalid value for boolean variable '{identifier}'");
-                    }
-
-                    else if (type.Equals("CHAR"))
-                    {
-                        var charValue = value;
-                        if (charValue?.Length == 3 && charValue[0] == '\'' && charValue[2] == '\'')
-                            Variables[identifier] = charValue[1];
-                        else
-                            Console.WriteLine($"Invalid value for character variable '{identifier}'");
-                    }
-                    else if (type.Equals("STRING"))
-                    {
-                        Variables[identifier] = value.Trim('"');
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Invalid variable type '{type}'");
-                    }
-                }
-            }*/
 
             return new List<object?>();
         }

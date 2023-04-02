@@ -19,4 +19,16 @@ BEGIN CODE
     DISPLAY: k
     DISPLAY: l
     DISPLAY: m
+    FLOAT s = 1.3
+    BOOL t = "TRUE"
+    STRING d = "Hello World"
+    INT y = 5
+    DISPLAY: "Ella"
+    DISPLAY: d
+    DISPLAY: s
+    CHAR a_1
+    a_1 = 'a'
+    DISPLAY: a_1
+	DISPLAY: t
+	DISPLAY: y
 END CODE

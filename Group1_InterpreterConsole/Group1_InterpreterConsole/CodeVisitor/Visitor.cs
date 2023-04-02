@@ -34,35 +34,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitAssignment([NotNull] CodeParser.AssignmentContext context)
         {
-            /*var varName = context.IDENTIFIER().GetText();
-            var varType = VisitType(context.type());
-            var value = VisitExpression(context.expression());
-
-            // If the assignment only has one identifier, update its value directly
-            if (identifiers.Count == 1)
-            {
-                var varName = identifiers[0];
-                return Variables[varName] = value;
-            }
-
-            // If the assignment has multiple identifiers, update their values in a chain
-            for (int j = 0; j < identifiers.Count(); j++)
-            {
-                var varName = identifiers[j];
-
-                if (j == 0)
-                {
-                    // For the first identifier, assign the value directly
-                    Variables[varName] = value;
-                }
-                else
-                {
-                    // For subsequent identifiers, assign the value of the previous identifier
-                    Variables[varName] = Variables[identifiers[j - 1]];
-                }
-            }
-
-            return Variables[varName] = valueWithType;*/
             var identifier = context.IDENTIFIER();
             foreach(var i in identifier)
             {
@@ -112,6 +83,10 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 // Replace escape sequences with their corresponding characters
                 text = Regex.Replace(text, @"\\(.)", "$1");
                 return text;
+            }
+            else if (context.CHAR() != null)
+            {
+                return context.CHAR().GetText()[1];
             }
             else
             {
@@ -381,7 +356,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 return float.Parse(f.GetText());
             
             if (context.constant().CHAR() is { } g)
-                return char.Parse(g.GetText());
+                return g.GetText()[1];
 
             if (context.constant().STRING() is { } s)
                 return s.GetText()[1..^1];

@@ -2,8 +2,10 @@
 using Group1_InterpreterConsole.Contents;
 using Group1_InterpreterConsole.Methods;
 using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using static Group1_InterpreterConsole.Contents.CodeParser;
 
 namespace Group1_InterpreterConsole.CodeVisitor
 {
@@ -32,7 +34,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitAssignment([NotNull] CodeParser.AssignmentContext context)
         {
-            var identifiers = context.IDENTIFIER().Select(x => x.GetText()).ToList();
+            /*var varName = context.IDENTIFIER().GetText();
+            var varType = VisitType(context.type());
             var value = VisitExpression(context.expression());
 
             // If the assignment only has one identifier, update its value directly
@@ -59,10 +62,16 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 }
             }
 
+            return Variables[varName] = valueWithType;*/
+            var identifier = context.IDENTIFIER();
+            foreach(var i in identifier)
+            {
+                var expression = context.expression().Accept(this);
+                Variables[i.GetText()] = expression;
+            }
+            
             return null;
         }
-
-
 
         public override object? VisitVariable([NotNull] CodeParser.VariableContext context)
         {
@@ -202,25 +211,50 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override List<object?> VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
         {
             var type = context.type().GetText();
-            var identifiers = context.IDENTIFIER().Select(x => x.GetText()).ToList();
+            var varnames = context.IDENTIFIER();      
 
-            var values = context.expression();
+            // remove type
+            var contextstring = context.GetText().Replace(type, "");
 
-            for (int j = 0; j < values.Count(); j++)
+            var contextParts = contextstring.Split(',');
+            var exp = context.expression();
+            int expctr = 0;
+            //Dictionary<string, object?> expList = new Dictionary<string, object?>();
+
+            // traverse each part
+            for (int x = 0; x < contextParts.Length; x++)
             {
-                var value = "";
-                if (values[j] != null)
+                if (Variables.ContainsKey(varnames[x].GetText()))
                 {
-                    value = values[j].GetText();
+                    Console.WriteLine(varnames[x].GetText() + "is already declared");
+                    continue;
                 }
-
-                if (j >= identifiers.Count())
+                if (contextParts[x].Contains('='))
                 {
-                    Console.WriteLine($"Too many values specified for variable '{string.Join(",", identifiers)}'");
+                    if ( expctr < exp.Count())
+                    {
+                        Variables[varnames[x].GetText()] = Visit(exp[expctr]);
+                        expctr++;
+                    }
+                }
+                else
+                {
+                    Variables[varnames[x].GetText()] = null;
+                }
+                
+            }
+
+            /*for (int j = 0; j < values.Count(); j++)
+            {
+                var value = values[j].GetText();
+                    
+                if (j >= varnames.Count())
+                {
+                    Console.WriteLine($"Too many values specified for variable '{string.Join(",", varnames)}'");
                     break;
                 }
 
-                var identifier = identifiers[j];
+                var identifier = varnames[j];
 
                 if (Variables.ContainsKey(identifier))
                 {
@@ -271,7 +305,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                         Console.WriteLine($"Invalid variable type '{type}'");
                     }
                 }
-            }
+            }*/
 
             return new List<object?>();
         }

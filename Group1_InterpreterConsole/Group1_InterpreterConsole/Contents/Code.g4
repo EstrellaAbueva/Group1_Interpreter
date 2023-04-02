@@ -8,7 +8,7 @@ line: (declaration | statement | COMMENT) NEWLINE;
 BEGIN: 'BEGIN CODE';
 END: 'END CODE';
 
-declaration: NEWLINE? type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ; 
+declaration: NEWLINE? type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ;  // INT a, b, c = 3
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: NEWLINE? type IDENTIFIER ('=' (expression))?;
 variable_assignment: NEWLINE? type IDENTIFIER NEWLINE?;

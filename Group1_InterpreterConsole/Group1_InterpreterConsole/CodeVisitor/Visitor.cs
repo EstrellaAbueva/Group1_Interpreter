@@ -311,5 +311,20 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return Variables[name] = null;
         }
 
+        public override object? VisitUnaryExpression([NotNull] CodeParser.UnaryExpressionContext context)
+        {
+            var value = Visit(context);
+
+            if (value is int i)
+            {
+                return -i;
+            }
+            if (value is float f)
+            {
+                return -f;
+            }
+            throw new ArgumentException("Unary minus operator can only be applied to numeric values");
+        }
+
     }
 }

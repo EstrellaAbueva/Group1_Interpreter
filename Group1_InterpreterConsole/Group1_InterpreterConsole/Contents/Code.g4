@@ -56,9 +56,9 @@ expression
 	| '(' expression ')'									# parenthesisExpression
 	| 'NOT' expression										# NOTExpression
 	| expression unary_operator expression					# unaryExpression
-	| expression add_operator expression					# addOpExpression
-	| expression multiply_operator expression				# multiplyOpExpression
-	| expression compare_operator expression				# compareOpExpression
+	| expression add_operator expression					# additiveExpression
+	| expression multiply_operator expression				# multiplicativeExpression
+	| expression compare_operator expression				# relationalExpression
 	| expression bool_operator expression					# boolOpExpression
 	| expression concat_operator expression					# concatOpExpression
 	;

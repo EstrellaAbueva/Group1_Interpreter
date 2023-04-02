@@ -112,7 +112,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {
-            var displayValues = context.expression();
             var exp = Visit(context.expression());
 
             Console.Write(exp);
@@ -186,13 +185,21 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return VisitDeclaration(context.declaration());
             }
+            else if (context.variable_assignment() != null)
+            {
+                return VisitVariable_assignment(context.variable_assignment());
+            }
+            else if (context.variable() != null)
+            {
+                return VisitVariable(context.variable());
+            }
             else
             {
                 throw new Exception("Unknown statement type");
             }
         }
 
-        public override List<object?>? VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
+        public override List<object?> VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
         {
             var type = context.type().GetText();
             var identifiers = context.IDENTIFIER().Select(x => x.GetText()).ToList();
@@ -201,7 +208,11 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             for (int j = 0; j < values.Count(); j++)
             {
-                var value = values[j].GetText();
+                var value = "";
+                if (values[j] != null)
+                {
+                    value = values[j].GetText();
+                }
 
                 if (j >= identifiers.Count())
                 {
@@ -262,8 +273,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 }
             }
 
-            return new List<object?>(); // add this to the end of the for loop
+            return new List<object?>();
         }
+
 
 
         public override object? VisitVariable_dec([NotNull] CodeParser.Variable_decContext context)

@@ -8,10 +8,10 @@ line: (declaration | statement | COMMENT) NEWLINE;
 BEGIN: 'BEGIN CODE';
 END: 'END CODE';
 
-declaration: NEWLINE? type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ; 
+declaration: NEWLINE? type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ;  // INT a, b, c = 3
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: IDENTIFIER ('=' (expression))?;
-assignment: type IDENTIFIER '=' expression NEWLINE;
+assignment: NEWLINE? IDENTIFIER ('=' IDENTIFIER)* '=' expression NEWLINE?;
 function_call: IDENTIFIER (display | scan);
 arguments: expression (',' expression)*;
 

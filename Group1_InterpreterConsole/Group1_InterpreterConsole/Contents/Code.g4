@@ -76,7 +76,7 @@ operator
 unary_operator: '+' | '-';
 add_operator: '+' | '-';
 multiply_operator: '*' | '/' | '%';
-compare_operator: '>' | '<' | '>=' | '<=' | '=' | '<>';
+compare_operator: '>' | '<' | '>=' | '<=' | '==' | '<>';
 bool_operator: 'AND' | 'OR';
 concat_operator: '&';
 newline_operator: '$';

@@ -349,5 +349,25 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }; ;
         }
 
+        public override object? VisitRelationalExpression([NotNull] RelationalExpressionContext context)
+        {
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
+
+            var ops = context.compare_operator().GetText();
+
+            var result = op.Relational(left, right, ops);
+
+            if (result?.GetType() == typeof(bool))
+            {
+                return result.ToString()?.ToUpper();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
     }
 }

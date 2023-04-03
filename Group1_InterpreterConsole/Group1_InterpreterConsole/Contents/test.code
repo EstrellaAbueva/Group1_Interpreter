@@ -1,6 +1,6 @@
 ﻿# This is a sample CODE
 BEGIN CODE
-    INT c = 3 + 1
+    BOOL c = 3 < 4;
     DISPLAY: c
-    DISPLAY: 4 + 4
-END CODEa
+    DISPLAY: 3 == 3
+END CODE

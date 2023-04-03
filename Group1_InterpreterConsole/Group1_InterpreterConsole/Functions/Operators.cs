@@ -8,6 +8,23 @@ namespace Group1_InterpreterConsole.Functions
 {
     public class Operators
     {
+        public object? Unary(string symbol, object? value)
+        {
+            if (symbol == "+")
+                return value;
+
+            if (symbol == "-")
+            {
+                if (value is int i)
+                    return -i;
+                if (value is float f)
+                    return -f;
+            }
+
+            throw new Exception($"Cannot get unary value for symbol {symbol}");
+        }
+
+
         public object? Add(object? left, object? right)
         {
             if (left is int i && right is int j)

@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime.Misc;
 using Group1_InterpreterConsole.Contents;
+using Group1_InterpreterConsole.Functions;
 using Group1_InterpreterConsole.Methods;
 using System.ComponentModel;
 using System.Linq.Expressions;
@@ -12,6 +13,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
     public class Visitor : CodeBaseVisitor<object?>
     {
         private Dictionary<string, object?> Variables { get; set; } = new Dictionary<string, object?>();
+        private Operators op = new Operators();
 
         public override object? VisitProgram([NotNull] CodeParser.ProgramContext context)
         {
@@ -311,19 +313,50 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return Variables[name] = null;
         }
 
-        public override object? VisitUnaryExpression([NotNull] CodeParser.UnaryExpressionContext context)
-        {
-            var value = Visit(context);
+        //public override object? VisitUnaryExpression([NotNull] CodeParser.UnaryExpressionContext context)
+        //{
+        //    var value = Visit(context);
 
-            if (value is int i)
+        //    if (value is int i)
+        //    {
+        //        return -i;
+        //    }
+        //    if (value is float f)
+        //    {
+        //        return -f;
+        //    }
+        //    throw new ArgumentException("Unary minus operator can only be applied to numeric values");
+        //}
+
+        public override object? VisitAdditiveExpression([NotNull] AdditiveExpressionContext context)
+        {
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
+
+            var ops = context.add_operator().GetText();
+
+            return ops switch
             {
-                return -i;
-            }
-            if (value is float f)
+                "+" => op.Add(left, right),
+                "-" => op.Subtract(left, right),
+                _ => throw new NotImplementedException(),
+            }; ;
+        }
+
+        public override object? VisitMultiplicativeExpression([NotNull] MultiplicativeExpressionContext context)
+        {
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
+
+            var ops = context.multiply_operator().GetText();
+
+            return ops switch
             {
-                return -f;
-            }
-            throw new ArgumentException("Unary minus operator can only be applied to numeric values");
+                "*" => op.Multiply(left, right),
+                "/" => op.Divide(left, right),
+                "%" => op.Modulo(left, right),
+                _ => throw new NotImplementedException(),
+            }; ;
         }
 
     }

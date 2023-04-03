@@ -113,5 +113,82 @@ namespace Group1_InterpreterConsole.Functions
 
             throw new Exception($"Cannot get modulo for the values of types {left?.GetType()} and {right?.GetType()}");
         }
+
+        public object? Relational(object? left, object? right, string op)
+        {
+            if (op == ">")
+            {
+                if (left is int leftInt && right is int rightInt)
+                {
+                    return leftInt > rightInt;
+                }
+                else if (left is float leftFloat && right is float rightFloat)
+                {
+                    return leftFloat > rightFloat;
+                }
+                else
+                {
+                    throw new Exception($"Cannot compare values of types {left?.GetType()} and {right?.GetType()} with '>' operator");
+                }
+            }
+            else if (op == "<")
+            {
+                if (left is int leftInt && right is int rightInt)
+                {
+                    return leftInt < rightInt;
+                }
+                else if (left is float leftFloat && right is float rightFloat)
+                {
+                    return leftFloat < rightFloat;
+                }
+                else
+                {
+                    throw new Exception($"Cannot compare values of types {left?.GetType()} and {right?.GetType()} with '<' operator");
+                }
+            }
+            else if (op == ">=")
+            {
+                if (left is int leftInt && right is int rightInt)
+                {
+                    return leftInt >= rightInt;
+                }
+                else if (left is float leftFloat && right is float rightFloat)
+                {
+                    return leftFloat >= rightFloat;
+                }
+                else
+                {
+                    throw new Exception($"Cannot compare values of types {left?.GetType()} and {right?.GetType()} with '>=' operator");
+                }
+            }
+            else if (op == "<=")
+            {
+                if (left is int leftInt && right is int rightInt)
+                {
+                    return leftInt <= rightInt;
+                }
+                else if (left is float leftFloat && right is float rightFloat)
+                {
+                    return leftFloat <= rightFloat;
+                }
+                else
+                {
+                    throw new Exception($"Cannot compare values of types {left?.GetType()} and {right?.GetType()} with '<=' operator");
+                }
+            }
+            else if (op == "==")
+            {
+                return left?.Equals(right);
+            }
+            else if (op == "<>")
+            {
+                return !left?.Equals(right);
+            }
+            else
+            {
+                throw new Exception($"Invalid operator: {op}");
+            }
+        }
+
     }
 }

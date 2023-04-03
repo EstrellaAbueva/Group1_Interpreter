@@ -13,7 +13,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
     public class Visitor : CodeBaseVisitor<object?>
     {
         private Dictionary<string, object?> Variables { get; set; } = new Dictionary<string, object?>();
-        private Operators op = new Operators();
+        private Operators op = new ();
 
         public override object? VisitProgram([NotNull] CodeParser.ProgramContext context)
         {
@@ -313,20 +313,10 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return Variables[name] = null;
         }
 
-        //public override object? VisitUnaryExpression([NotNull] CodeParser.UnaryExpressionContext context)
-        //{
-        //    var value = Visit(context);
-
-        //    if (value is int i)
-        //    {
-        //        return -i;
-        //    }
-        //    if (value is float f)
-        //    {
-        //        return -f;
-        //    }
-        //    throw new ArgumentException("Unary minus operator can only be applied to numeric values");
-        //}
+        public override object? VisitUnaryExpression([NotNull] CodeParser.UnaryExpressionContext context)
+        {
+            return op.Unary(context.unary_operator().GetText(), Visit(context.expression()));
+        }
 
         public override object? VisitAdditiveExpression([NotNull] AdditiveExpressionContext context)
         {

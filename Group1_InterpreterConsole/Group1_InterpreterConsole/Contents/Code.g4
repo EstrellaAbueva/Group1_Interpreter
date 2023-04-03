@@ -55,7 +55,7 @@ expression
 	| IDENTIFIER											# identifierExpression
 	| '(' expression ')'									# parenthesisExpression
 	| 'NOT' expression										# NOTExpression
-	| expression unary_operator expression					# unaryExpression
+	| unary_operator expression								# unaryExpression
 	| expression add_operator expression					# additiveExpression
 	| expression multiply_operator expression				# multiplicativeExpression
 	| expression compare_operator expression				# relationalExpression

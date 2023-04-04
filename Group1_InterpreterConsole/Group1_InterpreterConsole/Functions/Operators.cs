@@ -229,19 +229,6 @@ namespace Group1_InterpreterConsole.Functions
             {
                 throw new ArgumentException($"Invalid escape sequence: {sequence}");
             }
-            /*switch (sequence)
-            {
-                case "\\\\": return "\\";
-                case "\\[": return "[";
-                case "\\]": return "]";
-                case "\\r": return "\r";
-                case "\\n": return "\n";
-                case "\\t": return "\t";
-                case "\\'": return "'";
-                case "\\\"": return "\"";
-                default:
-                    throw new ArgumentException($"Invalid escape sequence: {sequence}");
-            }*/
         }
     }
 }

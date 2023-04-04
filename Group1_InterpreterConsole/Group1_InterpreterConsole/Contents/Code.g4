@@ -8,7 +8,7 @@ line: (declaration | statement | COMMENT) NEWLINE;
 BEGIN: 'BEGIN CODE';
 END: 'END CODE';
 
-declaration: NEWLINE? type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ;  // INT a, b, c = 3
+declaration: NEWLINE? type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: NEWLINE? type IDENTIFIER ('=' (expression))?;
 variable_assignment: NEWLINE? type IDENTIFIER NEWLINE?;
@@ -34,7 +34,7 @@ FLOAT: [0-9]+('.' [0-9]+)?;
 BOOL: 'TRUE' | 'FALSE';
 CHAR: '\'' ~('\''|'\\') '\'';
 STRING: '"' ~('"')* '"';
-ESCAPE_SEQUENCE: '\\' . ;
+ESCAPE_SEQUENCE: '\\' ('\\' | '[' | ']' | 'r' | 'n' | 't' | '\'' | '"');
 IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
 statement 
@@ -61,7 +61,8 @@ expression
 	| expression compare_operator expression				# relationalExpression
 	| expression bool_operator expression					# boolOpExpression
 	| expression concat_operator expression					# concatOpExpression
-	| expression newline_operator expression				# newlineOpExpression
+	| newline_operator										# newlineOpExpression
+	| ESCAPE_SEQUENCE										# escapeSequenceExpression
 	;
 
 operator

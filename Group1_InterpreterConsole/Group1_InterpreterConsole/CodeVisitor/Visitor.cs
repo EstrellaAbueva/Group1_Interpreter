@@ -4,6 +4,7 @@ using Group1_InterpreterConsole.Functions;
 using Group1_InterpreterConsole.Methods;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using static Group1_InterpreterConsole.Contents.CodeParser;
@@ -392,14 +393,40 @@ namespace Group1_InterpreterConsole.CodeVisitor
             var left = Visit(context.expression(0));
             var right = Visit(context.expression(1));
             var boolop = context.bool_operator().GetText();
-            switch (boolop) {
-            case "AND":
-                return (Convert.ToBoolean(left) && Convert.ToBoolean(right)).ToString().ToUpper();
-            case "OR":
-                return (Convert.ToBoolean(left) || Convert.ToBoolean(right)).ToString().ToUpper();
-            default:
-                throw new Exception("Invalid boolean operator: " + boolop);
-            }
+
+            return op.BoolOperation(left, right, boolop);
         }
+
+        public override object? VisitEscapeSequenceExpression([NotNull] EscapeSequenceExpressionContext context)
+        {
+            var sequence = context.GetText().Substring(1);
+            var result = op.Escape(sequence);
+
+            if (result == null)
+            {
+                throw new ArgumentException("Invalid escape sequence");
+            }
+            return result;
+        }
+
+        public override object? VisitNewlineOpExpression([NotNull] NewlineOpExpressionContext context)
+        {
+            var count = context.ChildCount - 1;
+            var output = new StringBuilder();
+
+            for (int i = 0; i < count; i++)
+            {
+                var childContext = context.GetChild(i); 
+                var childOutput = Visit(childContext);
+
+                output.Append(childOutput);
+            }
+
+            output.Append(Environment.NewLine);
+
+            return output.ToString();
+        }
+
+
     }
 }

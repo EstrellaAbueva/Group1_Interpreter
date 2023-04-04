@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Group1_InterpreterConsole.Functions
 {
@@ -204,5 +205,34 @@ namespace Group1_InterpreterConsole.Functions
             }
         }
 
+        public object? BoolOperation(object? left, object? right, string boolop)
+        {
+            switch (boolop)
+            {
+                case "AND":
+                    return (Convert.ToBoolean(left) && Convert.ToBoolean(right)).ToString().ToUpper();
+                case "OR":
+                    return (Convert.ToBoolean(left) || Convert.ToBoolean(right)).ToString().ToUpper();
+                default:
+                    throw new Exception("Invalid boolean operator: " + boolop);
+            }
+        }
+
+        public object? Escape(object? sequence)
+        {
+            switch (sequence)
+            {
+                case "\\\\": return "\\";
+                case "\\[": return "[";
+                case "\\]": return "]";
+                case "\\r": return "\r";
+                case "\\n": return "\n";
+                case "\\t": return "\t";
+                case "\\'": return "'";
+                case "\\\"": return "\"";
+                default:
+                    throw new ArgumentException($"Invalid escape sequence: {sequence}");
+            }
+        }
     }
 }

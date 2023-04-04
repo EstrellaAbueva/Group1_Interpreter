@@ -1,6 +1,6 @@
 ﻿grammar Code;
 
-program: NEWLINE? BEGIN NEWLINE statement* NEWLINE END;
+program: NEWLINE? BEGIN NEWLINE? statement* NEWLINE? END;
 variable_dec: declaration* NEWLINE?;
 executable_code: statement* NEWLINE?;
 line: (declaration | statement | COMMENT) NEWLINE;
@@ -44,10 +44,10 @@ statement
 	| while_loop
 	| display
 	| scan
-	| COMMENT
 	| declaration
 	| variable
 	| variable_assignment
+	| COMMENT
 	;
 
 expression
@@ -83,6 +83,6 @@ bool_operator: 'AND' | 'OR';
 concat_operator: '&';
 newline_operator: '$';
 
-WS: [ \t]+ -> skip;
-COMMENT: '#' ~[\r\n]* -> skip ;
-NEWLINE: '\n';
+WHITESPACE: [\t\r\n]+ -> skip;
+COMMENT: '#' ~[\n]* -> skip;
+NEWLINE: '\r'? '\n'| '\r';

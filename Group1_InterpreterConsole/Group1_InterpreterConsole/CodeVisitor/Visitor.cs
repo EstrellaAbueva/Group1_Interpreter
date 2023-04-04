@@ -399,13 +399,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitEscapeSequenceExpression([NotNull] EscapeSequenceExpressionContext context)
         {
-            var sequence = context.GetText().Substring(1, 1);
-            var result = op.Escape(sequence);
+            var sequence = context.GetText()[1];
+            var result = op.Escape(sequence) ?? throw new ArgumentException($"Invalid escape sequence: {context.GetText()}");
 
-            if (result == null)
-            {
-                throw new ArgumentException("Invalid escape sequence");
-            }
             return result;
         }
 

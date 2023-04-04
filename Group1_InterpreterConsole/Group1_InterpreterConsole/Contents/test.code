@@ -1,6 +1,13 @@
 ﻿# This is a sample CODE
 BEGIN CODE
     BOOL c = 3 < 4;
-    DISPLAY: c
-    DISPLAY: 3 == 3
+    BOOL a = "FALSE"
+    DISPLAY: NOT c AND NOT a                #FALSE && TRUE
+    DISPLAY: "FALSE" AND "FALSE"                #FALSE && FALSE
+    DISPLAY: "TRUE" AND "FALSE"                #T && F
+    DISPLAY: "TRUE" AND "TRUE"                #T && T
+    DISPLAY: a OR 2 > 0                #T || F
+    DISPLAY: 0 OR "TRUE"                #FALSE || TRUE
+    DISPLAY: 1 OR "TRUE"                #T || T
+    DISPLAY: 0 OR 0                #F || F
 END CODE

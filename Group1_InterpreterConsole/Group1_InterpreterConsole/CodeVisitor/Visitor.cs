@@ -344,7 +344,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 "/" => op.Divide(left, right),
                 "%" => op.Modulo(left, right),
                 _ => throw new NotImplementedException(),
-            }; ;
+            };
         }
 
         public override object? VisitRelationalExpression([NotNull] RelationalExpressionContext context)
@@ -366,6 +366,40 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
         }
 
+        public override object? VisitParenthesisExpression([NotNull] ParenthesisExpressionContext context)
+        {
+            return Visit(context.expression());
+        }
 
+        public override object? VisitNOTExpression([NotNull] NOTExpressionContext context)
+        {
+            var expressionValue = Visit(context.expression());
+
+            var negatedValue = op.Negation(expressionValue);
+
+            if (negatedValue != null && negatedValue is bool boolValue)
+            {
+                return boolValue.ToString()?.ToUpper();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public override object? VisitBoolOpExpression([NotNull] BoolOpExpressionContext context)
+        {
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
+            var boolop = context.bool_operator().GetText();
+            switch (boolop) {
+            case "AND":
+                return (Convert.ToBoolean(left) && Convert.ToBoolean(right)).ToString().ToUpper();
+            case "OR":
+                return (Convert.ToBoolean(left) || Convert.ToBoolean(right)).ToString().ToUpper();
+            default:
+                throw new Exception("Invalid boolean operator: " + boolop);
+            }
+        }
     }
 }

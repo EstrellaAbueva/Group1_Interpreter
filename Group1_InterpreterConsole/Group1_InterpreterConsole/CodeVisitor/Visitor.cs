@@ -368,6 +368,11 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
         }
 
+        public override object? VisitParenthesisExpression([NotNull] ParenthesisExpressionContext context)
+        {
+            return Visit(context.expression());
+        }
+
         public override object? VisitNOTExpression([NotNull] NOTExpressionContext context)
         {
             var expressionValue = Visit(context.expression());
@@ -384,9 +389,19 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
         }
 
-        public override object? VisitParenthesisExpression([NotNull] ParenthesisExpressionContext context)
+        public override object? VisitBoolOpExpression([NotNull] BoolOpExpressionContext context)
         {
-            return Visit(context.expression());
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
+            var boolop = context.bool_operator().GetText();
+            switch (boolop) {
+            case "AND":
+                return (Convert.ToBoolean(left) && Convert.ToBoolean(right)).ToString().ToUpper();
+            case "OR":
+                return (Convert.ToBoolean(left) || Convert.ToBoolean(right)).ToString().ToUpper();
+            default:
+                throw new Exception("Invalid boolean operator: " + boolop);
+            }
         }
     }
 }

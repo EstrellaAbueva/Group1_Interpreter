@@ -34,7 +34,7 @@ FLOAT: [0-9]+('.' [0-9]+)?;
 BOOL: 'TRUE' | 'FALSE';
 CHAR: '\'' ~('\''|'\\') '\'';
 STRING: '"' ~('"')* '"';
-ESCAPE_SEQUENCE: '\\' ('\\' | '[' | ']' | 'r' | 'n' | 't' | '\'' | '"');
+ESCAPE_SEQUENCE: '[' . ']';
 IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
 statement 

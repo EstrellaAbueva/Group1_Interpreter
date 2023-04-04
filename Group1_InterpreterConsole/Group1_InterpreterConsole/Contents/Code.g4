@@ -8,11 +8,11 @@ line: (declaration | statement | COMMENT) NEWLINE;
 BEGIN: 'BEGIN CODE';
 END: 'END CODE';
 
-declaration: NEWLINE? type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ; 
+declaration: NEWLINE? type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: NEWLINE? type IDENTIFIER ('=' (expression))?;
 variable_assignment: NEWLINE? type IDENTIFIER NEWLINE?;
-assignment: NEWLINE? IDENTIFIER '=' expression NEWLINE?;
+assignment: NEWLINE? IDENTIFIER ('=' IDENTIFIER)* '=' expression NEWLINE?;
 function_call: IDENTIFIER (display | scan);
 arguments: expression (',' expression)*;
 
@@ -34,7 +34,7 @@ FLOAT: [0-9]+('.' [0-9]+)?;
 BOOL: 'TRUE' | 'FALSE';
 CHAR: '\'' ~('\''|'\\') '\'';
 STRING: '"' ~('"')* '"';
-ESCAPE_SEQUENCE: '\\' . ;
+ESCAPE_SEQUENCE: '\\' ('\\' | '[' | ']' | 'r' | 'n' | 't' | '\'' | '"');
 IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
 statement 
@@ -46,6 +46,7 @@ statement
 	| scan
 	| COMMENT
 	| declaration
+	| variable
 	| variable_assignment
 	;
 
@@ -54,12 +55,14 @@ expression
 	| IDENTIFIER											# identifierExpression
 	| '(' expression ')'									# parenthesisExpression
 	| 'NOT' expression										# NOTExpression
-	| expression unary_operator expression					# unaryExpression
-	| expression add_operator expression					# addOpExpression
-	| expression multiply_operator expression				# multiplyOpExpression
-	| expression compare_operator expression				# compareOpExpression
+	| unary_operator expression								# unaryExpression
+	| expression multiply_operator expression				# multiplicativeExpression
+	| expression add_operator expression					# additiveExpression
+	| expression compare_operator expression				# relationalExpression
 	| expression bool_operator expression					# boolOpExpression
 	| expression concat_operator expression					# concatOpExpression
+	| newline_operator										# newlineOpExpression
+	| ESCAPE_SEQUENCE										# escapeSequenceExpression
 	;
 
 operator
@@ -75,7 +78,7 @@ operator
 unary_operator: '+' | '-';
 add_operator: '+' | '-';
 multiply_operator: '*' | '/' | '%';
-compare_operator: '>' | '<' | '>=' | '<=' | '=' | '<>';
+compare_operator: '>' | '<' | '>=' | '<=' | '==' | '<>';
 bool_operator: 'AND' | 'OR';
 concat_operator: '&';
 newline_operator: '$';

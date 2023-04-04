@@ -1,15 +1,20 @@
 ﻿using Antlr4.Runtime.Misc;
 using Group1_InterpreterConsole.Contents;
+using Group1_InterpreterConsole.Functions;
 using Group1_InterpreterConsole.Methods;
 using System.ComponentModel;
+using System.Linq.Expressions;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using static Group1_InterpreterConsole.Contents.CodeParser;
 
 namespace Group1_InterpreterConsole.CodeVisitor
 {
     public class Visitor : CodeBaseVisitor<object?>
     {
         private Dictionary<string, object?> Variables { get; set; } = new Dictionary<string, object?>();
+        private Operators op = new ();
 
         public override object? VisitProgram([NotNull] CodeParser.ProgramContext context)
         {
@@ -32,23 +37,14 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitAssignment([NotNull] CodeParser.AssignmentContext context)
         {
-            var varName = context.IDENTIFIER().GetText();
-            var value = VisitExpression(context.expression());
-
-            if (Variables.ContainsKey(varName))
+            var identifier = context.IDENTIFIER();
+            foreach(var i in identifier)
             {
-                var existingValue = Variables[varName];
-                var existingValueType = existingValue?.GetType();
-                var converter = existingValueType != null ? TypeDescriptor.GetConverter(existingValueType) : null;
-                var newValueWithType = converter?.ConvertFrom(value?.ToString() ?? "");
-                Variables[varName] = newValueWithType;
+                var expression = context.expression().Accept(this);
+                Variables[i.GetText()] = expression;
             }
-            else
-            {
-                Variables[varName] = value;
-            }
-
-            return Variables[varName];
+            
+            return null;
         }
 
         public override object? VisitVariable([NotNull] CodeParser.VariableContext context)
@@ -91,6 +87,10 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 text = Regex.Replace(text, @"\\(.)", "$1");
                 return text;
             }
+            else if (context.CHAR() != null)
+            {
+                return context.CHAR().GetText()[1];
+            }
             else
             {
                 throw new InvalidOperationException("Unknown literal type");
@@ -99,10 +99,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {
-            var displayValues = context.expression();
             var exp = Visit(context.expression());
 
-            Console.WriteLine(exp);
+            Console.Write(exp);
 
             return null;
         }
@@ -173,80 +172,56 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return VisitDeclaration(context.declaration());
             }
+            else if (context.variable_assignment() != null)
+            {
+                return VisitVariable_assignment(context.variable_assignment());
+            }
+            else if (context.variable() != null)
+            {
+                return VisitVariable(context.variable());
+            }
             else
             {
                 throw new Exception("Unknown statement type");
             }
         }
 
-        public override List<object?>? VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
+        public override List<object?> VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
         {
             var type = context.type().GetText();
-            var identifiers = context.IDENTIFIER().Select(x => x.GetText()).ToList();
+            var varnames = context.IDENTIFIER();      
 
-            var values = context.expression();
+            // remove type
+            var contextstring = context.GetText().Replace(type, "");
 
-            for (int j = 0; j < values.Count(); j++)
+            var contextParts = contextstring.Split(',');
+            var exp = context.expression();
+            int expctr = 0;
+
+            // traverse each part
+            for (int x = 0; x < contextParts.Length; x++)
             {
-                var value = values[j].GetText();
-                    
-                if (j >= identifiers.Count())
+                if (Variables.ContainsKey(varnames[x].GetText()))
                 {
-                    Console.WriteLine($"Too many values specified for variable '{string.Join(",", identifiers)}'");
-                    break;
+                    Console.WriteLine(varnames[x].GetText() + "is already declared");
+                    continue;
                 }
-
-                var identifier = identifiers[j];
-
-                if (Variables.ContainsKey(identifier))
+                if (contextParts[x].Contains('='))
                 {
-                    Console.WriteLine($"Variable '{identifier}' is already defined!");
+                    if ( expctr < exp.Count())
+                    {
+                        Variables[varnames[x].GetText()] = Visit(exp[expctr]);
+                        expctr++;
+                    }
                 }
                 else
                 {
-                    if (type.Equals("INT"))
-                    {
-                        if (int.TryParse(value, out int intValue))
-                        {
-                            Variables[identifier] = intValue;
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Invalid value for integer variable '{identifier}'");
-                        }
-                    }
-                    else if (type.Equals("FLOAT"))
-                    {
-                        if (float.TryParse(value, out float floatValue))
-                            Variables[identifier] = floatValue;
-                        else
-                            Console.WriteLine($"Invalid value for float variable '{identifier}'");
-                    }
-                    else if (bool.TryParse(value.ToString().Trim('"'), out bool boolValue))
-                    {
-                        var upperBoolValue = boolValue ? true : false;
-                        Variables[identifier] = upperBoolValue.ToString().ToUpper();
-                    }
-                    else if (type.Equals("CHAR"))
-                    {
-                        var charValue = value;
-                        if (charValue?.Length == 3 && charValue[0] == '\'' && charValue[2] == '\'')
-                            Variables[identifier] = charValue[1];
-                        else
-                            Console.WriteLine($"Invalid value for character variable '{identifier}'");
-                    }
-                    else if (type.Equals("STRING"))
-                    {
-                        Variables[identifier] = value.Trim('"');
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Invalid variable type '{type}'");
-                    }
+                    Variables[varnames[x].GetText()] = null;
                 }
+                
             }
 
-            return new List<object?>(); // add this to the end of the for loop
+            return new List<object?>();
         }
 
         public override object? VisitVariable_dec([NotNull] CodeParser.Variable_decContext context)
@@ -294,7 +269,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return output;
         }
 
-
         public override object? VisitIdentifierExpression([NotNull] CodeParser.IdentifierExpressionContext context)
         {
             var identifier = context.IDENTIFIER().GetText();
@@ -319,7 +293,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 return float.Parse(f.GetText());
             
             if (context.constant().CHAR() is { } g)
-                return char.Parse(g.GetText());
+                return g.GetText()[1];
 
             if (context.constant().STRING() is { } s)
                 return s.GetText()[1..^1];
@@ -337,6 +311,122 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             return Variables[name] = null;
         }
+
+        public override object? VisitUnaryExpression([NotNull] CodeParser.UnaryExpressionContext context)
+        {
+            return op.Unary(context.unary_operator().GetText(), Visit(context.expression()));
+        }
+
+        public override object? VisitAdditiveExpression([NotNull] AdditiveExpressionContext context)
+        {
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
+
+            var ops = context.add_operator().GetText();
+
+            return ops switch
+            {
+                "+" => op.Add(left, right),
+                "-" => op.Subtract(left, right),
+                _ => throw new NotImplementedException(),
+            }; ;
+        }
+
+        public override object? VisitMultiplicativeExpression([NotNull] MultiplicativeExpressionContext context)
+        {
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
+
+            var ops = context.multiply_operator().GetText();
+
+            return ops switch
+            {
+                "*" => op.Multiply(left, right),
+                "/" => op.Divide(left, right),
+                "%" => op.Modulo(left, right),
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        public override object? VisitRelationalExpression([NotNull] RelationalExpressionContext context)
+        {
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
+
+            var ops = context.compare_operator().GetText();
+
+            var result = op.Relational(left, right, ops);
+
+            if (result?.GetType() == typeof(bool))
+            {
+                return result.ToString()?.ToUpper();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public override object? VisitParenthesisExpression([NotNull] ParenthesisExpressionContext context)
+        {
+            return Visit(context.expression());
+        }
+
+        public override object? VisitNOTExpression([NotNull] NOTExpressionContext context)
+        {
+            var expressionValue = Visit(context.expression());
+
+            var negatedValue = op.Negation(expressionValue);
+
+            if (negatedValue != null && negatedValue is bool boolValue)
+            {
+                return boolValue.ToString()?.ToUpper();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public override object? VisitBoolOpExpression([NotNull] BoolOpExpressionContext context)
+        {
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
+            var boolop = context.bool_operator().GetText();
+
+            return op.BoolOperation(left, right, boolop);
+        }
+
+        public override object? VisitEscapeSequenceExpression([NotNull] EscapeSequenceExpressionContext context)
+        {
+            var sequence = context.GetText().Substring(1);
+            var result = op.Escape(sequence);
+
+            if (result == null)
+            {
+                throw new ArgumentException("Invalid escape sequence");
+            }
+            return result;
+        }
+
+        public override object? VisitNewlineOpExpression([NotNull] NewlineOpExpressionContext context)
+        {
+            var count = context.ChildCount - 1;
+            var output = new StringBuilder();
+
+            for (int i = 0; i < count; i++)
+            {
+                var childContext = context.GetChild(i); 
+                var childOutput = Visit(childContext);
+
+                output.Append(childOutput);
+            }
+
+            output.Append(Environment.NewLine);
+
+            return output.ToString();
+        }
+
 
     }
 }

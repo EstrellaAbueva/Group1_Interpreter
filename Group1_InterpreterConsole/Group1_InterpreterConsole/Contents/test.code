@@ -1,11 +1,10 @@
 ﻿# This is a sample CODE
 BEGIN CODE
-	CHAR a_1
-	INT x = 1,  y = 2, z = 3
-	FLOAT i = 1.3
-	BOOL t = "FALSE"
-	STRING e = "Hello World"
-	DISPLAY: "Ella"
-	# DISPLAY: t
-	DISPLAY: "Kobe" & e & i & x & y & z & z
+    INT x, y, z = 5
+    CHAR a_1 = 'n'
+    BOOL t = "TRUE"
+    x = y = 4
+    a_1 = 'c'
+    # this is a comment
+    DISPLAY: x & t & z & $ & a_1 & "last"
 END CODE

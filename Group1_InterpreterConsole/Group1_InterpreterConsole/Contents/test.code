@@ -1,6 +1,7 @@
 ﻿# This is a sample CODE
 BEGIN CODE
-    BOOL c = 3 < 4;
+    INT c = ((2 * (4/2) * 2)) + 2 * 2
     DISPLAY: c
-    DISPLAY: 3 == 3
+    FLOAT d = ((2 * (4/2) * 2) + 2 * (2 + 1.5) * 2
+    DISPLAY: d
 END CODE

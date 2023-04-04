@@ -346,7 +346,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 "/" => op.Divide(left, right),
                 "%" => op.Modulo(left, right),
                 _ => throw new NotImplementedException(),
-            }; ;
+            };
         }
 
         public override object? VisitRelationalExpression([NotNull] RelationalExpressionContext context)
@@ -368,6 +368,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
         }
 
-
+        public override object? VisitParenthesisExpression([NotNull] ParenthesisExpressionContext context)
+        {
+            return Visit(context.expression());
+        }
     }
 }

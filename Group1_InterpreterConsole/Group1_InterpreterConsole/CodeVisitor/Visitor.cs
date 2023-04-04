@@ -223,8 +223,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return new List<object?>();
         }
 
-
-
         public override object? VisitVariable_dec([NotNull] CodeParser.Variable_decContext context)
         {
             foreach (var declarationContext in context.declaration())

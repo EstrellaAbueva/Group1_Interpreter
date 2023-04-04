@@ -220,7 +220,16 @@ namespace Group1_InterpreterConsole.Functions
 
         public object? Escape(object? sequence)
         {
-            switch (sequence)
+            if(sequence != null)
+            {
+                sequence = Convert.ToChar(sequence);
+                return $"{sequence}";
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid escape sequence: {sequence}");
+            }
+            /*switch (sequence)
             {
                 case "\\\\": return "\\";
                 case "\\[": return "[";
@@ -232,7 +241,7 @@ namespace Group1_InterpreterConsole.Functions
                 case "\\\"": return "\"";
                 default:
                     throw new ArgumentException($"Invalid escape sequence: {sequence}");
-            }
+            }*/
         }
     }
 }

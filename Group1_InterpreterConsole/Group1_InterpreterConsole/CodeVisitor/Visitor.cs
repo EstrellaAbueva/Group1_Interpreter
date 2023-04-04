@@ -399,7 +399,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitEscapeSequenceExpression([NotNull] EscapeSequenceExpressionContext context)
         {
-            var sequence = context.GetText().Substring(1);
+            var sequence = context.GetText().Substring(1, 1);
             var result = op.Escape(sequence);
 
             if (result == null)
@@ -416,7 +416,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             for (int i = 0; i < count; i++)
             {
-                var childContext = context.GetChild(i); 
+                var childContext = context.GetChild(i);
                 var childOutput = Visit(childContext);
 
                 output.Append(childOutput);
@@ -426,7 +426,5 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             return output.ToString();
         }
-
-
     }
 }

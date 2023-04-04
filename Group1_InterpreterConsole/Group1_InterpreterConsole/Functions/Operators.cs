@@ -190,5 +190,19 @@ namespace Group1_InterpreterConsole.Functions
             }
         }
 
+        public object? Negation(object? op)
+        {
+            var not = Convert.ToBoolean(op);
+
+            if (not is bool boolValue)
+            {
+                return !boolValue;
+            }
+            else
+            {
+                throw new ArgumentException("Argument must be a boolean value.");
+            }
+        }
+
     }
 }

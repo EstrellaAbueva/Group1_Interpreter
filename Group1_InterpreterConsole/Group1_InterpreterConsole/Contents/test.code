@@ -1,13 +1,10 @@
 ﻿# This is a sample CODE
 BEGIN CODE
-    BOOL c = 3 < 4;
-    BOOL a = "FALSE"
-    DISPLAY: NOT c AND NOT a                #FALSE && TRUE
-    DISPLAY: "FALSE" AND "FALSE"                #FALSE && FALSE
-    DISPLAY: "TRUE" AND "FALSE"                #T && F
-    DISPLAY: "TRUE" AND "TRUE"                #T && T
-    DISPLAY: a OR 2 > 0                #T || F
-    DISPLAY: 0 OR "TRUE"                #FALSE || TRUE
-    DISPLAY: 1 OR "TRUE"                #T || T
-    DISPLAY: 0 OR 0                #F || F
+    INT x, y, z = 5
+    CHAR a_1 = 'n'
+    BOOL t = "TRUE"
+    x = y = 4
+    a_1 = 'c'
+    # this is a comment
+    DISPLAY: x & t & z & a_1 & "last"
 END CODE

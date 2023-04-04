@@ -61,6 +61,7 @@ expression
 	| expression compare_operator expression				# relationalExpression
 	| expression bool_operator expression					# boolOpExpression
 	| expression concat_operator expression					# concatOpExpression
+	| expression newline_operator expression				# newlineOpExpression
 	;
 
 operator

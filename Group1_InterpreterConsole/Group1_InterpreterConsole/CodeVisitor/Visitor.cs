@@ -368,6 +368,21 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
         }
 
+        public override object? VisitNOTExpression([NotNull] NOTExpressionContext context)
+        {
+            var expressionValue = Visit(context.expression());
+
+            var negatedValue = op.Negation(expressionValue);
+
+            if (negatedValue != null && negatedValue is bool boolValue)
+            {
+                return boolValue.ToString()?.ToUpper();
+            }
+            else
+            {
+                return null;
+            }
+        }
 
     }
 }

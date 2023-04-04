@@ -1,6 +1,6 @@
 ﻿# This is a sample CODE
 BEGIN CODE
     BOOL c = 3 < 4;
-    DISPLAY: c
+    DISPLAY: NOT c
     DISPLAY: 3 == 3
 END CODE

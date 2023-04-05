@@ -65,10 +65,21 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return constant[1];
             }
-            if (context.BOOL() != null)
+            else if (context.BOOL() != null)
             {
-                var boolValue = context.BOOL().GetText().ToLower() == "true";
-                return boolValue;
+                string boolValue = context.BOOL().GetText();
+
+                if (boolValue == "TRUE" || boolValue == "FALSE")
+                {
+                    if (boolValue == "TRUE")
+                        return true;
+                    else
+                        return false;
+                }
+                else
+                {
+                    throw new ArgumentException("BOOL value must be either \"TRUE\" or \"FALSE\".");
+                }
             }
             else if (context.INT() != null)
             {
@@ -96,6 +107,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 throw new InvalidOperationException("Unknown literal type");
             }
         }
+
 
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {
@@ -156,34 +168,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     throw new NotImplementedException();
             }
 
-        }
-
-        public override object? VisitStatement([NotNull] CodeParser.StatementContext context)
-        {
-            if (context.assignment() != null)
-            {
-                return VisitAssignment(context.assignment());
-            }
-            else if (context.display() != null)
-            {
-                return VisitDisplay(context.display());
-            }
-            else if (context.declaration() != null)
-            {
-                return VisitDeclaration(context.declaration());
-            }
-            else if (context.variable_assignment() != null)
-            {
-                return VisitVariable_assignment(context.variable_assignment());
-            }
-            else if (context.variable() != null)
-            {
-                return VisitVariable(context.variable());
-            }
-            else
-            {
-                throw new Exception("Unknown statement type");
-            }
         }
 
         public override List<object?> VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
@@ -286,12 +270,12 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitConstantExpression([NotNull] CodeParser.ConstantExpressionContext context)
         {
-            if(context.constant().INT() is { } i)
+            if (context.constant().INT() is { } i)
                 return int.Parse(i.GetText());
-            
+
             if (context.constant().FLOAT() is { } f)
                 return float.Parse(f.GetText());
-            
+
             if (context.constant().CHAR() is { } g)
                 return g.GetText()[1];
 
@@ -299,10 +283,26 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 return s.GetText()[1..^1];
 
             if (context.constant().BOOL() is { } b)
-                return b.GetText() == "True";
+            {
+                string boolValue = b.GetText();
+
+                if (boolValue == "TRUE" || boolValue == "FALSE")
+                {
+                    if (boolValue == "TRUE")
+                        return true;
+                    else
+                        return false;
+                }
+                else
+                {
+                    throw new ArgumentException("BOOL value must be either \"TRUE\" or \"FALSE\".");
+                }
+            }
 
             throw new NotImplementedException();
         }
+
+
 
         public override object? VisitVariable_assignment([NotNull] CodeParser.Variable_assignmentContext context)
         {

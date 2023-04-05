@@ -102,7 +102,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             var exp = Visit(context.expression());
 
             if (exp is bool b)
-               exp = b.ToString().ToUpper();
+                exp = b.ToString().ToUpper();
 
             Console.Write(exp);
 

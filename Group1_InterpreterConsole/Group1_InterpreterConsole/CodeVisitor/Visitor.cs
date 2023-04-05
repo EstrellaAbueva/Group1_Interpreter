@@ -67,19 +67,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
             else if (context.BOOL() != null)
             {
-                string boolValue = context.BOOL().GetText();
-
-                if (boolValue == "TRUE" || boolValue == "FALSE")
-                {
-                    if (boolValue == "TRUE")
-                        return true;
-                    else
-                        return false;
-                }
-                else
-                {
-                    throw new ArgumentException("BOOL value must be either \"TRUE\" or \"FALSE\".");
-                }
+                return bool.Parse(context.BOOL().GetText().ToUpper());
             }
             else if (context.INT() != null)
             {
@@ -112,6 +100,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {
             var exp = Visit(context.expression());
+
+            if (exp is bool b)
+               exp = b.ToString().ToUpper();
 
             Console.Write(exp);
 
@@ -148,25 +139,10 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 throw new Exception("Cannot compare null values");
             }
 
-            var op = context.comparison_operator().GetText();
+            var ops = context.comparison_operator().GetText();
+            op.Relational(left, right, ops);
 
-            switch (op)
-            {
-                case "==":
-                    return left.Equals(right);
-                case "!=":
-                    return !left.Equals(right);
-                case ">":
-                    return (dynamic)left > (dynamic)right;
-                case ">=":
-                    return (dynamic)left >= (dynamic)right;
-                case "<":
-                    return (dynamic)left < (dynamic)right;
-                case "<=":
-                    return (dynamic)left <= (dynamic)right;
-                default:
-                    throw new NotImplementedException();
-            }
+            return null;
 
         }
 
@@ -218,32 +194,37 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return null;
         }
 
-        public override object VisitConcatOpExpression([NotNull] CodeParser.ConcatOpExpressionContext context)
+        public override object? VisitConcatOpExpression([NotNull] CodeParser.ConcatOpExpressionContext context)
         {
             // Get the left and right expressions;
             var left = context.expression()[0].Accept(this);
             var right = context.expression()[1].Accept(this);
             var output = "";
+
             // Check if both left and right are variable names
-            if(left == null && right == null)
+            if (left == null && right == null)
             {
                 throw new NullReferenceException();
             }
-            if (left != null) {
+
+            if (left != null)
+            {
                 if (Variables.ContainsKey(left.ToString()!))
                 {
-                    output += Variables[left.ToString()!];
+                    var leftValue = Variables[left.ToString()!];
+                    output += (leftValue is bool boolValue && boolValue) ? "TRUE" : leftValue?.ToString()?.ToUpper();
                 }
                 else
                 {
                     output += left.ToString();
                 }
-            }    
-            if(right != null)
+            }
+            if (right != null)
             {
                 if (Variables.ContainsKey(right.ToString()!))
                 {
-                    output += Variables[right.ToString()!];
+                    var rightValue = Variables[right.ToString()!];
+                    output += (rightValue is bool boolValue && boolValue) ? "TRUE" : rightValue?.ToString()?.ToUpper();
                 }
                 else
                 {
@@ -252,6 +233,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
             return output;
         }
+
 
         public override object? VisitIdentifierExpression([NotNull] CodeParser.IdentifierExpressionContext context)
         {
@@ -272,36 +254,17 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             if (context.constant().INT() is { } i)
                 return int.Parse(i.GetText());
-
-            if (context.constant().FLOAT() is { } f)
+            else if (context.constant().FLOAT() is { } f)
                 return float.Parse(f.GetText());
-
-            if (context.constant().CHAR() is { } g)
+            else if (context.constant().CHAR() is { } g)
                 return g.GetText()[1];
-
-            if (context.constant().STRING() is { } s)
+            else if (context.constant().BOOL() is { } b)
+                return b.GetText().Equals("\"TRUE\"");
+            else if (context.constant().STRING() is { } s)
                 return s.GetText()[1..^1];
-
-            if (context.constant().BOOL() is { } b)
-            {
-                string boolValue = b.GetText();
-
-                if (boolValue == "TRUE" || boolValue == "FALSE")
-                {
-                    if (boolValue == "TRUE")
-                        return true;
-                    else
-                        return false;
-                }
-                else
-                {
-                    throw new ArgumentException("BOOL value must be either \"TRUE\" or \"FALSE\".");
-                }
-            }
 
             throw new NotImplementedException();
         }
-
 
 
         public override object? VisitVariable_assignment([NotNull] CodeParser.Variable_assignmentContext context)
@@ -329,7 +292,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 "+" => op.Add(left, right),
                 "-" => op.Subtract(left, right),
                 _ => throw new NotImplementedException(),
-            }; ;
+            };
         }
 
         public override object? VisitMultiplicativeExpression([NotNull] MultiplicativeExpressionContext context)
@@ -361,10 +324,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return result.ToString()?.ToUpper();
             }
-            else
-            {
-                return null;
-            }
+            
+            return null;
         }
 
         public override object? VisitParenthesisExpression([NotNull] ParenthesisExpressionContext context)
@@ -375,17 +336,14 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitNOTExpression([NotNull] NOTExpressionContext context)
         {
             var expressionValue = Visit(context.expression());
-
             var negatedValue = op.Negation(expressionValue);
 
             if (negatedValue != null && negatedValue is bool boolValue)
             {
                 return boolValue.ToString()?.ToUpper();
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         public override object? VisitBoolOpExpression([NotNull] BoolOpExpressionContext context)

@@ -31,7 +31,7 @@ while_loop: 'WHILE' comparison 'DO' executable_code 'END WHILE';
 constant: INT | FLOAT | BOOL | CHAR | STRING;
 INT: [0-9]+;
 FLOAT: [0-9]+('.' [0-9]+)?;
-BOOL: 'TRUE' | 'FALSE';
+BOOL: '"TRUE"' | '"FALSE"' ;
 CHAR: '\'' ~('\''|'\\') '\'';
 STRING: '"' ~('"')* '"';
 ESCAPE_SEQUENCE: '[' . ']';

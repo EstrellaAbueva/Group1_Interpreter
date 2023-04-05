@@ -65,10 +65,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return constant[1];
             }
-            if (context.BOOL() != null)
+            else if (context.BOOL() != null)
             {
-                var boolValue = context.BOOL().GetText().ToLower() == "true";
-                return boolValue;
+                return bool.Parse(context.BOOL().GetText().ToUpper());
             }
             else if (context.INT() != null)
             {
@@ -100,6 +99,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {
             var exp = Visit(context.expression());
+
+            if (exp is bool b)
+                exp = b.ToString().ToUpper();
 
             Console.Write(exp);
 
@@ -286,20 +288,16 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitConstantExpression([NotNull] CodeParser.ConstantExpressionContext context)
         {
-            if(context.constant().INT() is { } i)
+            if (context.constant().INT() is { } i)
                 return int.Parse(i.GetText());
-            
-            if (context.constant().FLOAT() is { } f)
+            else if (context.constant().FLOAT() is { } f)
                 return float.Parse(f.GetText());
-            
-            if (context.constant().CHAR() is { } g)
+            else if (context.constant().CHAR() is { } g)
                 return g.GetText()[1];
-
-            if (context.constant().STRING() is { } s)
+            else if (context.constant().BOOL() is { } b)
+                return b.GetText().Equals("\"TRUE\"");
+            else if (context.constant().STRING() is { } s)
                 return s.GetText()[1..^1];
-
-            if (context.constant().BOOL() is { } b)
-                return b.GetText() == "True";
 
             throw new NotImplementedException();
         }

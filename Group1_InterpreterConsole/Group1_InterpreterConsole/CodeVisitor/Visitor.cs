@@ -160,34 +160,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         }
 
-        public override object? VisitStatement([NotNull] CodeParser.StatementContext context)
-        {
-            if (context.assignment() != null)
-            {
-                return VisitAssignment(context.assignment());
-            }
-            else if (context.display() != null)
-            {
-                return VisitDisplay(context.display());
-            }
-            else if (context.declaration() != null)
-            {
-                return VisitDeclaration(context.declaration());
-            }
-            else if (context.variable_assignment() != null)
-            {
-                return VisitVariable_assignment(context.variable_assignment());
-            }
-            else if (context.variable() != null)
-            {
-                return VisitVariable(context.variable());
-            }
-            else
-            {
-                throw new Exception("Unknown statement type");
-            }
-        }
-
         public override List<object?> VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
         {
             var type = context.type().GetText();
@@ -239,44 +211,17 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object VisitConcatOpExpression([NotNull] CodeParser.ConcatOpExpressionContext context)
         {
             // Get the left and right expressions;
-            var left = context.expression()[0].Accept(this);
-            var right = context.expression()[1].Accept(this);
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
             var output = "";
-            // Check if both left and right are variable names
-
+            
             if(left is bool b)
                 left = b.ToString().ToUpper();
 
             if(right is bool c)
                 right = c.ToString().ToUpper();
 
-
-            if (left == null && right == null)
-            {
-                throw new NullReferenceException();
-            }
-            if (left != null)
-            {
-                if (Variables.ContainsKey(left.ToString()!))
-                {
-                    output += Variables[left.ToString()!];
-                }
-                else
-                {
-                    output += left.ToString();
-                }
-            }
-            if (right != null)
-            {
-                if (Variables.ContainsKey(right.ToString()!))
-                {
-                    output += Variables[right.ToString()!];
-                }
-                else
-                {
-                    output += right.ToString();
-                }
-            }
+            output = $"{left}{right}";
             return output;
         }
 

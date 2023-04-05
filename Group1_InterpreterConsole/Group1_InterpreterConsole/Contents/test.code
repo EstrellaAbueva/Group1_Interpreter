@@ -6,6 +6,5 @@ BEGIN CODE
     x = y = 4
     a_1 = 'c'
     # this is a comment
-    DISPLAY: t
     DISPLAY: x & t & z & $ & a_1 & [#] & "last"
 END CODE

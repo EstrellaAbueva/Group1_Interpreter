@@ -108,7 +108,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return null;
         }
 
-
         public override object VisitType([NotNull] CodeParser.TypeContext context)
         {
             switch (context.GetText())
@@ -188,7 +187,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
         }
 
-        public override List<object?> VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
+        public override object? VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
         {
             var type = context.type().GetText();
             var varnames = context.IDENTIFIER();
@@ -223,7 +222,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             }
 
-            return new List<object?>();
+            return null;
         }
 
         public override object? VisitVariable_dec([NotNull] CodeParser.Variable_decContext context)
@@ -424,6 +423,19 @@ namespace Group1_InterpreterConsole.CodeVisitor
             output.Append(Environment.NewLine);
 
             return output.ToString();
+        }
+
+        public override object? VisitScan(CodeParser.ScanContext context)
+        {
+            foreach (var id in context.IDENTIFIER())
+            {
+                string input = Console.ReadLine() ?? "";
+                if (id.GetText() != null)
+                {
+                    Variables[id.GetText()] = input;
+                }
+            }
+            return null;
         }
     }
 }

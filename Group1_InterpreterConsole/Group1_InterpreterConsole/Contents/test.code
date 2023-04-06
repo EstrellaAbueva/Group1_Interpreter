@@ -7,5 +7,5 @@ BEGIN CODE
     a_1 = 'c'
     # this is a comment
     DISPLAY: t
-    DISPLAY: x & t & z & $ & a_1 & [#] & "last"
+    DISPLAY: x & y & t & z & $ & a_1 & [#] & "last"
 END CODE

@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime.Misc;
 using Group1_InterpreterConsole.Contents;
+using Group1_InterpreterConsole.ErrorHandling;
 using Group1_InterpreterConsole.Functions;
 using Group1_InterpreterConsole.Methods;
 using System.ComponentModel;
@@ -126,38 +127,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 default:
                     throw new NotImplementedException("Invalid Data Type");
             }
-        }
-
-        public override object? VisitComparison([NotNull] CodeParser.ComparisonContext context)
-        {
-            var left = Visit(context.expression()[0]);
-            var right = Visit(context.expression()[1]);
-
-            if (left is null || right is null)
-            {
-                throw new Exception("Cannot compare null values");
-            }
-
-            var op = context.comparison_operator().GetText();
-
-            switch (op)
-            {
-                case "==":
-                    return left.Equals(right);
-                case "!=":
-                    return !left.Equals(right);
-                case ">":
-                    return (dynamic)left > (dynamic)right;
-                case ">=":
-                    return (dynamic)left >= (dynamic)right;
-                case "<":
-                    return (dynamic)left < (dynamic)right;
-                case "<=":
-                    return (dynamic)left <= (dynamic)right;
-                default:
-                    throw new NotImplementedException();
-            }
-
         }
 
         public override List<object?> VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
@@ -369,6 +338,21 @@ namespace Group1_InterpreterConsole.CodeVisitor
             output.Append(Environment.NewLine);
 
             return output.ToString();
+        }
+
+        public override object? VisitIf_block([NotNull] If_blockContext context)
+        {
+            var condition = Visit(context.expression());
+             
+            if (ErrorHandler.ConditionChecker(condition) == true)
+            {
+                var lines = context.line().ToList();
+                foreach (var line in lines)
+                {
+                    Visit(line);
+                }
+            }
+            return null;
         }
     }
 }

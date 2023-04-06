@@ -3,7 +3,7 @@
 program: NEWLINE? BEGIN NEWLINE? statement* NEWLINE? END;
 variable_dec: declaration* NEWLINE?;
 executable_code: statement* NEWLINE?;
-line: (declaration | statement | COMMENT) NEWLINE;
+line: (declaration | statement | COMMENT) NEWLINE?;
 
 BEGIN: 'BEGIN CODE';
 END: 'END CODE';
@@ -19,14 +19,13 @@ arguments: expression (',' expression)*;
 display: NEWLINE? 'DISPLAY' ':' expression NEWLINE?;
 scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)* NEWLINE?;
 
-if_statement: if_block else_if_block* else_block? 'END IF';
-if_block: 'IF' comparison 'THEN' executable_code;
-else_if_block: 'ELSE IF' comparison 'THEN' executable_code;
-else_block: 'ELSE' executable_code;
-comparison: expression* comparison_operator expression*;
-comparison_operator: '>' | '<' | '>=' | '<=' | '=' | '<>';
+BEGIN_IF: 'BEGIN IF';
+END_IF: 'END IF';
+if_block: 'IF' '(' expression ')' BEGIN_IF line* END_IF else_if_block* else_block?;
+else_if_block: 'ELSE IF' BEGIN_IF '('expression ')' line* END_IF NEWLINE?;
+else_block: 'ELSE' BEGIN_IF line* END_IF NEWLINE?;
 
-while_loop: 'WHILE' comparison 'DO' executable_code 'END WHILE';
+while_loop: 'WHILE' expression 'DO' line 'END WHILE';
 
 constant: INT | FLOAT | BOOL | CHAR | STRING;
 INT: [0-9]+;
@@ -40,7 +39,7 @@ IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 statement 
 	: assignment
 	| function_call 
-	| if_statement 
+	| if_block 
 	| while_loop
 	| display
 	| scan
@@ -48,6 +47,7 @@ statement
 	| variable
 	| variable_assignment
 	| COMMENT
+	| expression
 	;
 
 expression

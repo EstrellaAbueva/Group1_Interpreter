@@ -48,7 +48,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
                 // check type
                 if (VarTypes[i.GetText()] == expression?.GetType())
-                {
+                { 
                     Variables[i.GetText()] = expression;
                 }
                 else

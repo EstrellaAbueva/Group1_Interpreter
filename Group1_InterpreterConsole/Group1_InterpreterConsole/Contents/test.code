@@ -1,12 +1,7 @@
 ﻿# asdasdasd
 BEGIN CODE
-    INT x, y, z=5
-    CHAR a_1 = 'n'
-    BOOL t = "TRUE"
-    t = (a < b AND c <>200)
-    x = y = 4
-    a_1 = 'c'
-    # this is a comment
-    DISPLAY: t
-    DISPLAY: x & t & z & $ & a_1 & [#] & "last"
+  INT a=100, b=200, c=300 
+  BOOL d="FALSE"
+  d = (a < b AND c <>200)
+  DISPLAY: d
 END CODE

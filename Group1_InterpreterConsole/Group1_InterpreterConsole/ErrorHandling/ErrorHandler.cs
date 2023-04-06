@@ -16,6 +16,9 @@ namespace Group1_InterpreterConsole.ErrorHandling
             throw new Exception($"Cannot convert {value} to bool");
         }
 
-
+        public static bool IsValidType(object? obj)
+        {
+            return obj is int || obj is float || obj is bool || obj is char || obj is string;
+        }
     }
 }

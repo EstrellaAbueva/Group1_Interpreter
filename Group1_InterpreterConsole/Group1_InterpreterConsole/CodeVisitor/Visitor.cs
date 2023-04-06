@@ -14,7 +14,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
     public class Visitor : CodeBaseVisitor<object?>
     {
         private Dictionary<string, object?> Variables { get; set; } = new Dictionary<string, object?>();
-        private Operators op = new ();
+        private Operators op = new();
 
         public override object? VisitProgram([NotNull] CodeParser.ProgramContext context)
         {
@@ -31,19 +31,19 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 Console.WriteLine("Code must start with 'BEGIN CODE' and end with 'END CODE'.");
             }
-            
+
             return null;
         }
 
         public override object? VisitAssignment([NotNull] CodeParser.AssignmentContext context)
         {
             var identifier = context.IDENTIFIER();
-            foreach(var i in identifier)
+            foreach (var i in identifier)
             {
                 var expression = context.expression().Accept(this);
                 Variables[i.GetText()] = expression;
             }
-            
+
             return null;
         }
 
@@ -65,10 +65,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return constant[1];
             }
-            if (context.BOOL() != null)
+            else if (context.BOOL() != null)
             {
-                var boolValue = context.BOOL().GetText().ToLower() == "true";
-                return boolValue;
+                return bool.Parse(context.BOOL().GetText().ToUpper());
             }
             else if (context.INT() != null)
             {
@@ -100,6 +99,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {
             var exp = Visit(context.expression());
+
+            if (exp is bool b)
+                exp = b.ToString().ToUpper();
 
             Console.Write(exp);
 
@@ -189,7 +191,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override List<object?> VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
         {
             var type = context.type().GetText();
-            var varnames = context.IDENTIFIER();      
+            var varnames = context.IDENTIFIER();
 
             // remove type
             var contextstring = context.GetText().Replace(type, "");
@@ -208,7 +210,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 }
                 if (contextParts[x].Contains('='))
                 {
-                    if ( expctr < exp.Count())
+                    if (expctr < exp.Count())
                     {
                         Variables[varnames[x].GetText()] = Visit(exp[expctr]);
                         expctr++;
@@ -218,7 +220,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 {
                     Variables[varnames[x].GetText()] = null;
                 }
-                
+
             }
 
             return new List<object?>();
@@ -241,11 +243,20 @@ namespace Group1_InterpreterConsole.CodeVisitor
             var right = context.expression()[1].Accept(this);
             var output = "";
             // Check if both left and right are variable names
-            if(left == null && right == null)
+
+            if(left is bool b)
+                left = b.ToString().ToUpper();
+
+            if(right is bool c)
+                right = c.ToString().ToUpper();
+
+
+            if (left == null && right == null)
             {
                 throw new NullReferenceException();
             }
-            if (left != null) {
+            if (left != null)
+            {
                 if (Variables.ContainsKey(left.ToString()!))
                 {
                     output += Variables[left.ToString()!];
@@ -254,8 +265,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 {
                     output += left.ToString();
                 }
-            }    
-            if(right != null)
+            }
+            if (right != null)
             {
                 if (Variables.ContainsKey(right.ToString()!))
                 {
@@ -286,20 +297,16 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitConstantExpression([NotNull] CodeParser.ConstantExpressionContext context)
         {
-            if(context.constant().INT() is { } i)
+            if (context.constant().INT() is { } i)
                 return int.Parse(i.GetText());
-            
-            if (context.constant().FLOAT() is { } f)
+            else if (context.constant().FLOAT() is { } f)
                 return float.Parse(f.GetText());
-            
-            if (context.constant().CHAR() is { } g)
+            else if (context.constant().CHAR() is { } g)
                 return g.GetText()[1];
-
-            if (context.constant().STRING() is { } s)
+            else if (context.constant().BOOL() is { } b)
+                return b.GetText().Equals("\"TRUE\"");
+            else if (context.constant().STRING() is { } s)
                 return s.GetText()[1..^1];
-
-            if (context.constant().BOOL() is { } b)
-                return b.GetText() == "True";
 
             throw new NotImplementedException();
         }
@@ -361,10 +368,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return result.ToString()?.ToUpper();
             }
-            else
-            {
-                return null;
-            }
+           
+            return null;
         }
 
         public override object? VisitParenthesisExpression([NotNull] ParenthesisExpressionContext context)
@@ -382,10 +387,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 return boolValue.ToString()?.ToUpper();
             }
-            else
-            {
-                return null;
-            }
+            
+             return null;
         }
 
         public override object? VisitBoolOpExpression([NotNull] BoolOpExpressionContext context)

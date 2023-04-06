@@ -3,8 +3,6 @@ BEGIN CODE
     INT x = 2
     IF (x == 2)
 		BEGIN IF
-			DISPLAY: "x is 2"
-		ELSE IF
-			DISPLAY: "x is not 2"
+			DISPLAY: x
 		END IF
 END CODE

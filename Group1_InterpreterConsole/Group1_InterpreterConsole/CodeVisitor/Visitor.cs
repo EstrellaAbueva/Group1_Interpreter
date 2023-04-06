@@ -323,6 +323,21 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return op.BoolOperation(left, right, boolop);
         }
 
+        public override object? VisitIf_block([NotNull] If_blockContext context)
+        {
+            var condition = Visit(context.expression());
+
+            if (ErrorHandler.ConditionChecker(condition) == true)
+            {
+                var lines = context.line().ToList();
+                foreach (var line in lines)
+                {
+                    Visit(line);
+                }
+            }
+            return null;
+        }
+
         public override object? VisitEscapeSequenceExpression([NotNull] EscapeSequenceExpressionContext context)
         {
             var sequence = context.GetText()[1];

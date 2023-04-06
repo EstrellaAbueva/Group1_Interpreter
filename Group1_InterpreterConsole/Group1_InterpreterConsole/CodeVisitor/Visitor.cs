@@ -1,9 +1,12 @@
 ﻿using Antlr4.Runtime.Misc;
 using Group1_InterpreterConsole.Contents;
+using Group1_InterpreterConsole.ErrorHandling;
 using Group1_InterpreterConsole.Functions;
 using Group1_InterpreterConsole.Methods;
+using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -14,6 +17,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
     public class Visitor : CodeBaseVisitor<object?>
     {
         private Dictionary<string, object?> Variables { get; set; } = new Dictionary<string, object?>();
+        private Dictionary<string, object?> VarTypes { get; set; } = new Dictionary<string, object?>();
         private Operators op = new();
 
         public override object? VisitProgram([NotNull] CodeParser.ProgramContext context)
@@ -41,7 +45,16 @@ namespace Group1_InterpreterConsole.CodeVisitor
             foreach (var i in identifier)
             {
                 var expression = context.expression().Accept(this);
-                Variables[i.GetText()] = expression;
+
+                // check type
+                if (VarTypes[i.GetText()] == expression?.GetType())
+                {
+                    Variables[i.GetText()] = expression;
+                }
+                else
+                {
+                    throw new InvalidCastException($"Cannot convert type {expression?.GetType()} to {VarTypes[i.GetText()]}");
+                }   
             }
 
             return null;
@@ -67,7 +80,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
             else if (context.BOOL() != null)
             {
-                return bool.Parse(context.BOOL().GetText().ToUpper());
+                return bool.Parse(context.BOOL().GetText());
             }
             else if (context.INT() != null)
             {
@@ -108,7 +121,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return null;
         }
 
-
         public override object VisitType([NotNull] CodeParser.TypeContext context)
         {
             switch (context.GetText())
@@ -128,73 +140,14 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
         }
 
-        public override object? VisitComparison([NotNull] CodeParser.ComparisonContext context)
+        public override object? VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
         {
-            var left = Visit(context.expression()[0]);
-            var right = Visit(context.expression()[1]);
-
-            if (left is null || right is null)
-            {
-                throw new Exception("Cannot compare null values");
-            }
-
-            var op = context.comparison_operator().GetText();
-
-            switch (op)
-            {
-                case "==":
-                    return left.Equals(right);
-                case "!=":
-                    return !left.Equals(right);
-                case ">":
-                    return (dynamic)left > (dynamic)right;
-                case ">=":
-                    return (dynamic)left >= (dynamic)right;
-                case "<":
-                    return (dynamic)left < (dynamic)right;
-                case "<=":
-                    return (dynamic)left <= (dynamic)right;
-                default:
-                    throw new NotImplementedException();
-            }
-
-        }
-
-        public override object? VisitStatement([NotNull] CodeParser.StatementContext context)
-        {
-            if (context.assignment() != null)
-            {
-                return VisitAssignment(context.assignment());
-            }
-            else if (context.display() != null)
-            {
-                return VisitDisplay(context.display());
-            }
-            else if (context.declaration() != null)
-            {
-                return VisitDeclaration(context.declaration());
-            }
-            else if (context.variable_assignment() != null)
-            {
-                return VisitVariable_assignment(context.variable_assignment());
-            }
-            else if (context.variable() != null)
-            {
-                return VisitVariable(context.variable());
-            }
-            else
-            {
-                throw new Exception("Unknown statement type");
-            }
-        }
-
-        public override List<object?> VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
-        {
-            var type = context.type().GetText();
+            var type = Visit(context.type());
+            var typestr = context.type().GetText();
             var varnames = context.IDENTIFIER();
 
             // remove type
-            var contextstring = context.GetText().Replace(type, "");
+            var contextstring = context.GetText().Replace(typestr, "");
 
             var contextParts = contextstring.Split(',');
             var exp = context.expression();
@@ -212,18 +165,26 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 {
                     if (expctr < exp.Count())
                     {
-                        Variables[varnames[x].GetText()] = Visit(exp[expctr]);
-                        expctr++;
+                        // check type
+                        if (type == Visit(exp[expctr])?.GetType()){
+                            Variables[varnames[x].GetText()] = Visit(exp[expctr]);
+                            VarTypes[varnames[x].GetText()] = type;
+                            expctr++;
+                        }
+                        else
+                        {
+                            throw new InvalidCastException($"Cannot convert type {Visit(exp[expctr])?.GetType()} to {type}");
+                        }
                     }
                 }
                 else
                 {
                     Variables[varnames[x].GetText()] = null;
+                    VarTypes[varnames[x].GetText()] = type;
                 }
-
             }
 
-            return new List<object?>();
+            return null;
         }
 
         public override object? VisitVariable_dec([NotNull] CodeParser.Variable_decContext context)
@@ -239,44 +200,17 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object VisitConcatOpExpression([NotNull] CodeParser.ConcatOpExpressionContext context)
         {
             // Get the left and right expressions;
-            var left = context.expression()[0].Accept(this);
-            var right = context.expression()[1].Accept(this);
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
             var output = "";
-            // Check if both left and right are variable names
-
+            
             if(left is bool b)
                 left = b.ToString().ToUpper();
 
             if(right is bool c)
                 right = c.ToString().ToUpper();
 
-
-            if (left == null && right == null)
-            {
-                throw new NullReferenceException();
-            }
-            if (left != null)
-            {
-                if (Variables.ContainsKey(left.ToString()!))
-                {
-                    output += Variables[left.ToString()!];
-                }
-                else
-                {
-                    output += left.ToString();
-                }
-            }
-            if (right != null)
-            {
-                if (Variables.ContainsKey(right.ToString()!))
-                {
-                    output += Variables[right.ToString()!];
-                }
-                else
-                {
-                    output += right.ToString();
-                }
-            }
+            output = $"{left}{right}";
             return output;
         }
 
@@ -313,9 +247,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitVariable_assignment([NotNull] CodeParser.Variable_assignmentContext context)
         {
-            var type = context.type().GetText();
             var name = context.IDENTIFIER().GetText();
 
+            VarTypes[name] = Visit(context.type());
             return Variables[name] = null;
         }
 
@@ -366,7 +300,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             if (result?.GetType() == typeof(bool))
             {
-                return result.ToString()?.ToUpper();
+                return result.ToString();
             }
            
             return null;
@@ -385,7 +319,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             if (negatedValue != null && negatedValue is bool boolValue)
             {
-                return boolValue.ToString()?.ToUpper();
+                return boolValue.ToString();
             }
             
              return null;
@@ -398,6 +332,21 @@ namespace Group1_InterpreterConsole.CodeVisitor
             var boolop = context.bool_operator().GetText();
 
             return op.BoolOperation(left, right, boolop);
+        }
+
+        public override object? VisitIf_block([NotNull] If_blockContext context)
+        {
+            var condition = Visit(context.expression());
+
+            if (ErrorHandler.ConditionChecker(condition) == true)
+            {
+                var lines = context.line().ToList();
+                foreach (var line in lines)
+                {
+                    Visit(line);
+                }
+            }
+            return null;
         }
 
         public override object? VisitEscapeSequenceExpression([NotNull] EscapeSequenceExpressionContext context)
@@ -424,6 +373,45 @@ namespace Group1_InterpreterConsole.CodeVisitor
             output.Append(Environment.NewLine);
 
             return output.ToString();
+        }
+
+        public override object? VisitScan([NotNull] ScanContext context)
+        {
+            foreach (var id in context.IDENTIFIER())
+            {
+                //testing purposes can be removed or kept after review
+                Console.Write($"Awaiting input for {id.GetText()}: ");
+
+                string input = Console.ReadLine() ?? "";
+                if (id.GetText() != null)
+                {
+                   if(VarTypes[id.GetText()] == typeof(int))
+                    {
+                        Variables[id.GetText()] = Convert.ToInt32(input);
+                    }
+                   else if (VarTypes[id.GetText()] == typeof(float))
+                    {
+                        Variables[id.GetText()] = Convert.ToDouble(input);
+                    }
+                   else if (VarTypes[id.GetText()] == typeof(bool))
+                    {
+                        Variables[id.GetText()] = Convert.ToBoolean(input);
+                    }
+                   else if (VarTypes[id.GetText()] == typeof(char))
+                    {
+                        Variables[id.GetText()] = Convert.ToChar(input);
+                    }
+                   else if (VarTypes[id.GetText()] == typeof(string))
+                    {
+                        Variables[id.GetText()] = Convert.ToString(input);
+                    }
+                    else
+                    {
+                        throw new Exception("Data type does not exist!");
+                    }
+                }
+            }
+            return null;
         }
     }
 }

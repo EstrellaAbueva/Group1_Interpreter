@@ -2,6 +2,7 @@
 using Group1_InterpreterConsole.Contents;
 using Group1_InterpreterConsole.Functions;
 using Group1_InterpreterConsole.Methods;
+using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Security.Cryptography.X509Certificates;
@@ -454,29 +455,33 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 //testing purposes can be removed or kept after review
                 Console.WriteLine($"Awaiting input for {id.GetText()}");
+
                 string input = Console.ReadLine() ?? "";
                 if (id.GetText() != null)
                 {
-                    Console.WriteLine(Variables[id.GetText()]?.GetType());
-                   if(Variables[id.GetText()] is int)
+                   if(VarTypes[id.GetText()] == typeof(int))
                     {
                         Variables[id.GetText()] = Convert.ToInt32(input);
                     }
-                   else if (Variables[id.GetText()] is float)
+                   else if (VarTypes[id.GetText()] == typeof(float))
                     {
                         Variables[id.GetText()] = Convert.ToDouble(input);
                     }
-                   else if (Variables[id.GetText()] is bool)
+                   else if (VarTypes[id.GetText()] == typeof(bool))
                     {
                         Variables[id.GetText()] = Convert.ToBoolean(input);
                     }
-                   else if (Variables[id.GetText()] is char)
+                   else if (VarTypes[id.GetText()] == typeof(char))
                     {
                         Variables[id.GetText()] = Convert.ToChar(input);
                     }
-                   else
+                   else if (VarTypes[id.GetText()] == typeof(string))
                     {
-                        Variables[id.GetText()] = input;
+                        Variables[id.GetText()] = Convert.ToString(input);
+                    }
+                    else
+                    {
+                        throw new Exception("Data type does not exist!");
                     }
                 }
             }

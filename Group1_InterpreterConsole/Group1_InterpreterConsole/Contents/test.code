@@ -1,8 +1,8 @@
 ﻿# asdasdasd
 BEGIN CODE
-    FLOAT x, y = 2.0 , z=5.0
-    x = 10.0
+    CHAR x
+    INT y
+    SCAN: x, y
     # this is a comment
-    y = 23.4
-    DISPLAY: x & y & z
+    DISPLAY: x & y
 END CODE

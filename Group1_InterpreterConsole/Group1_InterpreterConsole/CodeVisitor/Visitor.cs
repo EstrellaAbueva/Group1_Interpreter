@@ -4,6 +4,7 @@ using Group1_InterpreterConsole.Functions;
 using Group1_InterpreterConsole.Methods;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -180,20 +181,24 @@ namespace Group1_InterpreterConsole.CodeVisitor
             else if (context.variable() != null)
             {
                 return VisitVariable(context.variable());
+            }else if(context.scan() != null)
+            {
+                return VisitScan(context.scan());
             }
             else
             {
-                throw new Exception("Unknown statement type");
+                throw new Exception($"Unknown statement type: {context.GetText()}");
             }
         }
 
         public override object? VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
         {
-            var type = context.type().GetText();
+            var type = Visit(context.type());
+            var typestr = context.type().GetText();
             var varnames = context.IDENTIFIER();
 
             // remove type
-            var contextstring = context.GetText().Replace(type, "");
+            var contextstring = context.GetText().Replace(typestr, "");
 
             var contextParts = contextstring.Split(',');
             var exp = context.expression();
@@ -211,15 +216,21 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 {
                     if (expctr < exp.Count())
                     {
-                        Variables[varnames[x].GetText()] = Visit(exp[expctr]);
-                        expctr++;
+                        // check type
+                        if (type == Visit(exp[expctr])?.GetType()){
+                            Variables[varnames[x].GetText()] = Visit(exp[expctr]);
+                            expctr++;
+                        }
+                        else
+                        {
+                            throw new InvalidCastException($"Cannot convert type {Visit(exp[expctr])?.GetType()} to {type}");
+                        }
                     }
                 }
                 else
                 {
                     Variables[varnames[x].GetText()] = null;
                 }
-
             }
 
             return null;
@@ -314,6 +325,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var type = context.type().GetText();
             var name = context.IDENTIFIER().GetText();
+
+            // check type
 
             return Variables[name] = null;
         }
@@ -425,14 +438,36 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return output.ToString();
         }
 
-        public override object? VisitScan(CodeParser.ScanContext context)
+        public override object? VisitScan([NotNull] ScanContext context)
         {
             foreach (var id in context.IDENTIFIER())
             {
+                //testing purposes can be removed or kept after review
+                Console.WriteLine($"Awaiting input for {id.GetText()}");
                 string input = Console.ReadLine() ?? "";
                 if (id.GetText() != null)
                 {
-                    Variables[id.GetText()] = input;
+                    Console.WriteLine(Variables[id.GetText()]?.GetType());
+                   if(Variables[id.GetText()] is int)
+                    {
+                        Variables[id.GetText()] = Convert.ToInt32(input);
+                    }
+                   else if (Variables[id.GetText()] is float)
+                    {
+                        Variables[id.GetText()] = Convert.ToDouble(input);
+                    }
+                   else if (Variables[id.GetText()] is bool)
+                    {
+                        Variables[id.GetText()] = Convert.ToBoolean(input);
+                    }
+                   else if (Variables[id.GetText()] is char)
+                    {
+                        Variables[id.GetText()] = Convert.ToChar(input);
+                    }
+                   else
+                    {
+                        Variables[id.GetText()] = input;
+                    }
                 }
             }
             return null;

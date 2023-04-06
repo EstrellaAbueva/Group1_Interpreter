@@ -210,9 +210,9 @@ namespace Group1_InterpreterConsole.Functions
             switch (boolop)
             {
                 case "AND":
-                    return (Convert.ToBoolean(left) && Convert.ToBoolean(right)).ToString().ToUpper();
+                    return (Convert.ToBoolean(left) && Convert.ToBoolean(right));
                 case "OR":
-                    return (Convert.ToBoolean(left) || Convert.ToBoolean(right)).ToString().ToUpper();
+                    return (Convert.ToBoolean(left) || Convert.ToBoolean(right));
                 default:
                     throw new Exception("Invalid boolean operator: " + boolop);
             }

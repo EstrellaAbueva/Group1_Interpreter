@@ -1,8 +1,5 @@
 ﻿# asdasdasd
 BEGIN CODE
-    INT x = 2
-    IF (x == 2)
-		BEGIN IF
-			DISPLAY: x
-		END IF
+    BOOL t = "TRUE"
+    DISPLAY: t
 END CODE

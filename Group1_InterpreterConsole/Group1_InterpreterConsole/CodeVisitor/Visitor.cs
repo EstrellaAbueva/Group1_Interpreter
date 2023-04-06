@@ -3,6 +3,7 @@ using Group1_InterpreterConsole.Contents;
 using Group1_InterpreterConsole.ErrorHandling;
 using Group1_InterpreterConsole.Functions;
 using Group1_InterpreterConsole.Methods;
+using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Security.Cryptography.X509Certificates;
@@ -16,6 +17,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
     public class Visitor : CodeBaseVisitor<object?>
     {
         private Dictionary<string, object?> Variables { get; set; } = new Dictionary<string, object?>();
+        private Dictionary<string, object?> VarTypes { get; set; } = new Dictionary<string, object?>();
         private Operators op = new();
 
         public override object? VisitProgram([NotNull] CodeParser.ProgramContext context)
@@ -43,7 +45,16 @@ namespace Group1_InterpreterConsole.CodeVisitor
             foreach (var i in identifier)
             {
                 var expression = context.expression().Accept(this);
-                Variables[i.GetText()] = expression;
+
+                // check type
+                if (VarTypes[i.GetText()] == expression?.GetType())
+                {
+                    Variables[i.GetText()] = expression;
+                }
+                else
+                {
+                    throw new InvalidCastException($"Cannot convert type {expression?.GetType()} to {VarTypes[i.GetText()]}");
+                }   
             }
 
             return null;
@@ -69,7 +80,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
             else if (context.BOOL() != null)
             {
-                return bool.Parse(context.BOOL().GetText().ToUpper());
+                return bool.Parse(context.BOOL().GetText());
             }
             else if (context.INT() != null)
             {
@@ -157,6 +168,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                         // check type
                         if (type == Visit(exp[expctr])?.GetType()){
                             Variables[varnames[x].GetText()] = Visit(exp[expctr]);
+                            VarTypes[varnames[x].GetText()] = type;
                             expctr++;
                         }
                         else
@@ -168,6 +180,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 else
                 {
                     Variables[varnames[x].GetText()] = null;
+                    VarTypes[varnames[x].GetText()] = type;
                 }
             }
 
@@ -234,11 +247,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitVariable_assignment([NotNull] CodeParser.Variable_assignmentContext context)
         {
-            var type = context.type().GetText();
             var name = context.IDENTIFIER().GetText();
 
-            // check type
-
+            VarTypes[name] = Visit(context.type());
             return Variables[name] = null;
         }
 
@@ -289,7 +300,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             if (result?.GetType() == typeof(bool))
             {
-                return result.ToString()?.ToUpper();
+                return result.ToString();
             }
            
             return null;
@@ -308,7 +319,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             if (negatedValue != null && negatedValue is bool boolValue)
             {
-                return boolValue.ToString()?.ToUpper();
+                return boolValue.ToString();
             }
             
              return null;
@@ -369,30 +380,34 @@ namespace Group1_InterpreterConsole.CodeVisitor
             foreach (var id in context.IDENTIFIER())
             {
                 //testing purposes can be removed or kept after review
-                Console.WriteLine($"Awaiting input for {id.GetText()}");
+                Console.Write($"Awaiting input for {id.GetText()}: ");
+
                 string input = Console.ReadLine() ?? "";
                 if (id.GetText() != null)
                 {
-                    Console.WriteLine(Variables[id.GetText()]?.GetType());
-                   if(Variables[id.GetText()] is int)
+                   if(VarTypes[id.GetText()] == typeof(int))
                     {
                         Variables[id.GetText()] = Convert.ToInt32(input);
                     }
-                   else if (Variables[id.GetText()] is float)
+                   else if (VarTypes[id.GetText()] == typeof(float))
                     {
                         Variables[id.GetText()] = Convert.ToDouble(input);
                     }
-                   else if (Variables[id.GetText()] is bool)
+                   else if (VarTypes[id.GetText()] == typeof(bool))
                     {
                         Variables[id.GetText()] = Convert.ToBoolean(input);
                     }
-                   else if (Variables[id.GetText()] is char)
+                   else if (VarTypes[id.GetText()] == typeof(char))
                     {
                         Variables[id.GetText()] = Convert.ToChar(input);
                     }
-                   else
+                   else if (VarTypes[id.GetText()] == typeof(string))
                     {
-                        Variables[id.GetText()] = input;
+                        Variables[id.GetText()] = Convert.ToString(input);
+                    }
+                    else
+                    {
+                        throw new Exception("Data type does not exist!");
                     }
                 }
             }

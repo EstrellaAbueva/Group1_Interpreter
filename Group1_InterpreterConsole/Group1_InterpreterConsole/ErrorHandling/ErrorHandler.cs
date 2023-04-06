@@ -10,8 +10,9 @@ namespace Group1_InterpreterConsole.ErrorHandling
     {
         public static bool ConditionChecker(object? value)
         {
-            if (value is bool b)
-                return b;
+            if (value != null && value.Equals("TRUE")) return true;
+            if (value != null && value.Equals("FALSE")) return false;
+
             throw new Exception($"Cannot convert {value} to bool");
         }
 

@@ -129,69 +129,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
         }
 
-        public override object? VisitComparison([NotNull] CodeParser.ComparisonContext context)
-        {
-            var left = Visit(context.expression()[0]);
-            var right = Visit(context.expression()[1]);
-
-            if (left is null || right is null)
-            {
-                throw new Exception("Cannot compare null values");
-            }
-
-            var op = context.comparison_operator().GetText();
-
-            switch (op)
-            {
-                case "==":
-                    return left.Equals(right);
-                case "!=":
-                    return !left.Equals(right);
-                case ">":
-                    return (dynamic)left > (dynamic)right;
-                case ">=":
-                    return (dynamic)left >= (dynamic)right;
-                case "<":
-                    return (dynamic)left < (dynamic)right;
-                case "<=":
-                    return (dynamic)left <= (dynamic)right;
-                default:
-                    throw new NotImplementedException();
-            }
-
-        }
-
-        public override object? VisitStatement([NotNull] CodeParser.StatementContext context)
-        {
-            if (context.assignment() != null)
-            {
-                return VisitAssignment(context.assignment());
-            }
-            else if (context.display() != null)
-            {
-                return VisitDisplay(context.display());
-            }
-            else if (context.declaration() != null)
-            {
-                return VisitDeclaration(context.declaration());
-            }
-            else if (context.variable_assignment() != null)
-            {
-                return VisitVariable_assignment(context.variable_assignment());
-            }
-            else if (context.variable() != null)
-            {
-                return VisitVariable(context.variable());
-            }else if(context.scan() != null)
-            {
-                return VisitScan(context.scan());
-            }
-            else
-            {
-                throw new Exception($"Unknown statement type: {context.GetText()}");
-            }
-        }
-
         public override object? VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
         {
             var type = Visit(context.type());

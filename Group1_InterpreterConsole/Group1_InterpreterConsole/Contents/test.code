@@ -1,7 +1,8 @@
 ﻿# asdasdasd
 BEGIN CODE
-    INT x, y = "hey" , z=5
-    x = 'a'
+    FLOAT x, y = 2.0 , z=5.0
+    x = 10.0
     # this is a comment
+    y = 23.4
     DISPLAY: x & y & z
 END CODE

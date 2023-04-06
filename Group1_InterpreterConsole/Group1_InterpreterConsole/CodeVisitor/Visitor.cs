@@ -15,6 +15,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
     public class Visitor : CodeBaseVisitor<object?>
     {
         private Dictionary<string, object?> Variables { get; set; } = new Dictionary<string, object?>();
+        private Dictionary<string, object?> VarTypes { get; set; } = new Dictionary<string, object?>();
         private Operators op = new();
 
         public override object? VisitProgram([NotNull] CodeParser.ProgramContext context)
@@ -42,7 +43,16 @@ namespace Group1_InterpreterConsole.CodeVisitor
             foreach (var i in identifier)
             {
                 var expression = context.expression().Accept(this);
-                Variables[i.GetText()] = expression;
+
+                // check type
+                if (VarTypes[i.GetText()] == expression?.GetType())
+                {
+                    Variables[i.GetText()] = expression;
+                }
+                else
+                {
+                    throw new InvalidCastException($"Cannot convert type {expression?.GetType()} to {VarTypes[i.GetText()]}");
+                }   
             }
 
             return null;
@@ -219,6 +229,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                         // check type
                         if (type == Visit(exp[expctr])?.GetType()){
                             Variables[varnames[x].GetText()] = Visit(exp[expctr]);
+                            VarTypes[varnames[x].GetText()] = type;
                             expctr++;
                         }
                         else
@@ -230,6 +241,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 else
                 {
                     Variables[varnames[x].GetText()] = null;
+                    VarTypes[varnames[x].GetText()] = type;
                 }
             }
 
@@ -323,11 +335,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitVariable_assignment([NotNull] CodeParser.Variable_assignmentContext context)
         {
-            var type = context.type().GetText();
             var name = context.IDENTIFIER().GetText();
 
-            // check type
-
+            VarTypes[name] = Visit(context.type());
             return Variables[name] = null;
         }
 

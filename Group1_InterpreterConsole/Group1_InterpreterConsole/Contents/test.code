@@ -1,8 +1,7 @@
 ﻿# asdasdasd
 BEGIN CODE
-    INT x = 2
-    IF (x == 2)
-        BEGIN IF 
-            DISPLAY: x
-        END IF
+    INT x, y = "hey" , z=5
+    x = 'a'
+    # this is a comment
+    DISPLAY: x & y & z
 END CODE

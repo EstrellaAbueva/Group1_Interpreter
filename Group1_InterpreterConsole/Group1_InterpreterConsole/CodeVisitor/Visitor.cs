@@ -5,6 +5,7 @@ using Group1_InterpreterConsole.Functions;
 using Group1_InterpreterConsole.Methods;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -109,7 +110,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return null;
         }
 
-
         public override object VisitType([NotNull] CodeParser.TypeContext context)
         {
             switch (context.GetText())
@@ -129,13 +129,77 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
         }
 
-        public override List<object?> VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
+        public override object? VisitComparison([NotNull] CodeParser.ComparisonContext context)
         {
-            var type = context.type().GetText();
+            var left = Visit(context.expression()[0]);
+            var right = Visit(context.expression()[1]);
+
+            if (left is null || right is null)
+            {
+                throw new Exception("Cannot compare null values");
+            }
+
+            var op = context.comparison_operator().GetText();
+
+            switch (op)
+            {
+                case "==":
+                    return left.Equals(right);
+                case "!=":
+                    return !left.Equals(right);
+                case ">":
+                    return (dynamic)left > (dynamic)right;
+                case ">=":
+                    return (dynamic)left >= (dynamic)right;
+                case "<":
+                    return (dynamic)left < (dynamic)right;
+                case "<=":
+                    return (dynamic)left <= (dynamic)right;
+                default:
+                    throw new NotImplementedException();
+            }
+
+        }
+
+        public override object? VisitStatement([NotNull] CodeParser.StatementContext context)
+        {
+            if (context.assignment() != null)
+            {
+                return VisitAssignment(context.assignment());
+            }
+            else if (context.display() != null)
+            {
+                return VisitDisplay(context.display());
+            }
+            else if (context.declaration() != null)
+            {
+                return VisitDeclaration(context.declaration());
+            }
+            else if (context.variable_assignment() != null)
+            {
+                return VisitVariable_assignment(context.variable_assignment());
+            }
+            else if (context.variable() != null)
+            {
+                return VisitVariable(context.variable());
+            }else if(context.scan() != null)
+            {
+                return VisitScan(context.scan());
+            }
+            else
+            {
+                throw new Exception($"Unknown statement type: {context.GetText()}");
+            }
+        }
+
+        public override object? VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
+        {
+            var type = Visit(context.type());
+            var typestr = context.type().GetText();
             var varnames = context.IDENTIFIER();
 
             // remove type
-            var contextstring = context.GetText().Replace(type, "");
+            var contextstring = context.GetText().Replace(typestr, "");
 
             var contextParts = contextstring.Split(',');
             var exp = context.expression();
@@ -153,18 +217,24 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 {
                     if (expctr < exp.Count())
                     {
-                        Variables[varnames[x].GetText()] = Visit(exp[expctr]);
-                        expctr++;
+                        // check type
+                        if (type == Visit(exp[expctr])?.GetType()){
+                            Variables[varnames[x].GetText()] = Visit(exp[expctr]);
+                            expctr++;
+                        }
+                        else
+                        {
+                            throw new InvalidCastException($"Cannot convert type {Visit(exp[expctr])?.GetType()} to {type}");
+                        }
                     }
                 }
                 else
                 {
                     Variables[varnames[x].GetText()] = null;
                 }
-
             }
 
-            return new List<object?>();
+            return null;
         }
 
         public override object? VisitVariable_dec([NotNull] CodeParser.Variable_decContext context)
@@ -229,6 +299,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var type = context.type().GetText();
             var name = context.IDENTIFIER().GetText();
+
+            // check type
 
             return Variables[name] = null;
         }
@@ -340,16 +412,36 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return output.ToString();
         }
 
-        public override object? VisitIf_block([NotNull] If_blockContext context)
+        public override object? VisitScan([NotNull] ScanContext context)
         {
-            var condition = Visit(context.expression());
-             
-            if (ErrorHandler.ConditionChecker(condition) == true)
+            foreach (var id in context.IDENTIFIER())
             {
-                var lines = context.line().ToList();
-                foreach (var line in lines)
+                //testing purposes can be removed or kept after review
+                Console.WriteLine($"Awaiting input for {id.GetText()}");
+                string input = Console.ReadLine() ?? "";
+                if (id.GetText() != null)
                 {
-                    Visit(line);
+                    Console.WriteLine(Variables[id.GetText()]?.GetType());
+                   if(Variables[id.GetText()] is int)
+                    {
+                        Variables[id.GetText()] = Convert.ToInt32(input);
+                    }
+                   else if (Variables[id.GetText()] is float)
+                    {
+                        Variables[id.GetText()] = Convert.ToDouble(input);
+                    }
+                   else if (Variables[id.GetText()] is bool)
+                    {
+                        Variables[id.GetText()] = Convert.ToBoolean(input);
+                    }
+                   else if (Variables[id.GetText()] is char)
+                    {
+                        Variables[id.GetText()] = Convert.ToChar(input);
+                    }
+                   else
+                    {
+                        Variables[id.GetText()] = input;
+                    }
                 }
             }
             return null;

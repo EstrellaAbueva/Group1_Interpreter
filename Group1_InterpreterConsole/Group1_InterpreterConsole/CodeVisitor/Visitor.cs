@@ -296,14 +296,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             var ops = context.compare_operator().GetText();
 
-            var result = op.Relational(left, right, ops);
-
-            if (result?.GetType() == typeof(bool))
-            {
-                return result.ToString();
-            }
-           
-            return null;
+            return op.Relational(left, right, ops);
         }
 
         public override object? VisitParenthesisExpression([NotNull] ParenthesisExpressionContext context)
@@ -315,14 +308,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var expressionValue = Visit(context.expression());
 
-            var negatedValue = op.Negation(expressionValue);
-
-            if (negatedValue != null && negatedValue is bool boolValue)
-            {
-                return boolValue.ToString();
-            }
-            
-             return null;
+            return op.Negation(expressionValue);
         }
 
         public override object? VisitBoolOpExpression([NotNull] BoolOpExpressionContext context)
@@ -338,7 +324,10 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var condition = Visit(context.expression());
 
-            if (ErrorHandler.ConditionChecker(condition) == true)
+            var result = ErrorHandler.ConditionChecker(condition);
+            result = Convert.ToBoolean(result);
+
+            if (result == true)
             {
                 var lines = context.line().ToList();
                 foreach (var line in lines)
@@ -352,9 +341,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitEscapeSequenceExpression([NotNull] EscapeSequenceExpressionContext context)
         {
             var sequence = context.GetText()[1];
-            var result = op.Escape(sequence) ?? throw new ArgumentException($"Invalid escape sequence: {context.GetText()}");
 
-            return result;
+            return op.Escape(sequence) ?? throw new ArgumentException($"Invalid escape sequence: {context.GetText()}");
         }
 
         public override object? VisitNewlineOpExpression([NotNull] NewlineOpExpressionContext context)
@@ -372,7 +360,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             output.Append(Environment.NewLine);
 
-            return output.ToString();
+            return output;
         }
 
         public override object? VisitScan([NotNull] ScanContext context)

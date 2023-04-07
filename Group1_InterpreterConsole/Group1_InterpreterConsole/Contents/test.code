@@ -1,5 +1,5 @@
 ﻿# asdasdasd
 BEGIN CODE
-  INT x = 'c'
-  DISPLAY: x
+  INT x = 6
+  DISPLAY: y
 END CODE

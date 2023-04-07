@@ -19,21 +19,18 @@ namespace Group1_InterpreterConsole.CodeVisitor
         private Dictionary<string, object?> Variables { get; set; } = new Dictionary<string, object?>();
         private Dictionary<string, object?> VarTypes { get; set; } = new Dictionary<string, object?>();
         private Operators op = new();
+        private ErrorHandler error = new();
 
         public override object? VisitProgram([NotNull] CodeParser.ProgramContext context)
         {
             string code = context.GetText().Trim();
-            if (code.StartsWith("BEGIN CODE") && code.EndsWith("END CODE"))
+            if (error.HandleProgramCreationError(context,code,"Program Creation"))
             {
                 // Visit each statement in the code
                 foreach (var statementContext in context.statement())
                 {
                     VisitStatement(statementContext);
                 }
-            }
-            else
-            {
-                Console.WriteLine("Code must start with 'BEGIN CODE' and end with 'END CODE'.");
             }
 
             return null;
@@ -46,7 +43,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 var expression = context.expression().Accept(this);
 
                 // check type
-                if (ErrorHandler.IsValidType(context, expression, (Type?)VarTypes[i.GetText()], "Variable Assignment"))
+                if (error.IsValidType(context, expression, (Type?)VarTypes[i.GetText()], "Variable Assignment"))
                 { 
                     Variables[i.GetText()] = expression;
                 }  
@@ -57,7 +54,16 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitVariable([NotNull] CodeParser.VariableContext context)
         {
             var varName = context.IDENTIFIER().GetText();
-            return Variables?.GetValueOrDefault(varName) ?? throw new Exception($"Variable {varName} not found");
+
+            if (Variables != null && Variables.TryGetValue(varName, out object? value))
+            {
+                return value;
+            }
+            else
+            {
+                error?.HandleUndefinedVariableError(context, varName);
+                return null;
+            }
         }
 
         public override object? VisitConstant([NotNull] CodeParser.ConstantContext context)
@@ -160,7 +166,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     if (expctr < exp.Count())
                     {
                         // check type
-                        if (ErrorHandler.IsValidType(context, Visit(exp[expctr]), (Type?)type, "Variable Declaration"))
+                        if (error.IsValidType(context, Visit(exp[expctr]), (Type?)type, "Variable Declaration"))
                         {
                             Variables[varnames[x].GetText()] = Visit(exp[expctr]);
                             VarTypes[varnames[x].GetText()] = type;
@@ -213,7 +219,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
             else
             {
-                Console.WriteLine($"Variable '{identifier}' is not defined!");
+                error.HandleUndefinedVariableError(context, identifier);
                 return null;
             }
         }
@@ -313,7 +319,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var condition = Visit(context.expression());
 
-            var result = ErrorHandler.ConditionChecker(condition);
+            var result = error.ConditionChecker(condition);
             result = Convert.ToBoolean(result);
 
             if (result == true)

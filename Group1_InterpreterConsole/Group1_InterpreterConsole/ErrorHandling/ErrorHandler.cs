@@ -5,7 +5,7 @@ namespace Group1_InterpreterConsole.ErrorHandling
 {
     public class ErrorHandler
     {
-        public static bool? ConditionChecker(object? value)
+        public bool? ConditionChecker(object? value)
         {
             if (value?.ToString()?.Equals("True", StringComparison.OrdinalIgnoreCase) == true)
             {
@@ -22,7 +22,7 @@ namespace Group1_InterpreterConsole.ErrorHandling
             }
         }
 
-        public static bool IsValidType([NotNull] ParserRuleContext context, object? obj, Type? type, string location)
+        public bool IsValidType([NotNull] ParserRuleContext context, object? obj, Type? type, string location)
         {
             if (obj is int || obj is float || obj is bool || obj is char || obj is string)
             {
@@ -47,9 +47,27 @@ namespace Group1_InterpreterConsole.ErrorHandling
             }
         }
 
-        public static void HandleUndefinedVariableError(object? variableName)
+        public void HandleUndefinedVariableError([NotNull] ParserRuleContext context, object? variableName)
         {
-            Console.WriteLine($"Semantic Error: Variable '{variableName}' is not defined!");
+                var line = context.Start.Line;
+                Console.WriteLine($"Semantic Error: in line {line}.\n" +
+                                  $"Variable '{variableName}' is not defined.");
+        }
+
+        public bool HandleProgramCreationError([NotNull] ParserRuleContext context, string message, string location)
+        {
+
+            if (message.StartsWith("BEGIN CODE") && message.EndsWith("END CODE"))
+            {
+                return true;
+            }
+            else
+            {
+                /*var line = context.Start.Line;
+                Console.WriteLine($"Semantic Error: in {location}, line {line}.");
+                Console.WriteLine("Code must start with 'BEGIN CODE' and end with 'END CODE'.");*/
+                return false;
+            }
         }
     }
 }

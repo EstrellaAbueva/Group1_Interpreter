@@ -4,6 +4,7 @@ using Group1_InterpreterConsole.ErrorHandling;
 using Group1_InterpreterConsole.Functions;
 using Group1_InterpreterConsole.Methods;
 using System;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Security.Cryptography.X509Certificates;
@@ -324,10 +325,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var condition = Visit(context.expression());
 
-            var result = ErrorHandler.ConditionChecker(condition);
-            result = Convert.ToBoolean(result);
-
-            if (result == true)
+            if (ErrorHandler.ConditionChecker(condition) == true)
             {
                 var lines = context.line().ToList();
                 foreach (var line in lines)
@@ -335,8 +333,38 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     Visit(line);
                 }
             }
+            else
+            {
+                var elseIfBlocks = context.else_if_block();
+                foreach (var elseIfBlock in elseIfBlocks)
+                {
+                    var elseIfCondition = Visit(elseIfBlock.expression());
+                    if (ErrorHandler.ConditionChecker(elseIfCondition) == true)
+                    {
+                        var elseIfLines = elseIfBlock.line().ToList();
+                        foreach (var line in elseIfLines)
+                        {
+                            Visit(line);
+                        }
+                        // Exit the loop once the first true else-if block is found
+                        return null;
+                    }
+                }
+
+                var elseBlock = context.else_block();
+                if (elseBlock != null)
+                {
+                    var elseLines = elseBlock.line().ToList();
+                    foreach (var line in elseLines)
+                    {
+                        Visit(line);
+                    }
+                }
+            }
+
             return null;
         }
+
 
         public override object? VisitEscapeSequenceExpression([NotNull] EscapeSequenceExpressionContext context)
         {
@@ -367,31 +395,37 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             foreach (var id in context.IDENTIFIER())
             {
+                string idName = id.GetText();
+                if (!VarTypes.ContainsKey(idName))
+                {
+                    throw new ArgumentException($"Variable '{idName}' has not been declared.");
+                }
+
                 //testing purposes can be removed or kept after review
-                Console.Write($"Awaiting input for {id.GetText()}: ");
+                Console.Write($"Awaiting input for {idName}: ");
 
                 string input = Console.ReadLine() ?? "";
-                if (id.GetText() != null)
+                if (idName != null)
                 {
-                   if(VarTypes[id.GetText()] == typeof(int))
+                    if (VarTypes[idName] == typeof(int))
                     {
-                        Variables[id.GetText()] = Convert.ToInt32(input);
+                        Variables[idName] = Convert.ToInt32(input);
                     }
-                   else if (VarTypes[id.GetText()] == typeof(float))
+                    else if (VarTypes[idName] == typeof(float))
                     {
-                        Variables[id.GetText()] = Convert.ToDouble(input);
+                        Variables[idName] = Convert.ToDouble(input);
                     }
-                   else if (VarTypes[id.GetText()] == typeof(bool))
+                    else if (VarTypes[idName] == typeof(bool))
                     {
-                        Variables[id.GetText()] = Convert.ToBoolean(input);
+                        Variables[idName] = Convert.ToBoolean(input);
                     }
-                   else if (VarTypes[id.GetText()] == typeof(char))
+                    else if (VarTypes[idName] == typeof(char))
                     {
-                        Variables[id.GetText()] = Convert.ToChar(input);
+                        Variables[idName] = Convert.ToChar(input);
                     }
-                   else if (VarTypes[id.GetText()] == typeof(string))
+                    else if (VarTypes[idName] == typeof(string))
                     {
-                        Variables[id.GetText()] = Convert.ToString(input);
+                        Variables[idName] = Convert.ToString(input);
                     }
                     else
                     {
@@ -401,5 +435,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
             return null;
         }
+
     }
 }

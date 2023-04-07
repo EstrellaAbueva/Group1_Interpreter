@@ -10,22 +10,13 @@ namespace Group1_InterpreterConsole.ErrorHandling
     {
         public static bool ConditionChecker(object? value)
         {
-            if (value?.ToString()?.Equals("True", StringComparison.OrdinalIgnoreCase) == true)
-            {
-                return true;
-            }
-            else if (value?.ToString()?.Equals("False", StringComparison.OrdinalIgnoreCase) == true)
-            {
-                return false;
-            }
-            else
-            {
-                throw new ArgumentException($"Cannot convert {value} to boolean.");
-            }
+            if(value is bool b)
+                return b;
+            
+            throw new ArgumentException($"Cannot convert {value} to boolean.");
         }
 
-
-
+     
 
     }
 }

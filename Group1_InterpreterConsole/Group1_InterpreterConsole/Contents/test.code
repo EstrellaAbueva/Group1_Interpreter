@@ -1,7 +1,18 @@
 ﻿# asdasdasd
 BEGIN CODE
-  INT a=100, b=200, c=300 
-  BOOL d="FALSE"
-  d = (a < b AND c <>200)
-  DISPLAY: d
+	INT y
+	SCAN: z
+	INT x = 3
+	IF (x == 2)
+		BEGIN IF
+			DISPLAY: "Hi"
+		END IF
+	ELSE IF (x == 3)
+		BEGIN IF
+			DISPLAY: "Hello"
+		END IF
+	ELSE 
+		BEGIN IF
+			DISPLAY: "HiHello"
+		END IF
 END CODE

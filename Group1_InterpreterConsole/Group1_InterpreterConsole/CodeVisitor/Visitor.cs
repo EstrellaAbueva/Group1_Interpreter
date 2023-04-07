@@ -160,7 +160,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     if (expctr < exp.Count())
                     {
                         // check type
-                        if (ErrorHandler.IsValidType(context, Visit(exp[expctr]), (Type?)VarTypes[varnames[x].GetText()], "Variable Declaration"))
+                        if (ErrorHandler.IsValidType(context, Visit(exp[expctr]), (Type?)type, "Variable Declaration"))
                         {
                             Variables[varnames[x].GetText()] = Visit(exp[expctr]);
                             VarTypes[varnames[x].GetText()] = type;

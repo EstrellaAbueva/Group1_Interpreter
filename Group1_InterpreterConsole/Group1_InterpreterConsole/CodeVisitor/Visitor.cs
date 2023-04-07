@@ -41,22 +41,16 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitAssignment([NotNull] CodeParser.AssignmentContext context)
         {
-            var identifier = context.IDENTIFIER();
-            foreach (var i in identifier)
+            foreach (var i in context.IDENTIFIER())
             {
                 var expression = context.expression().Accept(this);
 
                 // check type
-                if (VarTypes[i.GetText()] == expression?.GetType())
+                if (ErrorHandler.IsValidType(context, expression, (Type?)VarTypes[i.GetText()], "Variable Assignment"))
                 { 
                     Variables[i.GetText()] = expression;
-                }
-                else
-                {
-                    throw new InvalidCastException($"Cannot convert type {expression?.GetType()} to {VarTypes[i.GetText()]}");
-                }   
+                }  
             }
-
             return null;
         }
 
@@ -166,15 +160,12 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     if (expctr < exp.Count())
                     {
                         // check type
-                        if (type == Visit(exp[expctr])?.GetType()){
+                        if (ErrorHandler.IsValidType(context, Visit(exp[expctr]), (Type?)VarTypes[varnames[x].GetText()], "Variable Declaration"))
+                        {
                             Variables[varnames[x].GetText()] = Visit(exp[expctr]);
                             VarTypes[varnames[x].GetText()] = type;
-                            expctr++;
                         }
-                        else
-                        {
-                            throw new InvalidCastException($"Cannot convert type {Visit(exp[expctr])?.GetType()} to {type}");
-                        }
+                        expctr++;
                     }
                 }
                 else
@@ -183,7 +174,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     VarTypes[varnames[x].GetText()] = type;
                 }
             }
-
             return null;
         }
 
@@ -193,7 +183,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 VisitDeclaration(declarationContext);
             }
-
             return null;
         }
 
@@ -270,7 +259,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 "+" => op.Add(left, right),
                 "-" => op.Subtract(left, right),
                 _ => throw new NotImplementedException(),
-            }; ;
+            };
         }
 
         public override object? VisitMultiplicativeExpression([NotNull] MultiplicativeExpressionContext context)

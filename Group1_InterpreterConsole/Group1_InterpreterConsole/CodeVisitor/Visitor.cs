@@ -19,7 +19,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
     {
         private Dictionary<string, object?> Variables { get; set; } = new Dictionary<string, object?>();
         private Dictionary<string, object?> VarTypes { get; set; } = new Dictionary<string, object?>();
-        private Operators op = new();
 
         public override object? VisitProgram([NotNull] CodeParser.ProgramContext context)
         {
@@ -256,7 +255,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitUnaryExpression([NotNull] CodeParser.UnaryExpressionContext context)
         {
-            return op.Unary(context.unary_operator().GetText(), Visit(context.expression()));
+            return Operators.Unary(context.unary_operator().GetText(), Visit(context.expression()));
         }
 
         public override object? VisitAdditiveExpression([NotNull] AdditiveExpressionContext context)
@@ -268,8 +267,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             return ops switch
             {
-                "+" => op.Add(left, right),
-                "-" => op.Subtract(left, right),
+                "+" => Operators.Add(left, right),
+                "-" => Operators.Subtract(left, right),
                 _ => throw new NotImplementedException(),
             }; ;
         }
@@ -283,9 +282,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             return ops switch
             {
-                "*" => op.Multiply(left, right),
-                "/" => op.Divide(left, right),
-                "%" => op.Modulo(left, right),
+                "*" => Operators.Multiply(left, right),
+                "/" => Operators.Divide(left, right),
+                "%" => Operators.Modulo(left, right),
                 _ => throw new NotImplementedException(),
             };
         }
@@ -297,7 +296,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             var ops = context.compare_operator().GetText();
 
-            return op.Relational(left, right, ops);
+            return Operators.Relational(left, right, ops);
         }
 
         public override object? VisitParenthesisExpression([NotNull] ParenthesisExpressionContext context)
@@ -309,7 +308,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var expressionValue = Visit(context.expression());
 
-            return op.Negation(expressionValue);
+            return Operators.Negation(expressionValue);
         }
 
         public override object? VisitBoolOpExpression([NotNull] BoolOpExpressionContext context)
@@ -318,7 +317,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             var right = Visit(context.expression(1));
             var boolop = context.bool_operator().GetText();
 
-            return op.BoolOperation(left, right, boolop);
+            return Operators.BoolOperation(left, right, boolop);
         }
 
         public override object? VisitIf_block([NotNull] If_blockContext context)
@@ -370,7 +369,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var sequence = context.GetText()[1];
 
-            return op.Escape(sequence) ?? throw new ArgumentException($"Invalid escape sequence: {context.GetText()}");
+            return Operators.Escape(sequence) ?? throw new ArgumentException($"Invalid escape sequence: {context.GetText()}");
         }
 
         public override object? VisitNewlineOpExpression([NotNull] NewlineOpExpressionContext context)

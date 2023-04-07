@@ -27,7 +27,7 @@ else_block: 'ELSE' BEGIN_IF line* END_IF NEWLINE?;
 
 BEGIN_WHILE: 'BEGIN WHILE';
 END_WHILE: 'END WHILE';
-while_loop: 'WHILE' BEGIN_WHILE '(' expression ')' line* END_WHILE while_loop* NEWLINE?;
+while_loop: 'WHILE' '(' expression ')' BEGIN_WHILE line* END_WHILE NEWLINE?;
 
 constant: INT | FLOAT | BOOL | CHAR | STRING;
 INT: [0-9]+;

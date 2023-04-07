@@ -364,6 +364,21 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return null;
         }
 
+        public override object? VisitWhile_loop([NotNull] While_loopContext context)
+        {
+            var condition = Visit(context.expression());
+
+            while (ErrorHandler.ConditionChecker(condition) == true)
+            {
+                var lines = context.line().ToList();
+                foreach (var line in lines)
+                {
+                    Visit(line);
+                }
+                condition = Visit(context.expression());
+            }
+            return null;
+        }
 
         public override object? VisitEscapeSequenceExpression([NotNull] EscapeSequenceExpressionContext context)
         {

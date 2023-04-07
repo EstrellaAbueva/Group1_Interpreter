@@ -1,18 +1,9 @@
 ﻿# asdasdasd
 BEGIN CODE
-	INT y
-	SCAN: z
 	INT x = 3
-	IF (x == 2)
-		BEGIN IF
-			DISPLAY: "Hi"
-		END IF
-	ELSE IF (x == 3)
-		BEGIN IF
-			DISPLAY: "Hello"
-		END IF
-	ELSE 
-		BEGIN IF
-			DISPLAY: "HiHello"
-		END IF
+	WHILE (x < 10)
+		BEGIN WHILE
+			DISPLAY: "Hi" & $
+			x = x + 1
+		END WHILE
 END CODE

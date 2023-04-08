@@ -9,7 +9,7 @@ namespace Group1_InterpreterConsole.Functions
 {
     public class Operators
     {
-        public object? Unary(string symbol, object? value)
+        public static object? Unary(string symbol, object? value)
         {
             if (symbol == "+")
                 return value;
@@ -26,7 +26,7 @@ namespace Group1_InterpreterConsole.Functions
         }
 
 
-        public object? Add(object? left, object? right)
+        public static object? Add(object? left, object? right)
         {
             if (left is int i && right is int j)
                 return i + j;
@@ -47,7 +47,7 @@ namespace Group1_InterpreterConsole.Functions
             throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}");
         }
 
-        public object? Subtract(object? left, object? right)
+        public static object? Subtract(object? left, object? right)
         {
             if (left is int i && right is int j)
                 return i - j;
@@ -64,7 +64,7 @@ namespace Group1_InterpreterConsole.Functions
             throw new Exception($"Cannot subtract values of types {left?.GetType()} and {right?.GetType()}");
         }
 
-        public object? Multiply(object? left, object? right)
+        public static object? Multiply(object? left, object? right)
         {
             if (left is int i && right is int j)
                 return i * j;
@@ -81,7 +81,7 @@ namespace Group1_InterpreterConsole.Functions
             throw new Exception($"Cannot multiply values of types {left?.GetType()} and {right?.GetType()}");
         }
 
-        public object? Divide(object? left, object? right)
+        public static object? Divide(object? left, object? right)
         {
             if (left is int i && right is int j)
                 return i / j;
@@ -98,7 +98,7 @@ namespace Group1_InterpreterConsole.Functions
             throw new Exception($"Cannot divide values of types {left?.GetType()} and {right?.GetType()}");
         }
 
-        public object? Modulo(object? left, object? right)
+        public static object? Modulo(object? left, object? right)
         {
             if (left is int i && right is int j)
                 return i % j;
@@ -115,7 +115,7 @@ namespace Group1_InterpreterConsole.Functions
             throw new Exception($"Cannot get modulo for the values of types {left?.GetType()} and {right?.GetType()}");
         }
 
-        public object? Relational(object? left, object? right, string op)
+        public static object? Relational(object? left, object? right, string op)
         {
             if (op == ">")
             {
@@ -191,7 +191,7 @@ namespace Group1_InterpreterConsole.Functions
             }
         }
 
-        public object? Negation(object? op)
+        public static object? Negation(object? op)
         {
             var not = Convert.ToBoolean(op);
 
@@ -205,7 +205,7 @@ namespace Group1_InterpreterConsole.Functions
             }
         }
 
-        public object? BoolOperation(object? left, object? right, string boolop)
+        public static object? BoolOperation(object? left, object? right, string boolop)
         {
             switch (boolop)
             {
@@ -218,7 +218,7 @@ namespace Group1_InterpreterConsole.Functions
             }
         }
 
-        public object? Escape(object? sequence)
+        public static object? Escape(object? sequence)
         {
             if(sequence != null)
             {

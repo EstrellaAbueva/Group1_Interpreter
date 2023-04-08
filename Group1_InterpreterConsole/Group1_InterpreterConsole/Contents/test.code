@@ -1,5 +1,9 @@
 ﻿# asdasdasd
 BEGIN CODE
-  INT x = 6
-  DISPLAY: y
+	INT x = 3
+	WHILE (x < 10)
+		BEGIN WHILE
+			DISPLAY: "Hi" & $
+			x = x + 1
+		END WHILE
 END CODE

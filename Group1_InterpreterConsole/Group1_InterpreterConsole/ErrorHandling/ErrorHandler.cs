@@ -7,19 +7,10 @@ namespace Group1_InterpreterConsole.ErrorHandling
     {
         public bool? ConditionChecker(object? value)
         {
-            if (value?.ToString()?.Equals("True", StringComparison.OrdinalIgnoreCase) == true)
-            {
-                return true;
-            }
-            else if (value?.ToString()?.Equals("False", StringComparison.OrdinalIgnoreCase) == true)
-            {
-                return false;
-            }
-            else
-            {
-                Console.WriteLine($"Cannot convert {value} to boolean.");
-                return null;
-            }
+            if(value is bool b)
+                return b;
+            
+            throw new ArgumentException($"Cannot convert {value} to boolean.");
         }
 
         public bool IsValidType([NotNull] ParserRuleContext context, object? obj, Type? type, string location)

@@ -21,11 +21,13 @@ scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)* NEWLINE?;
 
 BEGIN_IF: 'BEGIN IF';
 END_IF: 'END IF';
-if_block: 'IF' '(' expression ')' BEGIN_IF line* END_IF else_if_block* else_block?;
-else_if_block: 'ELSE IF' BEGIN_IF '('expression ')' line* END_IF NEWLINE?;
+if_block: 'IF' '(' expression ')' BEGIN_IF line* END_IF else_if_block* else_block? NEWLINE?;
+else_if_block: 'ELSE IF' '(' expression ')' BEGIN_IF line* END_IF NEWLINE?;
 else_block: 'ELSE' BEGIN_IF line* END_IF NEWLINE?;
 
-while_loop: 'WHILE' expression 'DO' line 'END WHILE';
+BEGIN_WHILE: 'BEGIN WHILE';
+END_WHILE: 'END WHILE';
+while_loop: 'WHILE' '(' expression ')' BEGIN_WHILE line* END_WHILE NEWLINE?;
 
 constant: INT | FLOAT | BOOL | CHAR | STRING;
 INT: [0-9]+;

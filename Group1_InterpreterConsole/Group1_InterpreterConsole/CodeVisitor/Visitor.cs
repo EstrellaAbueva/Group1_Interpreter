@@ -4,6 +4,7 @@ using Group1_InterpreterConsole.ErrorHandling;
 using Group1_InterpreterConsole.Functions;
 using Group1_InterpreterConsole.Methods;
 using System;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Security.Cryptography.X509Certificates;
@@ -250,7 +251,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitUnaryExpression([NotNull] CodeParser.UnaryExpressionContext context)
         {
-            return op.Unary(context.unary_operator().GetText(), Visit(context.expression()));
+            return Operators.Unary(context.unary_operator().GetText(), Visit(context.expression()));
         }
 
         public override object? VisitAdditiveExpression([NotNull] AdditiveExpressionContext context)
@@ -262,8 +263,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             return ops switch
             {
-                "+" => op.Add(left, right),
-                "-" => op.Subtract(left, right),
+                "+" => Operators.Add(left, right),
+                "-" => Operators.Subtract(left, right),
                 _ => throw new NotImplementedException(),
             };
         }
@@ -277,9 +278,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             return ops switch
             {
-                "*" => op.Multiply(left, right),
-                "/" => op.Divide(left, right),
-                "%" => op.Modulo(left, right),
+                "*" => Operators.Multiply(left, right),
+                "/" => Operators.Divide(left, right),
+                "%" => Operators.Modulo(left, right),
                 _ => throw new NotImplementedException(),
             };
         }
@@ -291,7 +292,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             var ops = context.compare_operator().GetText();
 
-            return op.Relational(left, right, ops);
+            return Operators.Relational(left, right, ops);
         }
 
         public override object? VisitParenthesisExpression([NotNull] ParenthesisExpressionContext context)
@@ -303,7 +304,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var expressionValue = Visit(context.expression());
 
-            return op.Negation(expressionValue);
+            return Operators.Negation(expressionValue);
         }
 
         public override object? VisitBoolOpExpression([NotNull] BoolOpExpressionContext context)
@@ -312,7 +313,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             var right = Visit(context.expression(1));
             var boolop = context.bool_operator().GetText();
 
-            return op.BoolOperation(left, right, boolop);
+            return Operators.BoolOperation(left, right, boolop);
         }
 
         public override object? VisitIf_block([NotNull] If_blockContext context)
@@ -321,14 +322,58 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             var result = error.ConditionChecker(condition);
             result = Convert.ToBoolean(result);
-
-            if (result == true)
+            if (ErrorHandler.ConditionChecker(condition) == true)
             {
                 var lines = context.line().ToList();
                 foreach (var line in lines)
                 {
                     Visit(line);
                 }
+            }
+            else
+            {
+                var elseIfBlocks = context.else_if_block();
+                foreach (var elseIfBlock in elseIfBlocks)
+                {
+                    var elseIfCondition = Visit(elseIfBlock.expression());
+                    if (ErrorHandler.ConditionChecker(elseIfCondition) == true)
+                    {
+                        var elseIfLines = elseIfBlock.line().ToList();
+                        foreach (var line in elseIfLines)
+                        {
+                            Visit(line);
+                        }
+                        // Exit the loop once the first true else-if block is found
+                        return null;
+                    }
+                }
+
+                var elseBlock = context.else_block();
+                if (elseBlock != null)
+                {
+                    var elseLines = elseBlock.line().ToList();
+                    foreach (var line in elseLines)
+                    {
+                        Visit(line);
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public override object? VisitWhile_loop([NotNull] While_loopContext context)
+        {
+            var condition = Visit(context.expression());
+
+            while (ErrorHandler.ConditionChecker(condition) == true)
+            {
+                var lines = context.line().ToList();
+                foreach (var line in lines)
+                {
+                    Visit(line);
+                }
+                condition = Visit(context.expression());
             }
             return null;
         }
@@ -337,7 +382,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var sequence = context.GetText()[1];
 
-            return op.Escape(sequence) ?? throw new ArgumentException($"Invalid escape sequence: {context.GetText()}");
+            return Operators.Escape(sequence) ?? throw new ArgumentException($"Invalid escape sequence: {context.GetText()}");
         }
 
         public override object? VisitNewlineOpExpression([NotNull] NewlineOpExpressionContext context)
@@ -362,31 +407,37 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             foreach (var id in context.IDENTIFIER())
             {
+                string idName = id.GetText();
+                if (!VarTypes.ContainsKey(idName))
+                {
+                    throw new ArgumentException($"Variable '{idName}' has not been declared.");
+                }
+
                 //testing purposes can be removed or kept after review
-                Console.Write($"Awaiting input for {id.GetText()}: ");
+                Console.Write($"Awaiting input for {idName}: ");
 
                 string input = Console.ReadLine() ?? "";
-                if (id.GetText() != null)
+                if (idName != null)
                 {
-                   if(VarTypes[id.GetText()] == typeof(int))
+                    if (VarTypes[idName] == typeof(int))
                     {
-                        Variables[id.GetText()] = Convert.ToInt32(input);
+                        Variables[idName] = Convert.ToInt32(input);
                     }
-                   else if (VarTypes[id.GetText()] == typeof(float))
+                    else if (VarTypes[idName] == typeof(float))
                     {
-                        Variables[id.GetText()] = Convert.ToDouble(input);
+                        Variables[idName] = Convert.ToDouble(input);
                     }
-                   else if (VarTypes[id.GetText()] == typeof(bool))
+                    else if (VarTypes[idName] == typeof(bool))
                     {
-                        Variables[id.GetText()] = Convert.ToBoolean(input);
+                        Variables[idName] = Convert.ToBoolean(input);
                     }
-                   else if (VarTypes[id.GetText()] == typeof(char))
+                    else if (VarTypes[idName] == typeof(char))
                     {
-                        Variables[id.GetText()] = Convert.ToChar(input);
+                        Variables[idName] = Convert.ToChar(input);
                     }
-                   else if (VarTypes[id.GetText()] == typeof(string))
+                    else if (VarTypes[idName] == typeof(string))
                     {
-                        Variables[id.GetText()] = Convert.ToString(input);
+                        Variables[idName] = Convert.ToString(input);
                     }
                     else
                     {
@@ -396,5 +447,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
             return null;
         }
+
     }
 }

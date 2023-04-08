@@ -2,6 +2,6 @@
 BEGIN CODE
 	INT x = 4, z
 	CHAR y = 'c'
-	z = x % y
+	z = x < y
 	DISPLAY: z
 END CODE

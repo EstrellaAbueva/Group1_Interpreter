@@ -128,7 +128,7 @@ namespace Group1_InterpreterConsole.Functions
             //throw new Exception($"Cannot get modulo for the values of types {left?.GetType()} and {right?.GetType()}");
         }
 
-        public static object? Relational(object? left, object? right, string op)
+        public static object? Relational([NotNull] ParserRuleContext context, object? left, object? right, string op)
         {
             if (op == ">")
             {
@@ -142,7 +142,8 @@ namespace Group1_InterpreterConsole.Functions
                 }
                 else
                 {
-                    throw new Exception($"Cannot compare values of types {left?.GetType()} and {right?.GetType()} with '>' operator");
+                    ErrorHandler.HandleInvalidRelationOperatorError(context, left, right, op);
+                    return null;
                 }
             }
             else if (op == "<")
@@ -157,7 +158,8 @@ namespace Group1_InterpreterConsole.Functions
                 }
                 else
                 {
-                    throw new Exception($"Cannot compare values of types {left?.GetType()} and {right?.GetType()} with '<' operator");
+                    ErrorHandler.HandleInvalidRelationOperatorError(context, left, right, op);
+                    return null;
                 }
             }
             else if (op == ">=")
@@ -172,7 +174,8 @@ namespace Group1_InterpreterConsole.Functions
                 }
                 else
                 {
-                    throw new Exception($"Cannot compare values of types {left?.GetType()} and {right?.GetType()} with '>=' operator");
+                    ErrorHandler.HandleInvalidRelationOperatorError(context, left, right, op);
+                    return null;
                 }
             }
             else if (op == "<=")
@@ -187,7 +190,8 @@ namespace Group1_InterpreterConsole.Functions
                 }
                 else
                 {
-                    throw new Exception($"Cannot compare values of types {left?.GetType()} and {right?.GetType()} with '<=' operator");
+                    ErrorHandler.HandleInvalidRelationOperatorError(context, left, right, op);
+                    return null;
                 }
             }
             else if (op == "==")

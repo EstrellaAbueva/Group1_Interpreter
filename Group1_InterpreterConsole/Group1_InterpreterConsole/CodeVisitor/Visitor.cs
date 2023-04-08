@@ -292,7 +292,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             var ops = context.compare_operator().GetText();
 
-            return Operators.Relational(left, right, ops);
+            return Operators.Relational(context, left, right, ops);
         }
 
         public override object? VisitParenthesisExpression([NotNull] ParenthesisExpressionContext context)

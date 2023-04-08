@@ -66,9 +66,9 @@ namespace Group1_InterpreterConsole.ErrorHandling
             }
             else
             {
-                /*var line = context.Start.Line;
+                var line = context.Start.Line;
                 Console.WriteLine($"Semantic Error: in {location}, line {line}.");
-                Console.WriteLine("Code must start with 'BEGIN CODE' and end with 'END CODE'.");*/
+                Console.WriteLine("Code must start with 'BEGIN CODE' and end with 'END CODE'.");
                 return false;
             }
         }
@@ -102,6 +102,14 @@ namespace Group1_InterpreterConsole.ErrorHandling
             var line = context.Start.Line;
             Console.WriteLine($"Semantic Error: in line {line}.\n" +
                               $"Cannot {op} values of types {left?.GetType().Name.ToUpper()} and {right?.GetType().Name.ToUpper()}");
+            Environment.Exit(400);
+        }
+
+        public static void HandleInvalidRelationOperatorError([NotNull] ParserRuleContext context, object? left, object? right, string op)
+        {
+            var line = context.Start.Line;
+            Console.WriteLine($"Semantic Error: in line {line}.\n" +
+                              $"Cannot compare values of types {left?.GetType().Name.ToUpper()} and {right?.GetType().Name.ToUpper()} with '{op}' operator");
             Environment.Exit(400);
         }
     }

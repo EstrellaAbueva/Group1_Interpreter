@@ -251,7 +251,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitUnaryExpression([NotNull] CodeParser.UnaryExpressionContext context)
         {
-            return Operators.Unary(context.unary_operator().GetText(), Visit(context.expression()));
+            return Operators.Unary(context, context.unary_operator().GetText(), Visit(context.expression()));
         }
 
         public override object? VisitAdditiveExpression([NotNull] AdditiveExpressionContext context)
@@ -304,7 +304,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var expressionValue = Visit(context.expression());
 
-            return Operators.Negation(expressionValue);
+            return Operators.Negation(context, expressionValue);
         }
 
         public override object? VisitBoolOpExpression([NotNull] BoolOpExpressionContext context)
@@ -313,7 +313,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             var right = Visit(context.expression(1));
             var boolop = context.bool_operator().GetText();
 
-            return Operators.BoolOperation(left, right, boolop);
+            return Operators.BoolOperation(context, left, right, boolop);
         }
 
         public override object? VisitIf_block([NotNull] If_blockContext context)

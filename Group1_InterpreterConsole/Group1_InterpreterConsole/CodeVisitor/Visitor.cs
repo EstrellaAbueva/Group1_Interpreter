@@ -42,7 +42,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 var expression = context.expression().Accept(this);
 
                 // check type
-                if (ErrorHandler.IsValidType(context, expression, (Type?)VarTypes[i.GetText()], "Variable Assignment"))
+                if (ErrorHandler.HandleTypeError(context, expression, (Type?)VarTypes[i.GetText()], "Variable Assignment"))
                 { 
                     Variables[i.GetText()] = expression;
                 }  
@@ -167,7 +167,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     if (expctr < exp.Count())
                     {
                         // check type
-                        if (ErrorHandler.IsValidType(context, Visit(exp[expctr]), (Type?)type, "Variable Declaration"))
+                        if (ErrorHandler.HandleTypeError(context, Visit(exp[expctr]), (Type?)type, "Variable Declaration"))
                         {
                             Variables[varnames[x].GetText()] = Visit(exp[expctr]);
                             VarTypes[varnames[x].GetText()] = type;
@@ -320,9 +320,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var condition = Visit(context.expression());
 
-            var result = ErrorHandler.ConditionChecker(context, condition);
+            var result = ErrorHandler.HandleConditionError(context, condition);
             result = Convert.ToBoolean(result);
-            if (ErrorHandler.ConditionChecker(context, condition) == true)
+            if (ErrorHandler.HandleConditionError(context, condition) == true)
             {
                 var lines = context.line().ToList();
                 foreach (var line in lines)
@@ -336,7 +336,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 foreach (var elseIfBlock in elseIfBlocks)
                 {
                     var elseIfCondition = Visit(elseIfBlock.expression());
-                    if (ErrorHandler.ConditionChecker(context, elseIfCondition) == true)
+                    if (ErrorHandler.HandleConditionError(context, elseIfCondition) == true)
                     {
                         var elseIfLines = elseIfBlock.line().ToList();
                         foreach (var line in elseIfLines)
@@ -365,7 +365,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var condition = Visit(context.expression());
 
-            while (ErrorHandler.ConditionChecker(context, condition) == true)
+            while (ErrorHandler.HandleConditionError(context, condition) == true)
             {
                 var lines = context.line().ToList();
                 foreach (var line in lines)
@@ -406,7 +406,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             foreach (var id in context.IDENTIFIER())
             {
                 string idName = id.GetText();
-                if (ErrorHandler.DictionaryChecker(context, VarTypes, idName))
+                if (ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, idName))
                 {
                     //testing purposes can be removed or kept after review
                     Console.Write($"Awaiting Input for {idName}: ");
@@ -433,7 +433,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                                 break;
                             default:
                                 {
-                                    ErrorHandler.ScanTypeChecker(context, idName, "Input Scan");
+                                    ErrorHandler.HandleInvalidScanTypeError(context, idName, "Input Scan");
                                     break;
                                 }
                         }

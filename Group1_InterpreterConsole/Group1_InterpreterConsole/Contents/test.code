@@ -1,9 +1,7 @@
 ﻿# asdasdasd
 BEGIN CODE
-	INT x = 3
-	WHILE (x < 10)
-		BEGIN WHILE
-			DISPLAY: "Hi" & $
-			x = x + 1
-		END WHILE
+	INT x = 4, z
+	CHAR y = 'c'
+	z = x % y
+	DISPLAY: z
 END CODE

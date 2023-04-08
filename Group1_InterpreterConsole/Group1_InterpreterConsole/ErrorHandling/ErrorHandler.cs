@@ -6,7 +6,7 @@ namespace Group1_InterpreterConsole.ErrorHandling
 {
     public class ErrorHandler
     {
-        public static bool? ConditionChecker([NotNull] ParserRuleContext context, object? value)
+        public static bool? HandleConditionError([NotNull] ParserRuleContext context, object? value)
         {
             if(value is bool b)
             {
@@ -22,7 +22,7 @@ namespace Group1_InterpreterConsole.ErrorHandling
             }
         }
 
-        public static bool IsValidType([NotNull] ParserRuleContext context, object? obj, Type? type, string location)
+        public static bool HandleTypeError([NotNull] ParserRuleContext context, object? obj, Type? type, string location)
         {
             if (obj is int || obj is float || obj is bool || obj is char || obj is string)
             {
@@ -73,7 +73,7 @@ namespace Group1_InterpreterConsole.ErrorHandling
             }
         }
 
-        public static bool DictionaryChecker([NotNull] ParserRuleContext context, Dictionary<string, object?> dictionary, string keyId)
+        public static bool HandleUndeclaredVariableError([NotNull] ParserRuleContext context, Dictionary<string, object?> dictionary, string keyId)
         {
             if (dictionary.ContainsKey(keyId))
             {
@@ -89,7 +89,7 @@ namespace Group1_InterpreterConsole.ErrorHandling
             }
         }
 
-        public static void ScanTypeChecker([NotNull] ParserRuleContext context, string input, string location)
+        public static void HandleInvalidScanTypeError([NotNull] ParserRuleContext context, string input, string location)
         {
             var line = context.Start.Line;
             Console.WriteLine($"Semantic Error: in {location}, in line {line}.\n" +
@@ -97,7 +97,7 @@ namespace Group1_InterpreterConsole.ErrorHandling
             Environment.Exit(400);
         }
 
-        public static void InvalidTypeOperation([NotNull] ParserRuleContext context, object? left, object? right, string op)
+        public static void HandleInvalidOperatorError([NotNull] ParserRuleContext context, object? left, object? right, string op)
         {
             var line = context.Start.Line;
             Console.WriteLine($"Semantic Error: in line {line}.\n" +

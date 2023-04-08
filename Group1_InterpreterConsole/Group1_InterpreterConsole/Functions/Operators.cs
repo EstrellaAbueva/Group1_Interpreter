@@ -47,7 +47,7 @@ namespace Group1_InterpreterConsole.Functions
             if (left is string || right is string)
                 return $"{left}{right}";
 
-            ErrorHandler.InvalidTypeOperation(context, left, right, "add");
+            ErrorHandler.HandleInvalidOperatorError(context, left, right, "add");
             return null;
             /*throw new Exception($"Cannot add values of types {left?.GetType().Name.ToUpper()} and {right?.GetType().Name.ToUpper()}");*/
         }
@@ -66,7 +66,7 @@ namespace Group1_InterpreterConsole.Functions
             if (left is float lFloat && right is int rInt)
                 return lFloat - rInt;
 
-            ErrorHandler.InvalidTypeOperation(context, left, right, "subtract");
+            ErrorHandler.HandleInvalidOperatorError(context, left, right, "subtract");
             return null;
             //throw new Exception($"Cannot subtract values of types {left?.GetType()} and {right?.GetType()}");
         }
@@ -85,7 +85,7 @@ namespace Group1_InterpreterConsole.Functions
             if (left is float lFloat && right is int rInt)
                 return lFloat * rInt;
 
-            ErrorHandler.InvalidTypeOperation(context, left, right, "multiply");
+            ErrorHandler.HandleInvalidOperatorError(context, left, right, "multiply");
             return null;
             //throw new Exception($"Cannot multiply values of types {left?.GetType()} and {right?.GetType()}");
         }
@@ -104,7 +104,7 @@ namespace Group1_InterpreterConsole.Functions
             if (left is float lFloat && right is int rInt)
                 return lFloat / rInt;
 
-            ErrorHandler.InvalidTypeOperation(context, left, right, "divide");
+            ErrorHandler.HandleInvalidOperatorError(context, left, right, "divide");
             return null;
             //throw new Exception($"Cannot divide values of types {left?.GetType()} and {right?.GetType()}");
         }
@@ -123,7 +123,7 @@ namespace Group1_InterpreterConsole.Functions
             if (left is float lFloat && right is int rInt)
                 return lFloat % rInt;
 
-            ErrorHandler.InvalidTypeOperation(context, left, right, "get modulo for the");
+            ErrorHandler.HandleInvalidOperatorError(context, left, right, "get modulo for the");
             return null;
             //throw new Exception($"Cannot get modulo for the values of types {left?.GetType()} and {right?.GetType()}");
         }

@@ -97,20 +97,58 @@ namespace Group1_InterpreterConsole.ErrorHandling
             Environment.Exit(400);
         }
 
-        public static void HandleInvalidOperatorError([NotNull] ParserRuleContext context, object? left, object? right, string op)
+        public static object? HandleInvalidOperatorError([NotNull] ParserRuleContext context, object? left, object? right, string op)
         {
             var line = context.Start.Line;
             Console.WriteLine($"Semantic Error: in line {line}.\n" +
                               $"Cannot {op} values of types {left?.GetType().Name.ToUpper()} and {right?.GetType().Name.ToUpper()}");
             Environment.Exit(400);
+            return null;
         }
 
-        public static void HandleInvalidRelationOperatorError([NotNull] ParserRuleContext context, object? left, object? right, string op)
+        public static object? HandleInvalidRelationOperatorError([NotNull] ParserRuleContext context, object? left, object? right, string op)
         {
             var line = context.Start.Line;
             Console.WriteLine($"Semantic Error: in line {line}.\n" +
                               $"Cannot compare values of types {left?.GetType().Name.ToUpper()} and {right?.GetType().Name.ToUpper()} with '{op}' operator");
             Environment.Exit(400);
+            return null;
+        }
+
+        public static object? HandleInvalidOperatorError([NotNull] ParserRuleContext context, string op, string specifier)
+        {
+            var line = context.Start.Line;
+            Console.WriteLine($"Semantic Error: in line {line}.\n" +
+                              $"Invalid {specifier}operator: {op}");
+            Environment.Exit(400);
+            return null;
+        }
+
+        public static object? HandleNegationError([NotNull] ParserRuleContext context)
+        {
+            var line = context.Start.Line;
+            Console.WriteLine($"Semantic Error: in line {line}.\n" +
+                              $"Argument must be of boolean value.");
+            Environment.Exit(400);
+            return null;
+        }
+
+        public static object? HandleBoolOperationError([NotNull] ParserRuleContext context, string boolop)
+        {
+            var line = context.Start.Line;
+            Console.WriteLine($"Semantic Error: in line {line}.\n" +
+                              $"Invalid boolean operator: {boolop}");
+            Environment.Exit(400);
+            return null;
+        }
+
+        public static object HandleUnaryError([NotNull] ParserRuleContext context, string symbol)
+        {
+            var line = context.Start.Line;
+            Console.WriteLine($"Semantic Error: in line {line}.\n" +
+                              $"Cannot get unary value for symbol {symbol}");
+            Environment.Exit(400);
+            return null;
         }
     }
 }

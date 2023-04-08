@@ -12,7 +12,7 @@ namespace Group1_InterpreterConsole.Functions
 {
     public class Operators
     {
-        public static object? Unary(string symbol, object? value)
+        public static object? Unary([NotNull] ParserRuleContext context, string symbol, object? value)
         {
             if (symbol == "+")
                 return value;
@@ -25,7 +25,7 @@ namespace Group1_InterpreterConsole.Functions
                     return -f;
             }
 
-            throw new Exception($"Cannot get unary value for symbol {symbol}");
+            return ErrorHandler.HandleUnaryError(context, symbol);
         }
 
 
@@ -47,8 +47,7 @@ namespace Group1_InterpreterConsole.Functions
             if (left is string || right is string)
                 return $"{left}{right}";
 
-            ErrorHandler.HandleInvalidOperatorError(context, left, right, "add");
-            return null;
+            return ErrorHandler.HandleInvalidOperatorError(context, left, right, "add");
             /*throw new Exception($"Cannot add values of types {left?.GetType().Name.ToUpper()} and {right?.GetType().Name.ToUpper()}");*/
         }
 
@@ -66,8 +65,7 @@ namespace Group1_InterpreterConsole.Functions
             if (left is float lFloat && right is int rInt)
                 return lFloat - rInt;
 
-            ErrorHandler.HandleInvalidOperatorError(context, left, right, "subtract");
-            return null;
+            return ErrorHandler.HandleInvalidOperatorError(context, left, right, "subtract");
             //throw new Exception($"Cannot subtract values of types {left?.GetType()} and {right?.GetType()}");
         }
 
@@ -85,8 +83,7 @@ namespace Group1_InterpreterConsole.Functions
             if (left is float lFloat && right is int rInt)
                 return lFloat * rInt;
 
-            ErrorHandler.HandleInvalidOperatorError(context, left, right, "multiply");
-            return null;
+            return ErrorHandler.HandleInvalidOperatorError(context, left, right, "multiply");
             //throw new Exception($"Cannot multiply values of types {left?.GetType()} and {right?.GetType()}");
         }
 
@@ -104,8 +101,7 @@ namespace Group1_InterpreterConsole.Functions
             if (left is float lFloat && right is int rInt)
                 return lFloat / rInt;
 
-            ErrorHandler.HandleInvalidOperatorError(context, left, right, "divide");
-            return null;
+            return ErrorHandler.HandleInvalidOperatorError(context, left, right, "divide");
             //throw new Exception($"Cannot divide values of types {left?.GetType()} and {right?.GetType()}");
         }
 
@@ -123,9 +119,7 @@ namespace Group1_InterpreterConsole.Functions
             if (left is float lFloat && right is int rInt)
                 return lFloat % rInt;
 
-            ErrorHandler.HandleInvalidOperatorError(context, left, right, "get modulo for the");
-            return null;
-            //throw new Exception($"Cannot get modulo for the values of types {left?.GetType()} and {right?.GetType()}");
+            return ErrorHandler.HandleInvalidOperatorError(context, left, right, "get modulo for the");
         }
 
         public static object? Relational([NotNull] ParserRuleContext context, object? left, object? right, string op)
@@ -142,8 +136,7 @@ namespace Group1_InterpreterConsole.Functions
                 }
                 else
                 {
-                    ErrorHandler.HandleInvalidRelationOperatorError(context, left, right, op);
-                    return null;
+                    return ErrorHandler.HandleInvalidRelationOperatorError(context, left, right, op);
                 }
             }
             else if (op == "<")
@@ -158,8 +151,7 @@ namespace Group1_InterpreterConsole.Functions
                 }
                 else
                 {
-                    ErrorHandler.HandleInvalidRelationOperatorError(context, left, right, op);
-                    return null;
+                    return ErrorHandler.HandleInvalidRelationOperatorError(context, left, right, op);
                 }
             }
             else if (op == ">=")
@@ -174,8 +166,7 @@ namespace Group1_InterpreterConsole.Functions
                 }
                 else
                 {
-                    ErrorHandler.HandleInvalidRelationOperatorError(context, left, right, op);
-                    return null;
+                    return ErrorHandler.HandleInvalidRelationOperatorError(context, left, right, op);
                 }
             }
             else if (op == "<=")
@@ -190,8 +181,7 @@ namespace Group1_InterpreterConsole.Functions
                 }
                 else
                 {
-                    ErrorHandler.HandleInvalidRelationOperatorError(context, left, right, op);
-                    return null;
+                    return ErrorHandler.HandleInvalidRelationOperatorError(context, left, right, op);
                 }
             }
             else if (op == "==")
@@ -204,25 +194,25 @@ namespace Group1_InterpreterConsole.Functions
             }
             else
             {
-                throw new Exception($"Invalid operator: {op}");
+                return ErrorHandler.HandleInvalidOperatorError(context, op, "");
             }
         }
 
-        public static object? Negation(object? op)
+        public static object? Negation([NotNull] ParserRuleContext context, object? op)
         {
             var not = Convert.ToBoolean(op);
 
-            if (not is bool boolValue)
+            if (op is bool boolValue)
             {
                 return !boolValue;
             }
             else
             {
-                throw new ArgumentException("Argument must be a boolean value.");
+                return ErrorHandler.HandleNegationError(context);
             }
         }
 
-        public static object? BoolOperation(object? left, object? right, string boolop)
+        public static object? BoolOperation([NotNull] ParserRuleContext context, object? left, object? right, string boolop)
         {
             switch (boolop)
             {
@@ -231,7 +221,7 @@ namespace Group1_InterpreterConsole.Functions
                 case "OR":
                     return (Convert.ToBoolean(left) || Convert.ToBoolean(right));
                 default:
-                    throw new Exception("Invalid boolean operator: " + boolop);
+                    return ErrorHandler.HandleBoolOperationError(context, boolop);
             }
         }
 

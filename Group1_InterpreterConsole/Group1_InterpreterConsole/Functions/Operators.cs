@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Antlr4.Runtime;
+using Antlr4.Runtime.Misc;
+using Group1_InterpreterConsole.ErrorHandling;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,7 +29,7 @@ namespace Group1_InterpreterConsole.Functions
         }
 
 
-        public static object? Add(object? left, object? right)
+        public static object? Add([NotNull] ParserRuleContext context, object? left, object? right)
         {
             if (left is int i && right is int j)
                 return i + j;
@@ -44,10 +47,12 @@ namespace Group1_InterpreterConsole.Functions
             if (left is string || right is string)
                 return $"{left}{right}";
 
-            throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}");
+            ErrorHandler.InvalidTypeOperation(context, left, right, "add");
+            return null;
+            /*throw new Exception($"Cannot add values of types {left?.GetType().Name.ToUpper()} and {right?.GetType().Name.ToUpper()}");*/
         }
 
-        public static object? Subtract(object? left, object? right)
+        public static object? Subtract([NotNull] ParserRuleContext context, object? left, object? right)
         {
             if (left is int i && right is int j)
                 return i - j;
@@ -61,10 +66,12 @@ namespace Group1_InterpreterConsole.Functions
             if (left is float lFloat && right is int rInt)
                 return lFloat - rInt;
 
-            throw new Exception($"Cannot subtract values of types {left?.GetType()} and {right?.GetType()}");
+            ErrorHandler.InvalidTypeOperation(context, left, right, "subtract");
+            return null;
+            //throw new Exception($"Cannot subtract values of types {left?.GetType()} and {right?.GetType()}");
         }
 
-        public static object? Multiply(object? left, object? right)
+        public static object? Multiply([NotNull] ParserRuleContext context, object? left, object? right)
         {
             if (left is int i && right is int j)
                 return i * j;
@@ -78,10 +85,12 @@ namespace Group1_InterpreterConsole.Functions
             if (left is float lFloat && right is int rInt)
                 return lFloat * rInt;
 
-            throw new Exception($"Cannot multiply values of types {left?.GetType()} and {right?.GetType()}");
+            ErrorHandler.InvalidTypeOperation(context, left, right, "multiply");
+            return null;
+            //throw new Exception($"Cannot multiply values of types {left?.GetType()} and {right?.GetType()}");
         }
 
-        public static object? Divide(object? left, object? right)
+        public static object? Divide([NotNull] ParserRuleContext context, object? left, object? right)
         {
             if (left is int i && right is int j)
                 return i / j;
@@ -95,10 +104,12 @@ namespace Group1_InterpreterConsole.Functions
             if (left is float lFloat && right is int rInt)
                 return lFloat / rInt;
 
-            throw new Exception($"Cannot divide values of types {left?.GetType()} and {right?.GetType()}");
+            ErrorHandler.InvalidTypeOperation(context, left, right, "divide");
+            return null;
+            //throw new Exception($"Cannot divide values of types {left?.GetType()} and {right?.GetType()}");
         }
 
-        public static object? Modulo(object? left, object? right)
+        public static object? Modulo([NotNull] ParserRuleContext context, object? left, object? right)
         {
             if (left is int i && right is int j)
                 return i % j;
@@ -112,7 +123,9 @@ namespace Group1_InterpreterConsole.Functions
             if (left is float lFloat && right is int rInt)
                 return lFloat % rInt;
 
-            throw new Exception($"Cannot get modulo for the values of types {left?.GetType()} and {right?.GetType()}");
+            ErrorHandler.InvalidTypeOperation(context, left, right, "get modulo for the");
+            return null;
+            //throw new Exception($"Cannot get modulo for the values of types {left?.GetType()} and {right?.GetType()}");
         }
 
         public static object? Relational(object? left, object? right, string op)

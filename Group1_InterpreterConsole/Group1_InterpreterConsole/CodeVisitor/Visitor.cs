@@ -19,13 +19,11 @@ namespace Group1_InterpreterConsole.CodeVisitor
     {
         private Dictionary<string, object?> Variables { get; set; } = new Dictionary<string, object?>();
         private Dictionary<string, object?> VarTypes { get; set; } = new Dictionary<string, object?>();
-        private Operators op = new();
-        private ErrorHandler error = new();
 
         public override object? VisitProgram([NotNull] CodeParser.ProgramContext context)
         {
             string code = context.GetText().Trim();
-            if (error.HandleProgramCreationError(context,code,"Program Creation"))
+            if (ErrorHandler.HandleProgramCreationError(context,code,"Program Creation"))
             {
                 // Visit each statement in the code
                 foreach (var statementContext in context.statement())
@@ -44,7 +42,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 var expression = context.expression().Accept(this);
 
                 // check type
-                if (error.IsValidType(context, expression, (Type?)VarTypes[i.GetText()], "Variable Assignment"))
+                if (ErrorHandler.IsValidType(context, expression, (Type?)VarTypes[i.GetText()], "Variable Assignment"))
                 { 
                     Variables[i.GetText()] = expression;
                 }  
@@ -62,7 +60,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
             else
             {
-                error?.HandleUndefinedVariableError(context, varName);
+                ErrorHandler.HandleUndefinedVariableError(context, varName);
                 return null;
             }
         }
@@ -106,6 +104,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
             else
             {
+                //no need to implement Error Handler
                 throw new InvalidOperationException("Unknown literal type");
             }
         }
@@ -137,6 +136,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 case "STRING":
                     return typeof(string);
                 default:
+                    //no need to implement Error Handler
                     throw new NotImplementedException("Invalid Data Type");
             }
         }
@@ -167,7 +167,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     if (expctr < exp.Count())
                     {
                         // check type
-                        if (error.IsValidType(context, Visit(exp[expctr]), (Type?)type, "Variable Declaration"))
+                        if (ErrorHandler.IsValidType(context, Visit(exp[expctr]), (Type?)type, "Variable Declaration"))
                         {
                             Variables[varnames[x].GetText()] = Visit(exp[expctr]);
                             VarTypes[varnames[x].GetText()] = type;
@@ -220,7 +220,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             }
             else
             {
-                error.HandleUndefinedVariableError(context, identifier);
+                ErrorHandler.HandleUndefinedVariableError(context, identifier);
                 return null;
             }
         }
@@ -237,7 +237,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 return b.GetText().Equals("\"TRUE\"");
             else if (context.constant().STRING() is { } s)
                 return s.GetText()[1..^1];
-
+            //no need to implement Error Handler
             throw new NotImplementedException();
         }
 
@@ -263,8 +263,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             return ops switch
             {
-                "+" => Operators.Add(left, right),
-                "-" => Operators.Subtract(left, right),
+                "+" => Operators.Add(context, left, right),
+                "-" => Operators.Subtract(context, left, right),
                 _ => throw new NotImplementedException(),
             };
         }
@@ -278,9 +278,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             return ops switch
             {
-                "*" => Operators.Multiply(left, right),
-                "/" => Operators.Divide(left, right),
-                "%" => Operators.Modulo(left, right),
+                "*" => Operators.Multiply(context, left, right),
+                "/" => Operators.Divide(context, left, right),
+                "%" => Operators.Modulo(context, left, right),
                 _ => throw new NotImplementedException(),
             };
         }
@@ -320,9 +320,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var condition = Visit(context.expression());
 
-            var result = error.ConditionChecker(condition);
+            var result = ErrorHandler.ConditionChecker(context, condition);
             result = Convert.ToBoolean(result);
-            if (ErrorHandler.ConditionChecker(condition) == true)
+            if (ErrorHandler.ConditionChecker(context, condition) == true)
             {
                 var lines = context.line().ToList();
                 foreach (var line in lines)
@@ -336,7 +336,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 foreach (var elseIfBlock in elseIfBlocks)
                 {
                     var elseIfCondition = Visit(elseIfBlock.expression());
-                    if (ErrorHandler.ConditionChecker(elseIfCondition) == true)
+                    if (ErrorHandler.ConditionChecker(context, elseIfCondition) == true)
                     {
                         var elseIfLines = elseIfBlock.line().ToList();
                         foreach (var line in elseIfLines)
@@ -358,7 +358,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     }
                 }
             }
-
             return null;
         }
 
@@ -366,7 +365,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         {
             var condition = Visit(context.expression());
 
-            while (ErrorHandler.ConditionChecker(condition) == true)
+            while (ErrorHandler.ConditionChecker(context, condition) == true)
             {
                 var lines = context.line().ToList();
                 foreach (var line in lines)
@@ -381,8 +380,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitEscapeSequenceExpression([NotNull] EscapeSequenceExpressionContext context)
         {
             var sequence = context.GetText()[1];
-
-            return Operators.Escape(sequence) ?? throw new ArgumentException($"Invalid escape sequence: {context.GetText()}");
+            return Operators.Escape(sequence) ?? throw new ArgumentException($"Invalid escape sequence: {context.GetText()}"); //no need to implement Error Handler
         }
 
         public override object? VisitNewlineOpExpression([NotNull] NewlineOpExpressionContext context)
@@ -408,42 +406,40 @@ namespace Group1_InterpreterConsole.CodeVisitor
             foreach (var id in context.IDENTIFIER())
             {
                 string idName = id.GetText();
-                if (!VarTypes.ContainsKey(idName))
+                if (ErrorHandler.DictionaryChecker(context, VarTypes, idName))
                 {
-                    throw new ArgumentException($"Variable '{idName}' has not been declared.");
-                }
+                    //testing purposes can be removed or kept after review
+                    Console.Write($"Awaiting Input for {idName}: ");
 
-                //testing purposes can be removed or kept after review
-                Console.Write($"Awaiting input for {idName}: ");
+                    string input = Console.ReadLine() ?? "";
+                    if (idName != null)
+                    {
+                        switch (VarTypes[idName])
+                        {
+                            case int:
+                                Variables[idName] = Convert.ToInt32(input);
+                                break;
+                            case float:
+                                Variables[idName] = Convert.ToDouble(input);
+                                break;
+                            case bool:
+                                Variables[idName] = Convert.ToBoolean(input);
+                                break;
+                            case char:
+                                Variables[idName] = Convert.ToChar(input);
+                                break;
+                            case string:
+                                Variables[idName] = Convert.ToString(input);
+                                break;
+                            default:
+                                {
+                                    ErrorHandler.ScanTypeChecker(context, idName, "Input Scan");
+                                    break;
+                                }
+                        }
 
-                string input = Console.ReadLine() ?? "";
-                if (idName != null)
-                {
-                    if (VarTypes[idName] == typeof(int))
-                    {
-                        Variables[idName] = Convert.ToInt32(input);
                     }
-                    else if (VarTypes[idName] == typeof(float))
-                    {
-                        Variables[idName] = Convert.ToDouble(input);
-                    }
-                    else if (VarTypes[idName] == typeof(bool))
-                    {
-                        Variables[idName] = Convert.ToBoolean(input);
-                    }
-                    else if (VarTypes[idName] == typeof(char))
-                    {
-                        Variables[idName] = Convert.ToChar(input);
-                    }
-                    else if (VarTypes[idName] == typeof(string))
-                    {
-                        Variables[idName] = Convert.ToString(input);
-                    }
-                    else
-                    {
-                        throw new Exception("Data type does not exist!");
-                    }
-                }
+                }                
             }
             return null;
         }

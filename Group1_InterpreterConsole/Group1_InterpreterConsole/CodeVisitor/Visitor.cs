@@ -467,9 +467,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             {
                 var idName = context.IDENTIFIER(i).GetText();
                 ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, idName);
-
-                var inputValue = inputs[i];
-                Features.Scan(VarTypes, Variables, idName, inputValue);
+                Features.Scan(VarTypes, Variables, idName, inputs[i]);
             }
 
             return null;

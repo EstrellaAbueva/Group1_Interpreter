@@ -455,15 +455,23 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitScan([NotNull] ScanContext context)
         {
-            foreach (var id in context.IDENTIFIER())
+            var input = Console.ReadLine();
+            var inputs = input!.Split(',').Select(s => s.Trim()).ToArray();
+
+            if (inputs.Length < 1 || inputs.Length > context.IDENTIFIER().Length)
             {
-                string idName = id.GetText();
+                throw new ArgumentException($"Invalid number of inputs. Expected between 1 and {context.IDENTIFIER().Length}, but got {inputs.Length}.");
+            }
+
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                var idName = context.IDENTIFIER(i).GetText();
                 ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, idName);
 
-                //testing purposes can be removed or kept after review
-                string input = Console.ReadLine() ?? "";
-                Features.Scan(VarTypes, Variables, idName, input);
+                var inputValue = inputs[i];
+                Features.Scan(Variables, idName, inputValue);
             }
+
             return null;
         }
 

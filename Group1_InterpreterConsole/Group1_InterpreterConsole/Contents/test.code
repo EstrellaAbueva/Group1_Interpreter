@@ -1,8 +1,15 @@
-﻿# asdasdasd
+﻿# DIRI PAG EDIT
 BEGIN CODE
-	INT x
-	FOR (x = 3 ; x < 10 ; x++ )
-		BEGIN FOR LOOP
-			DISPLAY: "Hi" & $
-		END FOR LOOP
+	INT a=100, b=200, c=300, x, y, z
+	SCAN: x
+	FOR (y = 1; y <= x; y++)
+		BEGIN FOR
+			z = 1
+			WHILE (z < y)
+			BEGIN WHILE
+				DISPLAY: z
+				z++
+			END WHILE
+			DISPLAY: $
+		END FOR
 END CODE

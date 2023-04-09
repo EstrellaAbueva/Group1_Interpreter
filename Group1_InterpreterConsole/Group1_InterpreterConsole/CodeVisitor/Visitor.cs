@@ -466,6 +466,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 string input = Console.ReadLine() ?? "";
                 if (idName != null)
                 {
+                    //ErrorHandler.HandleTypeError(context, Visit(exp[expctr]), typeof(int), "i")
                     if (VarTypes[idName] == typeof(int))
                     {
                         Variables[idName] = Convert.ToInt32(input);
@@ -501,7 +502,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             if (ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, id))
             {
-                Convert.ToInt32(Features.Increment(VarTypes, Variables, id));
+                Convert.ToInt32(Features.Increment(context, VarTypes, Variables, id));
             }
             return null;
         }
@@ -512,7 +513,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             if (ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, id))
             {
-                Convert.ToInt32(Features.Decrement(VarTypes, Variables, id));
+                Convert.ToInt32(Features.Decrement(context, VarTypes, Variables, id));
             }
             return null;
         }

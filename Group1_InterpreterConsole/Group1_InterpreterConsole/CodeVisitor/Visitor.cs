@@ -461,36 +461,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, idName);
 
                 //testing purposes can be removed or kept after review
-                Console.Write($"Awaiting input for {idName}: ");
-
                 string input = Console.ReadLine() ?? "";
-                if (idName != null)
-                {
-                    if (VarTypes[idName] == typeof(int))
-                    {
-                        Variables[idName] = Convert.ToInt32(input);
-                    }
-                    else if (VarTypes[idName] == typeof(float))
-                    {
-                        Variables[idName] = Convert.ToDouble(input);
-                    }
-                    else if (VarTypes[idName] == typeof(bool))
-                    {
-                        Variables[idName] = Convert.ToBoolean(input);
-                    }
-                    else if (VarTypes[idName] == typeof(char))
-                    {
-                        Variables[idName] = Convert.ToChar(input);
-                    }
-                    else if (VarTypes[idName] == typeof(string))
-                    {
-                        Variables[idName] = Convert.ToString(input);
-                    }
-                    else
-                    {
-                        throw new Exception("Data type does not exist!");
-                    }
-                }
+                Features.Scan(VarTypes, Variables, idName, input);
             }
             return null;
         }

@@ -406,8 +406,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
             Visit(statement);
 
             // Evaluate the loop condition expression
-            int result = Convert.ToInt32(Visit(expression));
-            bool loopCondition = result != 0;
+            bool loopCondition = Convert.ToBoolean(Visit(expression));
 
             // Loop while the condition is true
             while (loopCondition)
@@ -422,8 +421,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 Visit(additional);
 
                 // Evaluate the loop condition expression again
-                int res = Convert.ToInt32(Visit(expression));
-                loopCondition = res != 0;
+                loopCondition = Convert.ToBoolean(Visit(expression));
             }
 
             return null;

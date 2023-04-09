@@ -152,20 +152,52 @@ namespace Group1_InterpreterConsole.ErrorHandling
             return null;
         }
 
-        public static void HandleInvalidIncrementTypeError(CodeParser.Increment_statementContext context, string id)
+        public static object? HandleInvalidIncrementTypeError([NotNull] ParserRuleContext context, Dictionary<string, object?> dictionarys, string id)
         {
+            Type? type = null;
+
+            if (dictionarys[id] is bool)
+            {
+                type = typeof(bool);
+            }
+            else if (dictionarys[id] is char)
+            {
+                type = typeof(char);
+            }
+            else if (dictionarys[id] is string)
+            {
+                type = typeof(string);
+            }
+
             var line = context.Start.Line;
             Console.WriteLine($"Semantic Error: in line {line}.\n" +
-                              $"Invalid: {context}");
+                              $"Cannot increment value of type {type?.Name.ToUpper()}");
             Environment.Exit(400);
+            return null;
         }
 
-        public static void HandleInvalidDecrementTypeError(CodeParser.Decrement_statementContext context, string id)
+        public static object? HandleInvalidDecrementTypeError([NotNull] ParserRuleContext context, Dictionary<string, object?> dictionarys, string id)
         {
+            Type? type = null;
+
+            if ((Type?)dictionarys[id] == typeof(bool))
+            {
+                type = typeof(bool);
+            }
+            else if ((Type?)dictionarys[id] == typeof(char))
+            {
+                type = typeof(char);
+            }
+            else if ((Type?)dictionarys[id] == typeof(string))
+            {
+                type = typeof(string);
+            }
+
             var line = context.Start.Line;
             Console.WriteLine($"Semantic Error: in line {line}.\n" +
-                              $"Invalid: {context}");
+                              $"Cannot decrement value of type {type?.Name.ToUpper()}");
             Environment.Exit(400);
+            return null;
         }
     }
 }

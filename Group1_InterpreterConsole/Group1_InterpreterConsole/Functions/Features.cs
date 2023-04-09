@@ -56,29 +56,32 @@ namespace Group1_InterpreterConsole.Functions
             }
         }
 
-        public static object? Scan(Dictionary<string, object?> dictionarys, string id, string input)
+        public static object? Scan(Dictionary<string, object?> dictionary, Dictionary<string, object?> dictionarys, string id, string input)
         {
-            if (int.TryParse(input, out int intValue))
+            if (dictionary[id] == typeof(int))
             {
-                dictionarys[id] = intValue;
+                return dictionarys[id] = Convert.ToInt32(input);
             }
-            else if (float.TryParse(input, out float floatValue))
+            else if (dictionary[id] == typeof(float))
             {
-                dictionarys[id] = floatValue;
+                return dictionarys[id] = Convert.ToDouble(input);
             }
-            else if (char.TryParse(input, out char charValue))
+            else if (dictionary[id] == typeof(bool))
             {
-                dictionarys[id] = charValue;
+                return dictionarys[id] = Convert.ToBoolean(input);
             }
-            else if (input != null)
+            else if (dictionary[id] == typeof(char))
             {
-                dictionarys[id] = input;
+                return dictionarys[id] = Convert.ToChar(input);
+            }
+            else if (dictionary[id] == typeof(string))
+            {
+                return dictionarys[id] = Convert.ToString(input);
             }
             else
             {
-                throw new ArgumentException($"Invalid input for variable {id}");
+                throw new Exception("Data type does not exist!");
             }
-            return null;
         }
     }
 }

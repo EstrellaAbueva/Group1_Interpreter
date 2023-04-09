@@ -377,6 +377,60 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return null;
         }
 
+        public override object? VisitDo_while_loop([NotNull] Do_while_loopContext context)
+        {
+            var condition = Visit(context.expression());
+
+            do
+            {
+                var lines = context.line().ToList();
+                foreach (var line in lines)
+                {
+                    Visit(line);
+                }
+                condition = Visit(context.expression());
+            } while (ErrorHandler.HandleConditionError(context, condition) == true);
+
+            return null;
+        }
+
+        public override object? VisitFor_loop([NotNull] For_loopContext context)
+        {
+            // Extract the loop variables from the context
+            var statement = context.statement();
+            var expression = context.expression();
+            var additional = context.additional();
+            var lines = context.line();
+
+            // Visit the loop initialization statement
+            Visit(statement);
+
+            // Evaluate the loop condition expression
+            int result = Convert.ToInt32(Visit(expression));
+            bool loopCondition = result != 0;
+
+            // Loop while the condition is true
+            while (loopCondition)
+            {
+                // Execute the loop body lines
+                foreach (var line in lines)
+                {
+                    Visit(line);
+                }
+
+                // Evaluate the loop additional expression
+                Visit(additional);
+
+                // Evaluate the loop condition expression again
+                int res = Convert.ToInt32(Visit(expression));
+                loopCondition = res != 0;
+            }
+
+            return null;
+        }
+
+
+
         public override object? VisitEscapeSequenceExpression([NotNull] EscapeSequenceExpressionContext context)
         {
             var sequence = context.GetText()[1];

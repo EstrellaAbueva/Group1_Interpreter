@@ -1,9 +1,8 @@
 ﻿# asdasdasd
 BEGIN CODE
-	INT x = 3
-	WHILE (x < 10)
-		BEGIN WHILE
+	INT x
+	FOR (x = 3 ; x < 10 ; x++ )
+		BEGIN FOR LOOP
 			DISPLAY: "Hi" & $
-			x++
-		END WHILE
+		END FOR LOOP
 END CODE

@@ -27,7 +27,13 @@ else_block: 'ELSE' BEGIN_IF line* END_IF NEWLINE?;
 
 BEGIN_WHILE: 'BEGIN WHILE';
 END_WHILE: 'END WHILE';
+BEGIN_DO_WHILE: 'BEGIN DO WHILE';
+END_DO_WHILE: 'END DO WHILE';
+BEGIN_FOR_LOOP: 'BEGIN FOR LOOP';
+END_FOR_LOOP: 'END FOR LOOP';
 while_loop: 'WHILE' '(' expression ')' BEGIN_WHILE line* END_WHILE NEWLINE?;
+do_while_loop: 'DO' BEGIN_DO_WHILE line* END_DO_WHILE 'WHILE' '(' expression ')' NEWLINE?;
+for_loop: 'FOR' '(' statement ';' expression ';'  additional')' BEGIN_FOR_LOOP line* END_FOR_LOOP NEWLINE?;
 
 constant: INT | FLOAT | BOOL | CHAR | STRING;
 INT: [0-9]+;
@@ -38,6 +44,7 @@ STRING: '"' ~('"')* '"';
 ESCAPE_SEQUENCE: '[' . ']';
 IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
+additional: increment_statement | decrement_statement;
 
 increment_statement : IDENTIFIER '++' NEWLINE? ;
 decrement_statement : IDENTIFIER '--' NEWLINE? ;
@@ -47,6 +54,8 @@ statement
 	| function_call 
 	| if_block 
 	| while_loop
+	| do_while_loop
+	| for_loop
 	| display
 	| scan
 	| declaration

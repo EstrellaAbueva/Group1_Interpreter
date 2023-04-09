@@ -501,18 +501,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             if (ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, id))
             {
-                if (VarTypes[id] == typeof(int))
-                {
-                    Variables[id] = Convert.ToInt32(Variables[id]) + 1;
-                }
-                else if (VarTypes[id] == typeof(float))
-                {
-                    Variables[id] = Convert.ToDouble(Variables[id]) + 1;
-                }
-                else
-                {
-                    ErrorHandler.HandleInvalidIncrementTypeError(context, id);
-                }
+                Convert.ToInt32(Features.Increment(VarTypes, Variables, id));
             }
             return null;
         }
@@ -523,18 +512,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             if (ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, id))
             {
-                if (VarTypes[id] == typeof(int))
-                {
-                    Variables[id] = Convert.ToInt32(Variables[id]) - 1;
-                }
-                else if (VarTypes[id] == typeof(float))
-                {
-                    Variables[id] = Convert.ToDouble(Variables[id]) - 1;
-                }
-                else
-                {
-                    ErrorHandler.HandleInvalidDecrementTypeError(context, id);
-                }
+                Convert.ToInt32(Features.Decrement(VarTypes, Variables, id));
             }
             return null;
         }

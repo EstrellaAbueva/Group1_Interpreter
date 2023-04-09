@@ -1,15 +1,12 @@
-﻿# DIRI PAG EDIT
-BEGIN CODE
-	INT a=100, b=200, c=300, x, y, z
-	SCAN: x
-	FOR (y = 1; y <= x; y++)
-		BEGIN FOR
-			z = 1
-			WHILE (z < y)
-			BEGIN WHILE
-				DISPLAY: z
-				z++
-			END WHILE
-			DISPLAY: $
-		END FOR
+﻿BEGIN CODE
+	INT a=100, b=200, c=300, x=0 
+	BOOL d="TRUE"
+	WHILE (x < 5)
+	BEGIN WHILE
+		IF (x % 2 <> 0)
+		BEGIN IF
+			DISPLAY: x
+		END IF
+		x++
+	END WHILE
 END CODE

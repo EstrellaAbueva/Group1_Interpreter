@@ -38,6 +38,10 @@ STRING: '"' ~('"')* '"';
 ESCAPE_SEQUENCE: '[' . ']';
 IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
+
+increment_statement : IDENTIFIER '++' NEWLINE? ;
+decrement_statement : IDENTIFIER '--' NEWLINE? ;
+
 statement 
 	: assignment
 	| function_call 
@@ -50,6 +54,8 @@ statement
 	| variable_assignment
 	| COMMENT
 	| expression
+	| increment_statement
+	| decrement_statement
 	;
 
 expression

@@ -444,5 +444,48 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return null;
         }
 
+        public override object? VisitIncrement_statement([NotNull] Increment_statementContext context)
+        {
+            var id = context.IDENTIFIER().GetText();
+
+            if (ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, id))
+            {
+                if (VarTypes[id] == typeof(int))
+                {
+                    Variables[id] = Convert.ToInt32(Variables[id]) + 1;
+                }
+                else if (VarTypes[id] == typeof(float))
+                {
+                    Variables[id] = Convert.ToDouble(Variables[id]) + 1;
+                }
+                else
+                {
+                    ErrorHandler.HandleInvalidIncrementTypeError(context, id);
+                }
+            }
+            return null;
+        }
+
+        public override object? VisitDecrement_statement([NotNull] Decrement_statementContext context)
+        {
+            var id = context.IDENTIFIER().GetText();
+
+            if (ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, id))
+            {
+                if (VarTypes[id] == typeof(int))
+                {
+                    Variables[id] = Convert.ToInt32(Variables[id]) - 1;
+                }
+                else if (VarTypes[id] == typeof(float))
+                {
+                    Variables[id] = Convert.ToDouble(Variables[id]) - 1;
+                }
+                else
+                {
+                    ErrorHandler.HandleInvalidDecrementTypeError(context, id);
+                }
+            }
+            return null;
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
+using Group1_InterpreterConsole.Contents;
 using System.Xml.Linq;
 
 namespace Group1_InterpreterConsole.ErrorHandling
@@ -142,13 +143,29 @@ namespace Group1_InterpreterConsole.ErrorHandling
             return null;
         }
 
-        public static object HandleUnaryError([NotNull] ParserRuleContext context, string symbol)
+        public static object? HandleUnaryError([NotNull] ParserRuleContext context, string symbol)
         {
             var line = context.Start.Line;
             Console.WriteLine($"Semantic Error: in line {line}.\n" +
                               $"Cannot get unary value for symbol {symbol}");
             Environment.Exit(400);
             return null;
+        }
+
+        public static void HandleInvalidIncrementTypeError(CodeParser.Increment_statementContext context, string id)
+        {
+            var line = context.Start.Line;
+            Console.WriteLine($"Semantic Error: in line {line}.\n" +
+                              $"Invalid: {context}");
+            Environment.Exit(400);
+        }
+
+        public static void HandleInvalidDecrementTypeError(CodeParser.Decrement_statementContext context, string id)
+        {
+            var line = context.Start.Line;
+            Console.WriteLine($"Semantic Error: in line {line}.\n" +
+                              $"Invalid: {context}");
+            Environment.Exit(400);
         }
     }
 }

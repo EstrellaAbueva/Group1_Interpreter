@@ -4,6 +4,6 @@ BEGIN CODE
 	WHILE (x < 10)
 		BEGIN WHILE
 			DISPLAY: "Hi" & $
-			x = x + 1
+			x++
 		END WHILE
 END CODE

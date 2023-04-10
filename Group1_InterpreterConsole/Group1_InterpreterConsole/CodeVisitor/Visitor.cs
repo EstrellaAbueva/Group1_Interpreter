@@ -460,7 +460,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             if (inputs.Length < 1 || inputs.Length > context.IDENTIFIER().Length)
             {
-                throw new ArgumentException($"Invalid number of inputs. Expected between 1 and {context.IDENTIFIER().Length}, but got {inputs.Length}.");
+                return ErrorHandler.HandlleInvalidScanInputsError(context, context.IDENTIFIER().Length, inputs.Length, "Input Scan");
+                //throw new ArgumentException($"Invalid number of inputs. Expected between 1 and {context.IDENTIFIER().Length}, but got {inputs.Length}.");
             }
 
             for (int i = 0; i < inputs.Length; i++)
@@ -468,9 +469,10 @@ namespace Group1_InterpreterConsole.CodeVisitor
                 var idName = context.IDENTIFIER(i).GetText();
                 if (!VarTypes.ContainsKey(idName))
                 {
-                    throw new ArgumentException($"Variable '{idName}' is not declared.");
+                    return ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, idName);
+                    //throw new ArgumentException($"Variable '{idName}' is not declared.");
                 }
-                Features.Scan(VarTypes, Variables, idName, inputs[i]);
+                Features.Scan(context, VarTypes, Variables, idName, inputs[i]);
             }
 
             return null;

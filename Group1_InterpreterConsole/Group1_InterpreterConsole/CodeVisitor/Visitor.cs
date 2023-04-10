@@ -53,92 +53,24 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitVariable([NotNull] CodeParser.VariableContext context)
         {
             var varName = context.IDENTIFIER().GetText();
-
-            if (Variables != null && Variables.TryGetValue(varName, out object? value))
-            {
-                return value;
-            }
-            else
-            {
-                ErrorHandler.HandleUndefinedVariableError(context, varName);
-                return null;
-            }
+            return Features.Variables(Variables, varName, context);
         }
 
         public override object? VisitConstant([NotNull] CodeParser.ConstantContext context)
         {
             var constant = context.GetText();
-
-            if (constant.StartsWith("\"") && constant.EndsWith("\""))
-            {
-                return constant.Substring(1, constant.Length - 2);
-            }
-            else if (constant.StartsWith("'") && constant.EndsWith("'"))
-            {
-                return constant[1];
-            }
-            else if (context.BOOL() != null)
-            {
-                return bool.Parse(context.BOOL().GetText());
-            }
-            else if (context.INT() != null)
-            {
-                return int.Parse(context.INT().GetText());
-            }
-            else if (context.FLOAT() != null)
-            {
-                return float.Parse(context.FLOAT().GetText());
-            }
-            else if (context.STRING() != null)
-            {
-                string text = context.STRING().GetText();
-                // Remove the enclosing quotes from the string
-                text = text.Substring(1, text.Length - 2);
-                // Replace escape sequences with their corresponding characters
-                text = Regex.Replace(text, @"\\(.)", "$1");
-                return text;
-            }
-            else if (context.CHAR() != null)
-            {
-                return context.CHAR().GetText()[1];
-            }
-            else
-            {
-                //no need to implement Error Handler
-                throw new InvalidOperationException("Unknown literal type");
-            }
+            return Features.ConstantParser(constant, context);
         }
 
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {
             var exp = Visit(context.expression());
-
-            if (exp is bool b)
-                exp = b.ToString().ToUpper();
-
-            Console.Write(exp);
-
-            return null;
+            return Features.Display(exp);
         }
 
-        public override object VisitType([NotNull] CodeParser.TypeContext context)
+        public override object? VisitType([NotNull] CodeParser.TypeContext context)
         {
-            switch (context.GetText())
-            {
-                case "INT":
-                    return typeof(int);
-                case "FLOAT":
-                    return typeof(float);
-                case "BOOL":
-                    return typeof(bool);
-                case "CHAR":
-                    return typeof(char);
-                case "STRING":
-                    return typeof(string);
-                default:
-                    //no need to implement Error Handler
-                    throw new NotImplementedException("Invalid Data Type");
-            }
+            return Features.TypeParser(context);
         }
 
         public override object? VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
@@ -193,52 +125,24 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return null;
         }
 
-        public override object VisitConcatOpExpression([NotNull] CodeParser.ConcatOpExpressionContext context)
+        public override object? VisitConcatOpExpression([NotNull] CodeParser.ConcatOpExpressionContext context)
         {
             // Get the left and right expressions;
             var left = Visit(context.expression(0));
             var right = Visit(context.expression(1));
-            var output = "";
-            
-            if(left is bool b)
-                left = b.ToString().ToUpper();
 
-            if(right is bool c)
-                right = c.ToString().ToUpper();
-
-            output = $"{left}{right}";
-            return output;
+            return Features.Concat(left, right);
         }
 
         public override object? VisitIdentifierExpression([NotNull] CodeParser.IdentifierExpressionContext context)
         {
             var identifier = context.IDENTIFIER().GetText();
-
-            if (Variables.ContainsKey(identifier))
-            {
-                return Variables[identifier];
-            }
-            else
-            {
-                ErrorHandler.HandleUndefinedVariableError(context, identifier);
-                return null;
-            }
+            return Features.Identifier(Variables, identifier, context);
         }
 
         public override object? VisitConstantExpression([NotNull] CodeParser.ConstantExpressionContext context)
         {
-            if (context.constant().INT() is { } i)
-                return int.Parse(i.GetText());
-            else if (context.constant().FLOAT() is { } f)
-                return float.Parse(f.GetText());
-            else if (context.constant().CHAR() is { } g)
-                return g.GetText()[1];
-            else if (context.constant().BOOL() is { } b)
-                return b.GetText().Equals("\"TRUE\"");
-            else if (context.constant().STRING() is { } s)
-                return s.GetText()[1..^1];
-            //no need to implement Error Handler
-            throw new NotImplementedException();
+            return Features.ConstantExpressionParser(context);
         }
 
         public override object? VisitVariable_assignment([NotNull] CodeParser.Variable_assignmentContext context)
@@ -426,8 +330,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             return null;
         }
-
-
 
         public override object? VisitEscapeSequenceExpression([NotNull] EscapeSequenceExpressionContext context)
         {

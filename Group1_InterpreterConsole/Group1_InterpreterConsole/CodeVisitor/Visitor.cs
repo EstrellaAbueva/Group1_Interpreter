@@ -466,7 +466,10 @@ namespace Group1_InterpreterConsole.CodeVisitor
             for (int i = 0; i < inputs.Length; i++)
             {
                 var idName = context.IDENTIFIER(i).GetText();
-                ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, idName);
+                if (!VarTypes.ContainsKey(idName))
+                {
+                    throw new ArgumentException($"Variable '{idName}' is not declared.");
+                }
                 Features.Scan(VarTypes, Variables, idName, inputs[i]);
             }
 

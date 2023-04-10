@@ -59,31 +59,22 @@ namespace Group1_InterpreterConsole.Functions
             }
         }
 
-        public static object? Scan(Dictionary<string, object?> dictionary, Dictionary<string, object?> dictionarys, string id, string input)
+        public static void Scan(Dictionary<string, object?> typeDictionary, Dictionary<string, object?> valueDictionary, string id, string input)
         {
-            if (dictionary[id] == typeof(int))
+            if (!typeDictionary.ContainsKey(id))
             {
-                return dictionarys[id] = Convert.ToInt32(input);
+                throw new ArgumentException($"Variable '{id}' is not declared.");
             }
-            else if (dictionary[id] == typeof(float))
+
+            Type? valueType = (Type?)typeDictionary[id];
+            try
             {
-                return dictionarys[id] = Convert.ToDouble(input);
+                object? convertedValue = Convert.ChangeType(input, valueType!);
+                valueDictionary[id] = convertedValue;
             }
-            else if (dictionary[id] == typeof(bool))
+            catch (FormatException)
             {
-                return dictionarys[id] = Convert.ToBoolean(input);
-            }
-            else if (dictionary[id] == typeof(char))
-            {
-                return dictionarys[id] = Convert.ToChar(input);
-            }
-            else if (dictionary[id] == typeof(string))
-            {
-                return dictionarys[id] = Convert.ToString(input);
-            }
-            else
-            {
-                throw new Exception("Data type does not exist!");
+                throw new ArgumentException($"Input '{input}' is not in the expected format for data type {valueType}.");
             }
         }
     }

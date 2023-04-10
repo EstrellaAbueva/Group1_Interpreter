@@ -2,6 +2,7 @@
 using Antlr4.Runtime.Misc;
 using Group1_InterpreterConsole.ErrorHandling;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -59,22 +60,23 @@ namespace Group1_InterpreterConsole.Functions
             }
         }
 
-        public static void Scan(Dictionary<string, object?> typeDictionary, Dictionary<string, object?> valueDictionary, string id, string input)
+        public static object? Scan([NotNull] ParserRuleContext context, Dictionary<string, object?> typeDictionary, Dictionary<string, object?> valueDictionary, string id, string input)
         {
             if (!typeDictionary.ContainsKey(id))
             {
-                throw new ArgumentException($"Variable '{id}' is not declared.");
+                return ErrorHandler.HandleUndeclaredVariableError(context, typeDictionary, id);
             }
 
             Type? valueType = (Type?)typeDictionary[id];
             try
             {
                 object? convertedValue = Convert.ChangeType(input, valueType!);
-                valueDictionary[id] = convertedValue;
+                return valueDictionary[id] = convertedValue;
             }
             catch (FormatException)
             {
-                throw new ArgumentException($"Input '{input}' is not in the expected format for data type {valueType}.");
+                return ErrorHandler.HandleInvalidScanTypeError(context,input,valueType,"Input Scan");
+                //throw new ArgumentException($"Input '{input}' is not in the expected format for data type {valueType}.");
             }
         }
     }

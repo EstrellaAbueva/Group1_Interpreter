@@ -455,44 +455,21 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
         public override object? VisitScan([NotNull] ScanContext context)
         {
-            foreach (var id in context.IDENTIFIER())
+            var input = Console.ReadLine();
+            var inputs = input!.Split(',').Select(s => s.Trim()).ToArray();
+
+            if (inputs.Length < 1 || inputs.Length > context.IDENTIFIER().Length)
             {
-                string idName = id.GetText();
-                ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, idName);
-
-                //testing purposes can be removed or kept after review
-                Console.Write($"Awaiting input for {idName}: ");
-
-                string input = Console.ReadLine() ?? "";
-                if (idName != null)
-                {
-                    //ErrorHandler.HandleTypeError(context, Visit(exp[expctr]), typeof(int), "i")
-                    if (VarTypes[idName] == typeof(int))
-                    {
-                        Variables[idName] = Convert.ToInt32(input);
-                    }
-                    else if (VarTypes[idName] == typeof(float))
-                    {
-                        Variables[idName] = Convert.ToDouble(input);
-                    }
-                    else if (VarTypes[idName] == typeof(bool))
-                    {
-                        Variables[idName] = Convert.ToBoolean(input);
-                    }
-                    else if (VarTypes[idName] == typeof(char))
-                    {
-                        Variables[idName] = Convert.ToChar(input);
-                    }
-                    else if (VarTypes[idName] == typeof(string))
-                    {
-                        Variables[idName] = Convert.ToString(input);
-                    }
-                    else
-                    {
-                        throw new Exception("Data type does not exist!");
-                    }
-                }
+                throw new ArgumentException($"Invalid number of inputs. Expected between 1 and {context.IDENTIFIER().Length}, but got {inputs.Length}.");
             }
+
+            for (int i = 0; i < inputs.Length; i++)
+            {
+                var idName = context.IDENTIFIER(i).GetText();
+                ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, idName);
+                Features.Scan(VarTypes, Variables, idName, inputs[i]);
+            }
+
             return null;
         }
 

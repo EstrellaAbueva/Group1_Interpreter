@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Group1_InterpreterConsole.Contents;
+using System;
 using System.Xml.Linq;
 
 namespace Group1_InterpreterConsole.ErrorHandling
@@ -90,13 +91,23 @@ namespace Group1_InterpreterConsole.ErrorHandling
             }
         }
 
-        public static void HandleInvalidScanTypeError([NotNull] ParserRuleContext context, string input, string location)
+        public static object? HandleInvalidScanTypeError([NotNull] ParserRuleContext context, string input, Type? type, string location)
         {
             var line = context.Start.Line;
             Console.WriteLine($"Semantic Error: in {location}, in line {line}.\n" +
-                              $"Input data assigned to '{input}' is Invalid.");
+                              $"Input '{input}' is not in the expected format for data type {type?.Name.ToUpper()}.");
             Environment.Exit(400);
+            return null;
         }
+
+        public static object? HandlleInvalidScanInputsError([NotNull] ParserRuleContext context,int length, int inputs, string location)
+        {
+            var line = context.Start.Line;
+            Console.WriteLine($"Semantic Error: in {location}, in line {line}.\n" +
+                              $"Invalid number of inputs. Expected between 1 and {length}, but got {inputs}.");
+            Environment.Exit(400);
+            return null;
+        }   
 
         public static object? HandleInvalidOperatorError([NotNull] ParserRuleContext context, object? left, object? right, string op)
         {

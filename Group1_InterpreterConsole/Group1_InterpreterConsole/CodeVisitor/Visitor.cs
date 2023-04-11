@@ -2,15 +2,7 @@
 using Group1_InterpreterConsole.Contents;
 using Group1_InterpreterConsole.ErrorHandling;
 using Group1_InterpreterConsole.Functions;
-using Group1_InterpreterConsole.Methods;
-using System;
-using System.Collections.Immutable;
-using System.ComponentModel;
-using System.Linq.Expressions;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using static Group1_InterpreterConsole.Contents.CodeParser;
 
 namespace Group1_InterpreterConsole.CodeVisitor

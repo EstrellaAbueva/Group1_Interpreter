@@ -1,8 +1,5 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
-using Group1_InterpreterConsole.Contents;
-using System;
-using System.Xml.Linq;
 
 namespace Group1_InterpreterConsole.ErrorHandling
 {

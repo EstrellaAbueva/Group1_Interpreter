@@ -302,6 +302,12 @@ namespace Group1_InterpreterConsole.ErrorHandling
             return null;
         }
 
+        /// <summary>
+        /// Handles a semantic error that occurs when an invalid escape sequence is encountered during parsing.
+        /// </summary>
+        /// <param name="context">The parser rule context where the error occurred.</param>
+        /// <param name="sequence">The invalid escape sequence that caused the error.</param>
+        /// <returns>Returns null as the error is handled by printing an error message and exiting the environment.</returns>
         public static object? HandleInvalidEscapeSequenceError([NotNull] ParserRuleContext context, object? sequence)
         {
             var line = context.Start.Line;

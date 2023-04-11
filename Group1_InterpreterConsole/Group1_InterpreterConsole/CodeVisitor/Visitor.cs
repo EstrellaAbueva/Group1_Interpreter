@@ -311,7 +311,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitEscapeSequenceExpression([NotNull] EscapeSequenceExpressionContext context)
         {
             var sequence = context.GetText()[1];
-            return Operators.Escape(sequence) ?? throw new ArgumentException($"Invalid escape sequence: {context.GetText()}"); //no need to implement Error Handler
+            return Operators.Escape(context, sequence) ?? ErrorHandler.HandleInvalidEscapeSequenceError(context, sequence);
         }
 
         public override object? VisitNewlineOpExpression([NotNull] NewlineOpExpressionContext context)

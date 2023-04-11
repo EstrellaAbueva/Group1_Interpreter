@@ -1,8 +1,7 @@
 ﻿grammar Code;
 
-program: NEWLINE? BEGIN NEWLINE? statement* NEWLINE? END;
+program: NEWLINE? BEGIN NEWLINE? statement* NEWLINE? END NEWLINE? EOF;
 variable_dec: declaration* NEWLINE?;
-executable_code: statement* NEWLINE?;
 line: (declaration | statement | COMMENT) NEWLINE?;
 
 BEGIN: 'BEGIN CODE';

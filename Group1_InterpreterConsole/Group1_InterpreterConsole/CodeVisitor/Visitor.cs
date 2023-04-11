@@ -20,21 +20,6 @@ namespace Group1_InterpreterConsole.CodeVisitor
         private Dictionary<string, object?> Variables { get; set; } = new Dictionary<string, object?>();
         private Dictionary<string, object?> VarTypes { get; set; } = new Dictionary<string, object?>();
 
-        public override object? VisitProgram([NotNull] CodeParser.ProgramContext context)
-        {
-            string code = context.GetText().Trim();
-            if (ErrorHandler.HandleProgramCreationError(context,code,"Program Creation"))
-            {
-                // Visit each statement in the code
-                foreach (var statementContext in context.statement())
-                {
-                    VisitStatement(statementContext);
-                }
-            }
-
-            return null;
-        }
-
         public override object? VisitAssignment([NotNull] CodeParser.AssignmentContext context)
         {
             foreach (var i in context.IDENTIFIER())

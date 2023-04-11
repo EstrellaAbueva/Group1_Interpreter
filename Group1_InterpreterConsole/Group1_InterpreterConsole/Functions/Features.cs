@@ -142,7 +142,6 @@ namespace Group1_InterpreterConsole.Functions
             throw new NotImplementedException();
         }
 
-
         public static object? Increment([NotNull] ParserRuleContext context, Dictionary<string, object?> dictionary, Dictionary<string, object?> dictionarys, string id)
         {
             if (dictionary.ContainsKey(id))
@@ -160,10 +159,8 @@ namespace Group1_InterpreterConsole.Functions
                     return ErrorHandler.HandleInvalidIncrementTypeError(context, dictionary, id);
                 }
             }
-            else
-            {
-                return ErrorHandler.HandleUndeclaredVariableError(context, dictionary, id);
-            }
+            
+            return ErrorHandler.HandleUndeclaredVariableError(context, dictionary, id);
         }
 
         public static object? Decrement([NotNull] ParserRuleContext context, Dictionary<string, object?> dictionary, Dictionary<string, object?> dictionarys, string id)
@@ -183,10 +180,7 @@ namespace Group1_InterpreterConsole.Functions
                     return ErrorHandler.HandleInvalidDecrementTypeError(context, dictionary, id);
                 }
             }
-            else
-            {
-                return ErrorHandler.HandleUndeclaredVariableError(context, dictionary, id); 
-            }
+            return ErrorHandler.HandleUndeclaredVariableError(context, dictionary, id); 
         }
 
         public static object? Scan([NotNull] ParserRuleContext context, Dictionary<string, object?> typeDictionary, Dictionary<string, object?> valueDictionary, string id, string input)

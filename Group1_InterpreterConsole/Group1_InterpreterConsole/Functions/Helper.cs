@@ -127,7 +127,7 @@ namespace Group1_InterpreterConsole.Functions
         /// </summary>
         /// <param name="left">The left object you want to concatenate.</param>
         /// <param name="right">The right object you want to concatenate.</param>
-        /// <returns></returns>
+        /// <returns>String of the concatenation of the left and right parameters.</returns>
         public static object? Concat(object? left, object? right)
         {
             if (left is bool b)
@@ -139,6 +139,13 @@ namespace Group1_InterpreterConsole.Functions
             return $"{left}{right}";
         }
 
+        /// <summary>
+        /// Identifies variable names and saves them in the dictionary.
+        /// </summary>
+        /// <param name="dictionary">Dictionary that contains a list of variable names.</param>
+        /// <param name="identifier">Name of the variable.</param>
+        /// <param name="context">Context of the rule.</param>
+        /// <returns>The variable.</returns>
         public static object? Identifier(Dictionary<string, object?> dictionary, string identifier, CodeParser.IdentifierExpressionContext context)
         {
             if (dictionary.ContainsKey(identifier))
@@ -152,6 +159,12 @@ namespace Group1_InterpreterConsole.Functions
             }
         }
 
+        /// <summary>
+        /// Parser for the ConstantExpression label 
+        /// </summary>
+        /// <param name="context">Context of the rule</param>
+        /// <returns>The successfully parsed constant.</returns>
+        /// <exception cref="NotImplementedException"></exception>
         public static object? ConstantExpressionParser(CodeParser.ConstantExpressionContext context)
         {
             if (context.constant().INT() is { } i)
@@ -168,6 +181,14 @@ namespace Group1_InterpreterConsole.Functions
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Increments the variable given its variable name. 
+        /// </summary>
+        /// <param name="context">Context of the rule.</param>
+        /// <param name="dictionary">Dictionary of the variable data types.</param>
+        /// <param name="dictionarys">Dictionary of the variables.</param>
+        /// <param name="id">Name of the variable.</param>
+        /// <returns>Incremented Variable</returns>
         public static object? Increment([NotNull] ParserRuleContext context, Dictionary<string, object?> dictionary, Dictionary<string, object?> dictionarys, string id)
         {
             if (dictionary.ContainsKey(id))
@@ -189,6 +210,14 @@ namespace Group1_InterpreterConsole.Functions
             return ErrorHandler.HandleUndeclaredVariableError(context, dictionary, id);
         }
 
+        /// <summary>
+        /// Decrements the variable given its variable name. 
+        /// </summary>
+        /// <param name="context">Context of the rule.</param>
+        /// <param name="dictionary">Dictionary of the variable data types.</param>
+        /// <param name="dictionarys">Dictionary of the variables.</param>
+        /// <param name="id">Name of the variable.</param>
+        /// <returns>Decremented Variable</returns>
         public static object? Decrement([NotNull] ParserRuleContext context, Dictionary<string, object?> dictionary, Dictionary<string, object?> dictionarys, string id)
         {
             if (dictionary.ContainsKey(id))
@@ -209,6 +238,15 @@ namespace Group1_InterpreterConsole.Functions
             return ErrorHandler.HandleUndeclaredVariableError(context, dictionary, id); 
         }
 
+        /// <summary>
+        /// Scans user input for the given variable.
+        /// </summary>
+        /// <param name="context">Context of the current rule.</param>
+        /// <param name="typeDictionary">Dictionary of the variable types.</param>
+        /// <param name="valueDictionary">Dictionary of the variables.</param>
+        /// <param name="id">Variable Name</param>
+        /// <param name="input">User Input</param>
+        /// <returns>Variable assigned with the input</returns>
         public static object? Scan([NotNull] ParserRuleContext context, Dictionary<string, object?> typeDictionary, Dictionary<string, object?> valueDictionary, string id, string input)
         {
             if (!typeDictionary.ContainsKey(id))

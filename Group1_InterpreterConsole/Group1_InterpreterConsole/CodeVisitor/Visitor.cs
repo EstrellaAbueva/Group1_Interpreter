@@ -38,24 +38,24 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitVariable([NotNull] CodeParser.VariableContext context)
         {
             var varName = context.IDENTIFIER().GetText();
-            return Features.Variables(Variables, varName, context);
+            return Helper.Variables(Variables, varName, context);
         }
 
         public override object? VisitConstant([NotNull] CodeParser.ConstantContext context)
         {
             var constant = context.GetText();
-            return Features.ConstantParser(constant, context);
+            return Helper.ConstantParser(constant, context);
         }
 
         public override object? VisitDisplay([NotNull] CodeParser.DisplayContext context)
         {
             var exp = Visit(context.expression());
-            return Features.Display(exp);
+            return Helper.Display(exp);
         }
 
         public override object? VisitType([NotNull] CodeParser.TypeContext context)
         {
-            return Features.TypeParser(context);
+            return Helper.TypeParser(context);
         }
 
         public override object? VisitDeclaration([NotNull] CodeParser.DeclarationContext context)
@@ -116,18 +116,18 @@ namespace Group1_InterpreterConsole.CodeVisitor
             var left = Visit(context.expression(0));
             var right = Visit(context.expression(1));
 
-            return Features.Concat(left, right);
+            return Helper.Concat(left, right);
         }
 
         public override object? VisitIdentifierExpression([NotNull] CodeParser.IdentifierExpressionContext context)
         {
             var identifier = context.IDENTIFIER().GetText();
-            return Features.Identifier(Variables, identifier, context);
+            return Helper.Identifier(Variables, identifier, context);
         }
 
         public override object? VisitConstantExpression([NotNull] CodeParser.ConstantExpressionContext context)
         {
-            return Features.ConstantExpressionParser(context);
+            return Helper.ConstantExpressionParser(context);
         }
 
         public override object? VisitVariable_assignment([NotNull] CodeParser.Variable_assignmentContext context)
@@ -359,7 +359,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     return ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, idName);
                     //throw new ArgumentException($"Variable '{idName}' is not declared.");
                 }
-                Features.Scan(context, VarTypes, Variables, idName, inputs[i]);
+                Helper.Scan(context, VarTypes, Variables, idName, inputs[i]);
             }
 
             return null;
@@ -371,7 +371,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             if (ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, id))
             {
-                Convert.ToInt32(Features.Increment(context, VarTypes, Variables, id));
+                Convert.ToInt32(Helper.Increment(context, VarTypes, Variables, id));
             }
             return null;
         }
@@ -382,7 +382,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
             if (ErrorHandler.HandleUndeclaredVariableError(context, VarTypes, id))
             {
-                Convert.ToInt32(Features.Decrement(context, VarTypes, Variables, id));
+                Convert.ToInt32(Helper.Decrement(context, VarTypes, Variables, id));
             }
             return null;
         }

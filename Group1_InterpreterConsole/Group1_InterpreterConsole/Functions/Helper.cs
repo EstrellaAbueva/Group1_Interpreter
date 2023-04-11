@@ -2,20 +2,20 @@
 using Antlr4.Runtime.Misc;
 using Group1_InterpreterConsole.Contents;
 using Group1_InterpreterConsole.ErrorHandling;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Group1_InterpreterConsole.Functions
 {
-    public class Features
+    public class Helper
     {
+        /// <summary>
+        /// Used for the code Visitor VisitVariable, where it checks if the given variable is present in the Dictionary.
+        /// If the given varName is present then it would return the value.
+        /// </summary>
+        /// <param name="variables">Dictionary containing all the elements.</param>
+        /// <param name="varName">The name that would be checked in the dictionary.</param>
+        /// <param name="context">VariableContext that would be of use for the ErrorHandler.</param>
+        /// <returns>Object Data Type</returns>
         public static object? Variables(Dictionary<string, object?> variables, string varName, CodeParser.VariableContext context)
         {
             if (variables != null && variables.TryGetValue(varName, out object? value))
@@ -29,6 +29,13 @@ namespace Group1_InterpreterConsole.Functions
             }
         }
 
+        /// <summary>
+        /// Function that would help in Parsing the provided string.
+        /// </summary>
+        /// <param name="constant">The string to be converted in to a certain data type.</param>
+        /// <param name="context">ConstantContext data type that would be needed to access base on the Code.g4 to get the data type.</param>
+        /// <returns>A parsed data type of the parameter constant.</returns>
+        /// <exception cref="InvalidOperationException">Throws this exception if the data type is Invalid.</exception>
         public static object? ConstantParser(string constant, CodeParser.ConstantContext context)
         {
             if (constant.StartsWith("\"") && constant.EndsWith("\""))
@@ -71,6 +78,13 @@ namespace Group1_InterpreterConsole.Functions
             }
         }
 
+        /// <summary>
+        /// Displays the expression in the Console.
+        /// 1. If the data type is BOOL it should be in uppercase
+        /// 2. If other data types it would display automatically.
+        /// </summary>
+        /// <param name="expression">The string that needs to be displayed.</param>
+        /// <returns></returns>
         public static object? Display(object? expression)
         {
             if (expression is bool b)
@@ -82,6 +96,12 @@ namespace Group1_InterpreterConsole.Functions
 
         }
 
+        /// <summary>
+        /// Parse the context to a specific data type.
+        /// </summary>
+        /// <param name="context">TypeContext that would be of use in converting it to a specific data type.</param>
+        /// <returns>The typeof depending on the context.</returns>
+        /// <exception cref="NotImplementedException">Throws this exception if the data type is Invalid.</exception>
         public static object? TypeParser(CodeParser.TypeContext context)
         {
             switch (context.GetText())
@@ -102,6 +122,12 @@ namespace Group1_InterpreterConsole.Functions
             }
         }
 
+        /// <summary>
+        /// Displays a concatenated version of the left and right.
+        /// </summary>
+        /// <param name="left">The left object you want to concatenate.</param>
+        /// <param name="right">The right object you want to concatenate.</param>
+        /// <returns></returns>
         public static object? Concat(object? left, object? right)
         {
             if (left is bool b)

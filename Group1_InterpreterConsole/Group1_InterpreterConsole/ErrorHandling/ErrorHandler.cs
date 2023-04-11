@@ -301,5 +301,14 @@ namespace Group1_InterpreterConsole.ErrorHandling
             Environment.Exit(400);
             return null;
         }
+
+        public static object? HandleInvalidEscapeSequenceError([NotNull] ParserRuleContext context, object? sequence)
+        {
+            var line = context.Start.Line;
+            Console.WriteLine($"Semantic Error: in line {line}.\n" +
+                              $"Invalid escape sequence: {sequence}");
+            Environment.Exit(400);
+            return null;
+        }
     }
 }

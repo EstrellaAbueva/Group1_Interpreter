@@ -26,7 +26,9 @@ while(isContinue) {
 
     Console.WriteLine("\n");
     Console.Write("Finish?(Y/N): ");
-    _ = Console.ReadLine()![0] == 'N' ? isContinue = true : isContinue = false;
+    var res = Console.ReadLine()![0];
+
+    isContinue = (res == 'N' || res == 'n') ? true : false;
 
     Console.WriteLine("---------------------------------------------------------------");
     Console.WriteLine("\n\n");

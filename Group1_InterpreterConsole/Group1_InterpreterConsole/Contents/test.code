@@ -2,4 +2,5 @@
     	INT x = 3
     	DISPLAY: x
 	DISPLAY: "ella"
+	DISPLAY: $ & "ella"
 END CODE

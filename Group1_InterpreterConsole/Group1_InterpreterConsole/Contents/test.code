@@ -1,6 +1,4 @@
 ﻿BEGIN CODE
-    	INT x = 3
-    	DISPLAY: x
-	DISPLAY: "ella"
-	DISPLAY: $ & "ella"
+    	INT x = 1, y = 2, z = 3
+	DISPLAY: x & $ & y & $ & z
 END CODE

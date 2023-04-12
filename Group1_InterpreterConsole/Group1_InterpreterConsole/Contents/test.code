@@ -1,5 +1,5 @@
-﻿# This is a sample CODE
-BEGIN CODE
-END CODE
-BEGIN CODE
+﻿BEGIN CODE
+    	INT x = 3
+    	DISPLAY: x
+	DISPLAY: "ella"
 END CODE

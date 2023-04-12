@@ -2,21 +2,32 @@
 using Group1_InterpreterConsole.CodeVisitor;
 using Group1_InterpreterConsole.Contents;
 using Group1_InterpreterConsole.Methods;
-using System.CodeDom.Compiler;
 
-var fileName = "Contents\\test.code";
+bool isContinue = true;
 
-var fileContents = File.ReadAllText(fileName);
+while(isContinue) {
+    var file = "..\\..\\..\\Contents\\test.code";
+    var fileContents = File.ReadAllText(file);
 
-var inputStream = new AntlrInputStream(fileContents);
+    var inputStream = new AntlrInputStream(fileContents);
 
-var codeLexer = new CodeLexer(inputStream);
-var commonTokenStream = new CommonTokenStream(codeLexer);
-var codeParser = new CodeParser(commonTokenStream);
+    // Create a lexer and parser for the code
+    var codeLexer = new CodeLexer(inputStream);
+    CommonTokenStream commonTokenStream = new CommonTokenStream(codeLexer);
+    var codeParser = new CodeParser(commonTokenStream);
 
-var errorListener = new ErrorHandling();
-codeParser.AddErrorListener(errorListener);
+    // Error Listener
+    var errorListener = new ErrorHandling();
+    codeParser.AddErrorListener(errorListener);
 
-var codeContext = codeParser.program();
-var visitor = new Visitor();
-visitor.Visit(codeContext);
+    var codeContext = codeParser.program();
+    var visitor = new Visitor();
+    visitor.Visit(codeContext);
+
+    Console.WriteLine("\n");
+    Console.Write("Finish?(Y/N): ");
+    _ = Console.ReadLine()![0] == 'N' ? isContinue = true : isContinue = false;
+
+    Console.WriteLine("---------------------------------------------------------------");
+    Console.WriteLine("\n\n");
+}

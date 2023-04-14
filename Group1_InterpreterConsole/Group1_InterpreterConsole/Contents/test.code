@@ -1,4 +1,4 @@
 ﻿BEGIN CODE
-    	INT x = 1, y = 2, z = 3
-	DISPLAY: x & $ & y & $ & z
+	INT x = -5 
+	DISPLAY: x
 END CODE

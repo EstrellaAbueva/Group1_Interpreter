@@ -1,28 +1,28 @@
 ﻿grammar Code;
 
-program: NEWLINE? BEGIN NEWLINE? statement* NEWLINE? END NEWLINE? EOF;
-variable_dec: declaration* NEWLINE?;
-line: (declaration | statement | COMMENT) NEWLINE?;
+program: NEWLINE? BEGIN NEWLINE? (line)* NEWLINE? END NEWLINE? EOF;
+variable_dec: declaration*;
+line: (declaration | statement | COMMENT) NEWLINE+;
 
 BEGIN: 'BEGIN CODE';
 END: 'END CODE';
 
-declaration: NEWLINE? type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ;
+declaration: type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
-variable: NEWLINE? type IDENTIFIER ('=' (expression))?;
-variable_assignment: NEWLINE? type IDENTIFIER NEWLINE?;
-assignment: NEWLINE? IDENTIFIER ('=' IDENTIFIER)* '=' expression NEWLINE?;
+variable: type IDENTIFIER ('=' (expression))?;
+variable_assignment: type IDENTIFIER;
+assignment: IDENTIFIER ('=' IDENTIFIER)* '=' expression;
 function_call: IDENTIFIER (display | scan);
 arguments: expression (',' expression)*;
 
-display: NEWLINE? 'DISPLAY' ':' expression NEWLINE?;
-scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)* NEWLINE?;
+display: 'DISPLAY' ':' expression;
+scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)*;
 
 BEGIN_IF: 'BEGIN IF';
 END_IF: 'END IF';
-if_block: 'IF' '(' expression ')' BEGIN_IF line* END_IF else_if_block* else_block? NEWLINE?;
-else_if_block: 'ELSE IF' '(' expression ')' BEGIN_IF line* END_IF NEWLINE?;
-else_block: 'ELSE' BEGIN_IF line* END_IF NEWLINE?;
+if_block: 'IF' '(' expression ')' NEWLINE? BEGIN_IF NEWLINE? line* NEWLINE? END_IF NEWLINE? else_if_block* else_block? NEWLINE?;
+else_if_block: 'ELSE IF' '(' expression ')' NEWLINE? BEGIN_IF NEWLINE? line* NEWLINE? END_IF NEWLINE?;
+else_block: 'ELSE' NEWLINE? BEGIN_IF NEWLINE? line* NEWLINE? END_IF NEWLINE?;
 
 BEGIN_WHILE: 'BEGIN WHILE';
 END_WHILE: 'END WHILE';
@@ -30,9 +30,9 @@ BEGIN_DO_WHILE: 'BEGIN DO WHILE';
 END_DO_WHILE: 'END DO WHILE';
 BEGIN_FOR_LOOP: 'BEGIN FOR';
 END_FOR_LOOP: 'END FOR';
-while_loop: 'WHILE' '(' expression ')' BEGIN_WHILE line* END_WHILE NEWLINE?;
-do_while_loop: 'DO' BEGIN_DO_WHILE line* END_DO_WHILE 'WHILE' '(' expression ')' NEWLINE?;
-for_loop: 'FOR' '(' statement ';' expression ';'  additional')' BEGIN_FOR_LOOP line* END_FOR_LOOP NEWLINE?;
+while_loop: 'WHILE' '(' expression ')' NEWLINE? BEGIN_WHILE NEWLINE? line* NEWLINE? END_WHILE NEWLINE?;
+do_while_loop: 'DO' NEWLINE? BEGIN_DO_WHILE NEWLINE? line* NEWLINE? END_DO_WHILE NEWLINE? 'WHILE' '(' expression ')' NEWLINE?;
+for_loop: 'FOR' '(' statement ';' expression ';'  additional')' NEWLINE? BEGIN_FOR_LOOP NEWLINE? line* NEWLINE? END_FOR_LOOP NEWLINE?;
 
 constant: INT | FLOAT | BOOL | CHAR | STRING;
 INT: [0-9]+;
@@ -99,6 +99,6 @@ bool_operator: 'AND' | 'OR';
 concat_operator: '&';
 newline_operator: '$';
 
-WHITESPACE: [\t\r\n]+ -> skip;
+WHITESPACE: [\t\r]+ -> skip;
 COMMENT: '#' ~[\n]* -> skip;
 NEWLINE: '\r'? '\n'| '\r';

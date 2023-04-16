@@ -443,20 +443,7 @@ namespace Group1_InterpreterConsole.CodeVisitor
         /// <returns>String on a new line.</returns>
         public override object? VisitNewlineOpExpression([NotNull] NewlineOpExpressionContext context)
         {
-            var count = context.ChildCount - 1;
-            var output = new StringBuilder();
-
-            for (int i = 0; i < count; i++)
-            {
-                var childContext = context.GetChild(i);
-                var childOutput = Visit(childContext);
-
-                output.Append(childOutput);
-            }
-
-            output.Append(Environment.NewLine);
-
-            return output;
+            return "\n";
         }
 
         /// <summary>

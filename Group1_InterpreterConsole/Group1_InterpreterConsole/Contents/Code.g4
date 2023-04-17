@@ -18,10 +18,9 @@ scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)*;
 
 BEGIN_IF: 'BEGIN IF';
 END_IF: 'END IF';
-
-if_block: 'IF' '(' expression ')' NEWLINE? BEGIN_IF NEWLINE? line* NEWLINE? END_IF NEWLINE? else_if_block* else_block? NEWLINE?;
-else_if_block: 'ELSE IF' '(' expression ')' NEWLINE? BEGIN_IF NEWLINE? line* NEWLINE? END_IF NEWLINE?;
-else_block: 'ELSE' NEWLINE? BEGIN_IF NEWLINE? line* NEWLINE? END_IF NEWLINE?;
+if_block: 'IF' '(' expression ')' NEWLINE+ BEGIN_IF NEWLINE? line* NEWLINE? END_IF NEWLINE? else_if_block* else_block? NEWLINE?;
+else_if_block: 'ELSE IF' '(' expression ')' NEWLINE+ BEGIN_IF NEWLINE? line* NEWLINE? END_IF NEWLINE?;
+else_block: 'ELSE' NEWLINE+ BEGIN_IF NEWLINE? line* NEWLINE? END_IF NEWLINE?;
 
 BEGIN_WHILE: 'BEGIN WHILE';
 END_WHILE: 'END WHILE';
@@ -29,10 +28,9 @@ BEGIN_DO_WHILE: 'BEGIN DO WHILE';
 END_DO_WHILE: 'END DO WHILE';
 BEGIN_FOR_LOOP: 'BEGIN FOR';
 END_FOR_LOOP: 'END FOR';
-
-while_loop: 'WHILE' '(' expression ')' NEWLINE? BEGIN_WHILE NEWLINE? line* NEWLINE? END_WHILE NEWLINE?;
-do_while_loop: 'DO' NEWLINE? BEGIN_DO_WHILE NEWLINE? line* NEWLINE? END_DO_WHILE NEWLINE? 'WHILE' '(' expression ')' NEWLINE?;
-for_loop: 'FOR' '(' for_assignment ';' expression ';'  additional')' NEWLINE? BEGIN_FOR_LOOP NEWLINE? line* NEWLINE? END_FOR_LOOP NEWLINE?;
+while_loop: 'WHILE' '(' expression ')' NEWLINE+ BEGIN_WHILE NEWLINE? line* NEWLINE? END_WHILE NEWLINE?;
+do_while_loop: 'DO' NEWLINE? BEGIN_DO_WHILE NEWLINE+ line* NEWLINE? END_DO_WHILE NEWLINE? 'WHILE' '(' expression ')' NEWLINE?;
+for_loop: 'FOR' '(' for_assignment ';' expression ';'  additional')' NEWLINE+ BEGIN_FOR_LOOP NEWLINE? line* NEWLINE? END_FOR_LOOP NEWLINE?;
 
 constant: INT | FLOAT | BOOL | CHAR | STRING;
 

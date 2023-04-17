@@ -313,5 +313,14 @@ namespace Group1_InterpreterConsole.ErrorHandling
             Environment.Exit(400);
             return null;
         }
+
+        public static object? HandleInfiniteLoopError([NotNull] ParserRuleContext context)
+        {
+            var line = context.Start.Line;
+            Console.WriteLine($"Semantic Error: in line {line}.\n" +
+                              $"Infinite loop detected.");
+            Environment.Exit(400);
+            return null;
+        }
     }
 }

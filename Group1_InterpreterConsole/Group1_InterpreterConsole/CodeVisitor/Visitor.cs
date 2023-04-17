@@ -12,6 +12,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
         private Dictionary<string, object?> Variables { get; set; } = new Dictionary<string, object?>();
         private Dictionary<string, object?> VarTypes { get; set; } = new Dictionary<string, object?>();
 
+        private bool isInfiniteLoop = false;
+
         /// <summary>
         /// Visits Assignment rule.
         /// </summary>
@@ -367,15 +369,24 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitWhile_loop([NotNull] While_loopContext context)
         {
             var condition = Visit(context.expression());
+            var maxIterations = 1000; // Set a maximum number of iterations
+            var iterations = 0;
 
             while (ErrorHandler.HandleConditionError(context, condition) == true)
             {
-                var lines = context.line().ToList();
-                foreach (var line in lines)
+                if (iterations >= maxIterations) // Check if the maximum number of iterations is reached
                 {
-                    Visit(line);
+                    return ErrorHandler.HandleInfiniteLoopError(context);
+                } else
+                {
+                    var lines = context.line().ToList();
+                    foreach (var line in lines)
+                    {
+                        Visit(line);
+                    }
+                    condition = Visit(context.expression());
+                    iterations++;
                 }
-                condition = Visit(context.expression());
             }
             return null;
         }
@@ -388,6 +399,8 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitDo_while_loop([NotNull] Do_while_loopContext context)
         {
             var condition = Visit(context.expression());
+            var maxIterations = 1000; // Set a maximum number of iterations
+            var iterations = 0;
 
             do
             {
@@ -397,6 +410,13 @@ namespace Group1_InterpreterConsole.CodeVisitor
                     Visit(line);
                 }
                 condition = Visit(context.expression());
+                iterations++;
+
+                if (iterations >= maxIterations) // Check if the maximum number of iterations is reached
+                {
+                    return ErrorHandler.HandleInfiniteLoopError(context);
+                }
+
             } while (ErrorHandler.HandleConditionError(context, condition) == true);
 
             return null;
@@ -421,6 +441,9 @@ namespace Group1_InterpreterConsole.CodeVisitor
             // Evaluate the loop condition expression
             bool loopCondition = Convert.ToBoolean(Visit(expression));
 
+            var maxIterations = 1000; // Set a maximum number of iterations
+            var iterations = 0;
+
             // Loop while the condition is true
             while (loopCondition)
             {
@@ -435,6 +458,13 @@ namespace Group1_InterpreterConsole.CodeVisitor
 
                 // Evaluate the loop condition expression again
                 loopCondition = Convert.ToBoolean(Visit(expression));
+                iterations++;
+
+                if (iterations >= maxIterations)
+                {
+                    ErrorHandler.HandleInfiniteLoopError(context);
+                    break;
+                }
             }
 
             return null;

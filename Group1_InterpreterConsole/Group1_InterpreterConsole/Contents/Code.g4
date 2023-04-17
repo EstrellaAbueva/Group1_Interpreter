@@ -1,6 +1,6 @@
 ﻿grammar Code;
 
-program: NEWLINE? BEGIN NEWLINE? (statement NEWLINE+)* END NEWLINE? EOF;
+program: NEWLINE? BEGIN NEWLINE? statement* NEWLINE? END NEWLINE? EOF;
 variable_dec: declaration* NEWLINE?;
 line: (declaration | statement | COMMENT) NEWLINE?;
 
@@ -12,6 +12,8 @@ type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: NEWLINE? type IDENTIFIER ('=' (expression))?;
 variable_assignment: NEWLINE? type IDENTIFIER NEWLINE?;
 assignment: NEWLINE? IDENTIFIER ('=' IDENTIFIER)* '=' expression NEWLINE?;
+function_call: IDENTIFIER (display | scan);
+arguments: expression (',' expression)*;
 
 display: NEWLINE? 'DISPLAY' ':' expression NEWLINE?;
 scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)* NEWLINE?;
@@ -47,7 +49,8 @@ increment_statement : IDENTIFIER '++' NEWLINE? ;
 decrement_statement : IDENTIFIER '--' NEWLINE? ;
 
 statement 
-	: assignment 
+	: assignment
+	| function_call 
 	| if_block 
 	| while_loop
 	| do_while_loop
@@ -96,6 +99,6 @@ bool_operator: 'AND' | 'OR';
 concat_operator: '&';
 newline_operator: '$';
 
-WHITESPACE: [\t\r]+ -> skip;
+WHITESPACE: [\t\r\n]+ -> skip;
 COMMENT: '#' ~[\n]* -> skip;
 NEWLINE: '\r'? '\n'| '\r';

@@ -1,28 +1,27 @@
 ﻿grammar Code;
 
-program: NEWLINE? BEGIN NEWLINE? statement* NEWLINE? END NEWLINE? EOF;
-variable_dec: declaration* NEWLINE?;
-line: (declaration | statement | COMMENT) NEWLINE?;
+program: BEGIN declaration* (line)* NEWLINE? END NEWLINE? EOF;
+line: (statement | COMMENT) NEWLINE+;
 
-BEGIN: 'BEGIN CODE';
+BEGIN: NEWLINE* 'BEGIN CODE' NEWLINE+;
 END: 'END CODE';
 
-declaration: NEWLINE? type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* ;
+declaration: type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* NEWLINE+;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
-variable: NEWLINE? type IDENTIFIER ('=' (expression))?;
-variable_assignment: NEWLINE? type IDENTIFIER NEWLINE?;
-assignment: NEWLINE? IDENTIFIER ('=' IDENTIFIER)* '=' expression NEWLINE?;
-function_call: IDENTIFIER (display | scan);
-arguments: expression (',' expression)*;
+variable: type IDENTIFIER ('=' (expression))?;
+assignment: IDENTIFIER ('=' IDENTIFIER)* '=' expression NEWLINE+;
+variable_assignment: type IDENTIFIER;
+for_assignment: IDENTIFIER ('=' IDENTIFIER)* '=' expression;
 
-display: NEWLINE? 'DISPLAY' ':' expression NEWLINE?;
-scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)* NEWLINE?;
+display: 'DISPLAY' ':' expression;
+scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)*;
 
 BEGIN_IF: 'BEGIN IF';
 END_IF: 'END IF';
-if_block: 'IF' '(' expression ')' BEGIN_IF line* END_IF else_if_block* else_block? NEWLINE?;
-else_if_block: 'ELSE IF' '(' expression ')' BEGIN_IF line* END_IF NEWLINE?;
-else_block: 'ELSE' BEGIN_IF line* END_IF NEWLINE?;
+
+if_block: 'IF' '(' expression ')' NEWLINE? BEGIN_IF NEWLINE? line* NEWLINE? END_IF NEWLINE? else_if_block* else_block? NEWLINE?;
+else_if_block: 'ELSE IF' '(' expression ')' NEWLINE? BEGIN_IF NEWLINE? line* NEWLINE? END_IF NEWLINE?;
+else_block: 'ELSE' NEWLINE? BEGIN_IF NEWLINE? line* NEWLINE? END_IF NEWLINE?;
 
 BEGIN_WHILE: 'BEGIN WHILE';
 END_WHILE: 'END WHILE';
@@ -30,18 +29,12 @@ BEGIN_DO_WHILE: 'BEGIN DO WHILE';
 END_DO_WHILE: 'END DO WHILE';
 BEGIN_FOR_LOOP: 'BEGIN FOR';
 END_FOR_LOOP: 'END FOR';
-while_loop: 'WHILE' '(' expression ')' BEGIN_WHILE line* END_WHILE NEWLINE?;
-do_while_loop: 'DO' BEGIN_DO_WHILE line* END_DO_WHILE 'WHILE' '(' expression ')' NEWLINE?;
-for_loop: 'FOR' '(' statement ';' expression ';'  additional')' BEGIN_FOR_LOOP line* END_FOR_LOOP NEWLINE?;
+
+while_loop: 'WHILE' '(' expression ')' NEWLINE? BEGIN_WHILE NEWLINE? line* NEWLINE? END_WHILE NEWLINE?;
+do_while_loop: 'DO' NEWLINE? BEGIN_DO_WHILE NEWLINE? line* NEWLINE? END_DO_WHILE NEWLINE? 'WHILE' '(' expression ')' NEWLINE?;
+for_loop: 'FOR' '(' for_assignment ';' expression ';'  additional')' NEWLINE? BEGIN_FOR_LOOP NEWLINE? line* NEWLINE? END_FOR_LOOP NEWLINE?;
 
 constant: INT | FLOAT | BOOL | CHAR | STRING;
-INT: [0-9]+;
-FLOAT: [0-9]+('.' [0-9]+)?;
-BOOL: '"TRUE"' | '"FALSE"' ;
-CHAR: '\'' ~('\''|'\\') '\'';
-STRING: '"' ~('"')* '"';
-ESCAPE_SEQUENCE: '[' . ']';
-IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
 
 additional: increment_statement | decrement_statement;
 
@@ -50,18 +43,15 @@ decrement_statement : IDENTIFIER '--' NEWLINE? ;
 
 statement 
 	: assignment
-	| function_call 
 	| if_block 
+	| variable
+	| variable_assignment
 	| while_loop
 	| do_while_loop
 	| for_loop
 	| display
 	| scan
-	| declaration
-	| variable
-	| variable_assignment
 	| COMMENT
-	| expression
 	| increment_statement
 	| decrement_statement
 	;
@@ -99,6 +89,14 @@ bool_operator: 'AND' | 'OR';
 concat_operator: '&';
 newline_operator: '$';
 
-WHITESPACE: [\t\r\n]+ -> skip;
+INT: [0-9]+;
+FLOAT: [0-9]+('.' [0-9]+)?;
+BOOL: '"TRUE"' | '"FALSE"' ;
+CHAR: '\'' ~('\''|'\\') '\'';
+STRING: '"' ~('"')* '"';
+ESCAPE_SEQUENCE: '[' . ']';
+IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]*;
+
+WHITESPACE: [\t\r]+ -> skip;
 COMMENT: '#' ~[\n]* -> skip;
 NEWLINE: '\r'? '\n'| '\r';

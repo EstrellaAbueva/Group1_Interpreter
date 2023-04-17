@@ -32,6 +32,21 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return null;
         }
 
+        public override object? VisitFor_assignment([NotNull] For_assignmentContext context)
+        {
+            foreach (var i in context.IDENTIFIER())
+            {
+                var expression = context.expression().Accept(this);
+
+                // check type
+                if (ErrorHandler.HandleTypeError(context, expression, (Type?)VarTypes[i.GetText()], "Variable Assignment"))
+                {
+                    Variables[i.GetText()] = expression;
+                }
+            }
+            return null;
+        }
+
         /// <summary>
         /// Visits the Variable rule.
         /// </summary>
@@ -123,19 +138,19 @@ namespace Group1_InterpreterConsole.CodeVisitor
             return null;
         }
 
-        /// <summary>
-        /// Visits the Variable declaration rule.
-        /// </summary>
-        /// <param name="context">Context of the current rule.</param>
-        /// <returns>Null</returns>
-        public override object? VisitVariable_dec([NotNull] CodeParser.Variable_decContext context)
-        {
-            foreach (var declarationContext in context.declaration())
-            {
-                VisitDeclaration(declarationContext);
-            }
-            return null;
-        }
+        ///// <summary>
+        ///// Visits the Variable declaration rule.
+        ///// </summary>
+        ///// <param name="context">Context of the current rule.</param>
+        ///// <returns>Null</returns>
+        //public override object? VisitVariable_dec([NotNull] CodeParser.Variable_decContext context)
+        //{
+        //    foreach (var declarationContext in context.declaration())
+        //    {
+        //        VisitDeclaration(declarationContext);
+        //    }
+        //    return null;
+        //}
 
         /// <summary>
         /// Visits the Concat Operation rule.
@@ -395,13 +410,13 @@ namespace Group1_InterpreterConsole.CodeVisitor
         public override object? VisitFor_loop([NotNull] For_loopContext context)
         {
             // Extract the loop variables from the context
-            var statement = context.statement();
+            var assignment = context.for_assignment();
             var expression = context.expression();
             var additional = context.additional();
             var lines = context.line();
 
             // Visit the loop initialization statement
-            Visit(statement);
+            Visit(assignment);
 
             // Evaluate the loop condition expression
             bool loopCondition = Convert.ToBoolean(Visit(expression));

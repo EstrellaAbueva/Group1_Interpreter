@@ -1,11 +1,4 @@
 ﻿BEGIN CODE
-INT a=100, b=200, c=300, x=0 
-BOOL d="TRUE"
-WHILE (x < 5)
-BEGIN WHILE
-	IF (x % 2 == 0)
-	BEGIN IF
-		DISPLAY: x
-	END IF
-END WHILE
+	INT x = -5 
+	DISPLAY: x
 END CODE

@@ -1,4 +1,5 @@
 ﻿BEGIN CODE
-	INT x = -5 
-	DISPLAY: x
+	INT x 
+	x=6
+	INT m
 END CODE

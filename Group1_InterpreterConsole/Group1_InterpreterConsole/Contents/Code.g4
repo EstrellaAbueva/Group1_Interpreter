@@ -1,6 +1,6 @@
 ﻿grammar Code;
 
-program: BEGIN declaration* (line)* NEWLINE? END NEWLINE? EOF;
+program: BEGIN declaration* (line)* NEWLINE* END NEWLINE* EOF;
 line: (statement | COMMENT) NEWLINE+;
 
 BEGIN: NEWLINE* 'BEGIN CODE' NEWLINE+;
@@ -9,11 +9,11 @@ END: 'END CODE';
 declaration: type IDENTIFIER ('=' expression)? (',' IDENTIFIER ('=' expression)?)* NEWLINE+;
 type: 'INT' | 'FLOAT' | 'BOOL' | 'CHAR' | 'STRING';
 variable: type IDENTIFIER ('=' (expression))?;
-assignment: IDENTIFIER ('=' IDENTIFIER)* '=' expression NEWLINE+;
+assignment: IDENTIFIER ('=' IDENTIFIER)* '=' expression NEWLINE*;
 variable_assignment: type IDENTIFIER;
 for_assignment: IDENTIFIER ('=' IDENTIFIER)* '=' expression;
 
-display: 'DISPLAY' ':' expression;
+display: 'DISPLAY' ':' expression NEWLINE*;
 scan: 'SCAN' ':' IDENTIFIER (',' IDENTIFIER)*;
 
 BEGIN_IF: 'BEGIN IF';
@@ -70,7 +70,7 @@ expression
 	;
 
 operator
-	: unary_operator
+	: unary_operator 
 	| add_operator
 	| multiply_operator
 	| compare_operator

@@ -57,10 +57,6 @@ namespace Group1_InterpreterConsole.Functions
             if (left is float lFloat && right is int rInt)
                 return lFloat + rInt;
 
-            //concatenate
-            if (left is string || right is string)
-                return $"{left}{right}";
-
             return ErrorHandler.HandleInvalidOperatorError(context, left, right, "add");
         }
 

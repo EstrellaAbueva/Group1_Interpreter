@@ -1,5 +1,18 @@
 ﻿BEGIN CODE
-	BOOL a = "TRUE", b = "FALSE", c = "TRUE", d
-	SCAN: d
-	DISPLAY: (a OR b) AND (c AND d)
+    INT x = 5,y,z
+    DISPLAY: "Enter value of y: "
+    SCAN: y
+
+    WHILE (y < 5)
+        BEGIN WHILE
+            DISPLAY: y
+            z = 0
+            
+            WHILE (z < 5)
+                BEGIN WHILE
+                    DISPLAY: "HELLO" & z & $
+                    z++
+                END WHILE
+            y++
+        END WHILE
 END CODE

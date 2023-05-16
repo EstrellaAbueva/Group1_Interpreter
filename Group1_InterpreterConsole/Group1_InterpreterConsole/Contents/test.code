@@ -1,10 +1,18 @@
-﻿# This is a sample CODE
-BEGIN CODE
-    INT x, y, z = 5
-    CHAR a_1 = 'n'
-    BOOL t = "TRUE"
-    x = y = 4
-    a_1 = 'c'
-    # this is a comment
-    DISPLAY: x & t & z & $ & a_1 & "last"
+﻿BEGIN CODE
+    INT x = 5,y,z
+    DISPLAY: "Enter value of y: "
+    SCAN: y
+
+    WHILE (y < 5)
+        BEGIN WHILE
+            DISPLAY: y
+            z = 0
+            
+            WHILE (z < 5)
+                BEGIN WHILE
+                    DISPLAY: "HELLO" & z & $
+                    z++
+                END WHILE
+            y++
+        END WHILE
 END CODE
